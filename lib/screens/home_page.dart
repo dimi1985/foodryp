@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -83,6 +84,80 @@ class _HomePageState extends State<HomePage> {
           'https://picsum.photos/200/300', // Replace with your actual image URL
       'color': Colors.lightBlue, // Light blue color for Drinks category
     },
+    // Add 5 more items here
+    {
+      'title': 'Indian',
+      'image':
+          'https://picsum.photos/200/300', // Replace with your actual image URL
+      'color': Colors.orangeAccent, // Orange accent color for Indian category
+    },
+    {
+      'title': 'Chinese',
+      'image':
+          'https://picsum.photos/200/300', // Replace with your actual image URL
+      'color': Colors.redAccent, // Red accent color for Chinese category
+    },
+    {
+      'title': 'French',
+      'image':
+          'https://picsum.photos/200/300', // Replace with your actual image URL
+      'color': Colors.purpleAccent, // Purple accent color for French category
+    },
+    {
+      'title': 'Thai',
+      'image':
+          'https://picsum.photos/200/300', // Replace with your actual image URL
+      'color':
+          Colors.lightGreenAccent, // Light green accent color for Thai category
+    },
+    {
+      'title': 'Middle Eastern',
+      'image':
+          'https://picsum.photos/200/300', // Replace with your actual image URL
+      'color': Colors
+          .yellowAccent, // Yellow accent color for Middle Eastern category
+    },
+  ];
+
+  // Featured recipes data with structure for image, title, description, etc.
+  final List<Map<String, dynamic>> featuredRecipes = [
+    {
+      'image': 'https://picsum.photos/200/300', // Replace with your image URL
+      'title': 'Recipe Title 1',
+      'description': 'A short description of the featured recipe...',
+    },
+    {
+      'image': 'https://picsum.photos/200/300', // Replace with your image URL
+      'title': 'Recipe Title 2',
+      'description': 'Another short description...',
+    },
+    {
+      'image': 'https://picsum.photos/200/300', // Replace with your image URL
+      'title': 'Recipe Title 3',
+      'description': 'Another short description...',
+    },
+    {
+      'image': 'https://picsum.photos/200/300', // Replace with your image URL
+      'title': 'Recipe Title 4',
+      'description': 'Another short description...',
+    },
+
+    // ... add more featured recipes
+  ];
+
+  final List<Map<String, dynamic>> regularRecipes = [
+    {
+      'image': 'https://picsum.photos/200/300', // Replace with image URL
+      'title': 'Recipe Name',
+      'ingredients': [
+        'Ingredient 1',
+        'Ingredient 2',
+        // ... list ingredients
+      ],
+      'duration': '30 minutes',
+      'difficulty': 'Easy',
+    },
+    // ... add more regular recipes
   ];
 
   bool showMenu = false;
@@ -127,23 +202,9 @@ class _HomePageState extends State<HomePage> {
           children: [
             Stack(
               children: [
-                _buildHeroSection(),
+                _buildTopSection(),
                 if (showMenu && MediaQuery.of(context).size.width <= 600)
-                  Positioned(
-                    right: 0.0,
-                    top: .1, // Adjust positioning as needed
-                    child: Material(
-                      elevation: 5.0,
-                      child: Container(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          children: menuItems
-                              .map((item) => _buildMenuItem(item))
-                              .toList(),
-                        ),
-                      ),
-                    ),
-                  ),
+                  _smallScreenButonMenu()
               ],
             ),
             _buildRecipeCategories(),
@@ -167,7 +228,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildHeroSection() {
+  Widget _buildTopSection() {
     return Container(
       height: 300.0, // Adjust height as needed
       decoration: const BoxDecoration(
@@ -228,84 +289,145 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRecipeCategories() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      child: Wrap(
-        // Adjust layout as needed (GridView or ListView)
-        spacing: 10.0, // Adjust spacing between categories
-        runSpacing: 10.0,
-        children:
-            categories.map((category) => _buildCategoryCard(category)).toList(),
+  _smallScreenButonMenu() {
+    return Positioned(
+      right: 0.0,
+      top: .1, // Adjust positioning as needed
+      child: Material(
+        elevation: 5.0,
+        child: Container(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: menuItems.map((item) => _buildMenuItem(item)).toList(),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildCategoryCard(Map<String, dynamic> category) {
-    return Stack(
+  Widget _buildRecipeCategories() {
+    return Column(
       children: [
-        ClipRRect(
-          // Apply rounded corners to the image
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20)), // Adjust the radius as desired
-          child: Image(
-            image: NetworkImage(category['image']),
-            fit: BoxFit.cover, // Adjust as needed
-          ),
-        ),
-        Positioned(
-          // Center the content horizontally and vertically
-          top: 0.0,
-          left: 0.0,
-          right: 0.0,
-          bottom: 0.0,
-          child: Container(
-            decoration: BoxDecoration(
-              // Apply a gradient with transparent top and category color at the bottom
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent, // Transparent top
-                  category['color']
-                      .withOpacity(0.7), // Category color with opacity
-                ],
+        const Padding(
+          padding: EdgeInsets.all(32),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              'Categories',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.black,
               ),
             ),
-            child: Center(
-              // Maintain centered content
-              child: Column(
-                mainAxisSize: MainAxisSize.min, // Content fits within the image
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 5.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white
-                          .withOpacity(0.7), // Semi-transparent white
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Text(
-                      category['title'],
-                      style: TextStyle(
-                        color: Colors.black.withOpacity(0.7),
-                        fontWeight: FontWeight.bold,
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          child: SizedBox(
+            height: 250,
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                },
+              ),
+              child: ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
+                scrollDirection: Axis.horizontal, // Horizontal scrolling
+                itemCount: categories.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(width: 10.0), // Spacing between items
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  return Stack(
+                    children: [
+                      InkWell(
+                        // Wrap with InkWell for hover effect
+                        hoverColor: Colors.transparent
+                            .withOpacity(0.2), // Slight hover effect
+                        onTap: () {
+                          // Handle card tap event (optional)
+                        },
+                        child: Stack(
+                          children: [
+                            Image(
+                              image: NetworkImage(category['image']),
+                              fit: BoxFit.cover, // Adjust as needed
+                            ),
+                            Positioned(
+                              // Center the content horizontally and vertically
+                              top: 0.0,
+                              left: 0.0,
+                              right: 0.0,
+                              bottom: 0.0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  // Apply a gradient with transparent top and category color at the bottom
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent, // Transparent top
+                                      category['color'].withOpacity(
+                                          0.7), // Category color with opacity
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              // Center the content horizontally and vertically
+                              top: 0.0,
+                              left: 0.0,
+                              right: 0.0,
+                              bottom: 0.0,
+                              child: Center(
+                                // Maintain centered content
+                                child: Column(
+                                  mainAxisSize: MainAxisSize
+                                      .min, // Content fits within the image
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0, vertical: 5.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(
+                                            0.7), // Semi-transparent white
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: Text(
+                                        category['title'],
+                                        style: TextStyle(
+                                          color: Colors.black.withOpacity(0.7),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                        height:
+                                            5.0), // Add spacing between text and recipe count
+                                    Text(
+                                      category['title'],
+                                      style: const TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 255, 255, 255),
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(
-                      height: 5.0), // Add spacing between text and recipe count
-                  Text(
-                    category['title'],
-                    style: const TextStyle(
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               ),
             ),
           ),
