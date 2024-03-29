@@ -244,9 +244,15 @@ class _HomePageState extends State<HomePage> {
   Widget _buildCategoryCard(Map<String, dynamic> category) {
     return Stack(
       children: [
-        Image(
-          image: NetworkImage(category['image']),
-          fit: BoxFit.cover, // Adjust as needed
+        ClipRRect(
+          // Apply rounded corners to the image
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20)), // Adjust the radius as desired
+          child: Image(
+            image: NetworkImage(category['image']),
+            fit: BoxFit.cover, // Adjust as needed
+          ),
         ),
         Positioned(
           // Center the content horizontally and vertically
@@ -284,7 +290,7 @@ class _HomePageState extends State<HomePage> {
                     child: Text(
                       category['title'],
                       style: TextStyle(
-                        color: category['color'].withOpacity(0.7),
+                        color: Colors.black.withOpacity(0.7),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
