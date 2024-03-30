@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:intl/intl.dart';
 
+import '../screens/recipe_page.dart';
+
 class RecipeCard extends StatefulWidget {
   final Size screenSize;
   const RecipeCard({super.key, required this.screenSize});
@@ -41,44 +43,49 @@ class _RecipeCardState extends State<RecipeCard> {
               itemBuilder: (context, index) {
                 final regularRecipe = Constants.regularRecipes[index];
                 return InkWell(
-                  onTap: () {},
-                  child: Card(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15))),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          flex: widget.screenSize.width > 800 ? 2 : 1,
-                          child: Container(
-                            height: widget.screenSize.width / 2,
-                            width: widget.screenSize.width * 0.4,
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(5),
-                                  topRight: Radius.circular(
-                                      5)), // Set desired corner radius
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                    'https://picsum.photos/200/300'),
-                                fit: BoxFit
-                                    .cover, // Maintain aspect ratio and cover container
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            RecipePage(recipeData: regularRecipe),
+                      ),
+                    );
+                  },
+                  child: SizedBox(
+                    width: widget.screenSize.height * 0.3,
+                    child: Card(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(15),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: widget.screenSize.width > 800 ? 2 : 1,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(5),
+                                    topRight: Radius.circular(
+                                        5)), // Set desired corner radius
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                      'https://picsum.photos/200/300'),
+                                  fit: BoxFit
+                                      .cover, // Maintain aspect ratio and cover container
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: widget.screenSize.width > 800 ? 2 : 1,
-                          child: SizedBox(
-                            height: widget.screenSize.width > 800
-                                ? widget.screenSize.width / 1.5
-                                : widget.screenSize.width / 1.5,
-                            width: widget.screenSize.width * 0.4,
+                          Expanded(
+                            flex: widget.screenSize.width > 800 ? 2 : 1,
                             child: Padding(
                               padding: const EdgeInsets.all(16),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -103,7 +110,6 @@ class _RecipeCardState extends State<RecipeCard> {
                                     height: 5,
                                   ),
                                   Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
                                         regularRecipe['title'],
@@ -116,10 +122,11 @@ class _RecipeCardState extends State<RecipeCard> {
                                       Row(
                                         children: [
                                           const Icon(Icons.date_range),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Expanded(
+                                          const SizedBox(width: 5),
+                                          Flexible(
+                                            // Use Flexible instead of Expanded
+                                            flex:
+                                                2, // Adjust flex value for desired space distribution
                                             child: Text(
                                               DateFormat('MMMM d, y').format(
                                                   regularRecipe['date']),
@@ -132,9 +139,9 @@ class _RecipeCardState extends State<RecipeCard> {
                                 ],
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 );

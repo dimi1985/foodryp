@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 
+import '../screens/recipe_page.dart';
+
 class CategoryCard extends StatefulWidget {
   final Size screenSize;
   const CategoryCard({super.key, required this.screenSize});
@@ -38,38 +40,40 @@ class _CategoryCardState extends State<CategoryCard> {
               itemBuilder: (context, index) {
                 final category = Constants.categories[index];
                 return InkWell(
-                  onTap: () {},
-                  child: Card(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15))),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          flex: widget.screenSize.width > 800 ? 2 : 1,
-                          child: Container(
-                            height: widget.screenSize.width / 2,
-                            width: widget.screenSize.width * 0.4,
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(5),
-                                  topRight: Radius.circular(
-                                      5)), // Set desired corner radius
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                    'https://picsum.photos/200/300'),
-                                fit: BoxFit
-                                    .cover, // Maintain aspect ratio and cover container
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecipePage(recipeData: category),
+                      ),
+                    );
+                  },
+                  child: SizedBox(
+                    width: widget.screenSize.height * 0.3,
+                    child: Card(
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15))),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            flex: widget.screenSize.width > 800 ? 2 : 1,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(5),
+                                    topRight: Radius.circular(
+                                        5)), // Set desired corner radius
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                      'https://picsum.photos/200/300'),
+                                  fit: BoxFit
+                                      .cover, // Maintain aspect ratio and cover container
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: widget.screenSize.width > 800 ? 2 : 1,
-                          child: SizedBox(
-                            height: widget.screenSize.width > 800
-                                ? widget.screenSize.width / 1.5
-                                : widget.screenSize.width / 1.5,
-                            width: widget.screenSize.width * 0.4,
+                          Expanded(
+                            flex: widget.screenSize.width > 800 ? 2 : 1,
                             child: Padding(
                               padding: const EdgeInsets.all(16),
                               child: Column(
@@ -109,9 +113,9 @@ class _CategoryCardState extends State<CategoryCard> {
                                 ],
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 );

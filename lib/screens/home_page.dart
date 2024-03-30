@@ -62,6 +62,10 @@ class _HomePageState extends State<HomePage> {
             ),
             CategoryCard(screenSize: screenSize),
             RecipeCard(screenSize: screenSize),
+            // CustomCard(),
+            const SizedBox(
+              height: 100,
+            ),
           ],
         ),
       ),
