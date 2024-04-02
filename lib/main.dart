@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/screens/home_page.dart';
+
+
+import 'screens/main_screen.dart';
 
 void main() {
   runApp(const Foodryp());
@@ -17,7 +19,7 @@ class Foodryp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      home: const MainScreen(),
     );
   }
 }
