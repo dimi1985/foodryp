@@ -1,26 +1,28 @@
-import 'dart:ui';
 
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_card.dart';
 
-class RecipeCard extends StatefulWidget {
-  const RecipeCard({super.key});
+class TopThreeRecipeCard extends StatefulWidget {
+  const TopThreeRecipeCard({super.key});
 
   @override
-  State<RecipeCard> createState() => _RecipeCardState();
+  State<TopThreeRecipeCard> createState() => _TopThreeRecipeCardState();
 }
 
-class _RecipeCardState extends State<RecipeCard> {
+class _TopThreeRecipeCardState extends State<TopThreeRecipeCard> {
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    Size screenSize = MediaQuery.of(context).size;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(Constants.defaultPadding),
         child: SizedBox(
-          height: 250,
+          height: screenSize.height,
           width: screenSize.width,
           child: ScrollConfiguration(
             behavior: ScrollConfiguration.of(context).copyWith(
@@ -33,11 +35,12 @@ class _RecipeCardState extends State<RecipeCard> {
               physics: const AlwaysScrollableScrollPhysics(),
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: DemoData.regularRecipes.length,
+              itemCount: 3,
               itemBuilder: (context, index) {
                 final regularRecipe = DemoData.regularRecipes[index];
                 return SizedBox(
-                  width: 250,
+                  width:Responsive.isMobile(context) ? 150 : screenSize.width / 8,
+                  height: screenSize.height,
                   child: CustomCard(
                     title: regularRecipe['title'],
                     imageUrl: regularRecipe['image'],
@@ -51,8 +54,8 @@ class _RecipeCardState extends State<RecipeCard> {
                 );
               },
               separatorBuilder: (BuildContext context, int index) {
-                return const SizedBox(
-                  width: 10,
+                return  SizedBox(
+                  width: Responsive.isMobile(context) ? 10 : 50,
                 );
               },
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/widgets/DesktopMiddleSide/components/recipe_card.dart';
+import '../CustomWidgets/top_creators.dart';
 import 'components/headingTitle.dart';
 import 'components/category_card.dart';
 
@@ -16,6 +17,8 @@ class DesktopMiddleSide extends StatelessWidget {
             CategoryCard(),
               HeadingTitle(title: 'Recipes',),
               RecipeCard(),
+               HeadingTitle(title: 'Top Creators',),
+              TopCreators()
 
           ],
         ),

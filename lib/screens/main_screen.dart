@@ -17,7 +17,7 @@ class MainScreen extends StatelessWidget {
         children: [
         SizedBox(
           height:Responsive.isDesktop(context)  ? 400: 250,
-          child: const Header()),
+          child:  Header()),
           Expanded(
             flex: 5,
             child: Row(children: [

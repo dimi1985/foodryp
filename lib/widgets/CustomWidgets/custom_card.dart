@@ -84,17 +84,6 @@ class CustomCard extends StatelessWidget {
                         // Layout for recipes (assuming 'recipes' internalUse)
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                              fontSize: Responsive.isDesktop(context)
-                                  ? Constants.desktopFontSize
-                                  : Constants.mobileFontSize,
-                              fontWeight: FontWeight.bold,
-                              color: color,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
                           Row(
                             children: [
                               // Image avatar (assuming you have a 'userImage' field)
@@ -117,6 +106,18 @@ class CustomCard extends StatelessWidget {
                               ),
                             ],
                           ),
+                          const SizedBox(height: 10),
+                          Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: Responsive.isDesktop(context)
+                                  ? Constants.desktopFontSize
+                                  : Constants.mobileFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: color,
+                            ),
+                          ),
+
                           const SizedBox(height: 10),
                           // Date (assuming you have a 'date' field)
                           Text(

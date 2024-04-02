@@ -1,34 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/utils/contants.dart';
-import 'components/logo_widget.dart';
-import 'components/menuWebItems.dart';
+import 'package:foodryp/widgets/Header/components/top_three_recipe_card.dart';
+import 'package:foodryp/widgets/header/components/logo_widget.dart';
+import 'package:foodryp/widgets/header/components/menuWebItems.dart';
 
-class Header extends StatelessWidget {
-  const Header({super.key});
+class Header extends StatefulWidget {
+  Header({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: Constants.headerColor,
-        child: const Column(
-          children: [
-            // Centered Logo
-            Flexible(
-              fit: FlexFit.loose,
-              flex: 3,
-              child: LogoWidget(),
-            ),
+  State<Header> createState() => _HeaderState();
+}
 
-            // Centered Menu Items
-            Flexible(
-              fit: FlexFit.tight,
-              flex: 1,
-              child: MenuWebItems(),
-            ),
+class _HeaderState extends State<Header> {
+  bool openMenu = false;
+
+  void showContextMenu() {
+    setState(() => openMenu = !openMenu);
+  }
+  @override
+  Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+    return Scaffold(
+      endDrawer: screenSize.width <= 1100 ? const MenuWebItems() : null,
+      appBar: AppBar(
+        toolbarHeight: 80,
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            LogoWidget(),
+            Text('Foodryp'),
           ],
         ),
+        actions: const [],
+      ),
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 1,
+            child: AnimatedContainer(
+              duration: const Duration(microseconds: 300),
+              child: screenSize.width <= 1100
+                  ? Container()
+                  : const MenuWebItems(),
+            ),
+          ),
+          Expanded(
+            flex: screenSize.width <= 1100 ?  10 : 3,
+            child: const TopThreeRecipeCard(),
+          )
+        ],
       ),
     );
   }
+
+  
 }

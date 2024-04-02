@@ -7,15 +7,12 @@ class LogoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        padding: const EdgeInsets.all(Constants.defaultPadding),
-        child: Image.asset(
-          'assets/logo.png',
-          width:Responsive.isDesktop(context ) ? 400 :300,
-          height: Responsive.isDesktop(context ) ? 400 :300,
-        ),
+    return Container(
+      padding: const EdgeInsets.all(Constants.defaultPadding),
+      child: Image.asset(
+        'assets/logo.png',
+        width:Responsive.isDesktop(context ) ? 100 :40,
+        height: Responsive.isDesktop(context ) ? 100 :40,
       ),
     );
   }
