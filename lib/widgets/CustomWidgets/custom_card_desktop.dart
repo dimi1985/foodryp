@@ -30,6 +30,7 @@ class CustomCardDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return InkWell(
+      
       hoverColor: Colors.white,
       onTap: onTap,
       child: SizedBox(

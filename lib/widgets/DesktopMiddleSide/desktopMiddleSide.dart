@@ -18,7 +18,7 @@ class DesktopMiddleSide extends StatelessWidget {
         body:Responsive.isMobile(context)? ListView(
           children:  const [
             SizedBox(
-              height: 400,
+              height: 300,
               child: TopThreeRecipeCard()),
           HeadingTitle(title: 'Categories',),
           CategoryCard(),

@@ -82,16 +82,18 @@ class CustomCategoryTopThreeMobileCard extends StatelessWidget {
                       )
                     : internalUse == 'top_three'
                         ? Column(
-                            // Layout for recipes (assuming 'recipes' internalUse)
+                            
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(
-                                height: 240,
+                              SizedBox(
+                                height:
+                                    Responsive.isMobile(context) ? 65 : 240,
                               ),
                               SizedBox(
-                                width: 100,
+                                width: Responsive.isMobile(context) ? 150 : 180,
                                 child: Text(
-                                  maxLines: 2,
+                                  maxLines:
+                                      Responsive.isMobile(context) ? 4 : 3,
                                   overflow: TextOverflow.ellipsis,
                                   title,
                                   style: TextStyle(
@@ -101,7 +103,9 @@ class CustomCategoryTopThreeMobileCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 50),
+                              SizedBox(
+                                height: Responsive.isMobile(context) ? 30 : 50,
+                              ),
                               Row(
                                 children: [
                                   // Image avatar (assuming you have a 'userImage' field)

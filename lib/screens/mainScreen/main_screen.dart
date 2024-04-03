@@ -14,21 +14,25 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
+      bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     return SafeArea(
       child: Scaffold(
-          endDrawer: screenSize.width <= 1100 ? const MenuWebItems() : null,
           appBar: AppBar(
+            surfaceTintColor : Colors.white,
             toolbarHeight: 80,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const LogoWidget(),
                 const Text('Foodryp'),
+                //FOR NOW LEAVE IT  FOR DEBIG, REMEMBER TO DELETE AFTER PRODUCTION
+                if(!isAndroid)
                 Text(screenSize.toString()),
               ],
             ),
             actions: const [],
           ),
+          endDrawer: screenSize.width <= 1100 ? const MenuWebItems() : null,
           body: Row(
             children: [
               if (Responsive.isDesktop(context))

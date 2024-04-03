@@ -34,7 +34,7 @@ class _TopThreeRecipeCardState extends State<TopThreeRecipeCard> {
             children: [
               Text('Top\n Three Recipes \n Of\n The Week',
               style: TextStyle(
-                fontSize:screenSize.width <=1500 ? 30: 60,
+                fontSize:screenSize.width <=1500 ? 30: 50,
                 fontWeight: FontWeight.bold,
                 
               ),),

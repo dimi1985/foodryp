@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
+import 'package:foodryp/screens/recipe_detail_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_category_topthree_mobile_card.dart';
 
@@ -43,10 +44,19 @@ class _RecipeCardMobileState extends State<RecipeCardMobile> {
                     imageUrl: regularRecipe['image'],
                     color: regularRecipe['color'],
                     itemList: regularRecipe.length.toString(),
-                    internalUse: 'recipes', 
+                    internalUse: 'recipes',
                     onTap: () {
                       // Handle card tap here (optional)
-                    }, username: regularRecipe['username'], userImageURL:  'https://picsum.photos/200/300', date: regularRecipe['date'],
+                      Navigator.push(
+                        context, // Current context
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                RecipeDetailPage(regularRecipe: regularRecipe)),
+                      );
+                    },
+                    username: regularRecipe['username'],
+                    userImageURL: 'https://picsum.photos/200/300',
+                    date: regularRecipe['date'],
                   ),
                 );
               },

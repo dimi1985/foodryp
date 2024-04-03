@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
-import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/desktopLeftSide/components/menuWebItems.dart';
-
 import '../../utils/contants.dart';
 
 class DesktopLeftSide extends StatelessWidget {
@@ -16,17 +14,16 @@ class DesktopLeftSide extends StatelessWidget {
         padding: const EdgeInsets.all(32),
         child: Column(
           children: [
-
             Expanded(
-            flex: 1,
-            child: AnimatedContainer(
-              duration: const Duration(microseconds: 300),
-              child: screenSize.width <= 1100
-                  ? Container()
-                  : const MenuWebItems(),
+              flex: 1,
+              child: AnimatedContainer(
+                duration: const Duration(microseconds: 300),
+                child: screenSize.width <= 1100
+                    ? Container()
+                    : const MenuWebItems(),
+              ),
             ),
-          ),
-          
+
             // Friend List Title
             Container(
               padding: const EdgeInsets.all(10.0),
@@ -51,18 +48,19 @@ class DesktopLeftSide extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                              screenSize.width <=1300 ? Container():  Expanded(
-                                  flex: 1,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                        Constants.defaultPadding),
-                                    child: Image.network(
-                                      creatorTeam['image'],
-                                     
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
+                                screenSize.width <= 1300
+                                    ? Container()
+                                    : Expanded(
+                                        flex: 1,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                              Constants.defaultPadding),
+                                          child: Image.network(
+                                            creatorTeam['image'],
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
                                 Expanded(
                                   flex: 3,
                                   child: Column(
@@ -70,18 +68,19 @@ class DesktopLeftSide extends StatelessWidget {
                                       Text(
                                         creatorTeam['name'],
                                         style: TextStyle(
-                                            fontSize:
-                                               screenSize.width <=1500 ? 12 : Constants.desktopFontSize,
+                                            fontSize: screenSize.width <= 1500
+                                                ? 12
+                                                : Constants.desktopFontSize,
                                             fontWeight: FontWeight.bold),
                                       ),
-        
-                              
-                            Text(
-                              'Specialized in : ${creatorTeam['specializedIn']}',
-                              style: TextStyle(
-                                fontSize:screenSize.width <=1500 ? 12 : Constants.desktopFontSize,
-                              ),
-                            ),
+                                      Text(
+                                        'Specialized in : ${creatorTeam['specializedIn']}',
+                                        style: TextStyle(
+                                          fontSize: screenSize.width <= 1500
+                                              ? 12
+                                              : Constants.desktopFontSize,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -93,9 +92,12 @@ class DesktopLeftSide extends StatelessWidget {
                       ),
                     ),
                   );
-                }, separatorBuilder: (BuildContext context, int index) { 
-                  return const SizedBox(height: 15,);
-                 },
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    height: 15,
+                  );
+                },
               ),
             ),
           ],

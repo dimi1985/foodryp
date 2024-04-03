@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
+import 'package:foodryp/screens/recipe_detail_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_category_topthree_mobile_card.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_card_desktop.dart';
@@ -50,7 +51,12 @@ class _RecipeCardDesktopState extends State<RecipeCardDesktop> {
                       itemList: regularRecipe.length.toString(),
                       internalUse: 'recipes-desktop',
                       onTap: () {
-                        // Handle card tap here (optional)
+                         Navigator.push(
+                        context, // Current context
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                RecipeDetailPage(regularRecipe: regularRecipe)),
+                      );
                       },
                       username: regularRecipe['username'],
                       userImageURL: 'https://picsum.photos/200/300', description:  regularRecipe['description'],
