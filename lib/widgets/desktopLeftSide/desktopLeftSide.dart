@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/widgets/desktopLeftSide/components/menuWebItems.dart';
 
 import '../../utils/contants.dart';
 
@@ -15,6 +16,17 @@ class DesktopLeftSide extends StatelessWidget {
         padding: const EdgeInsets.all(32),
         child: Column(
           children: [
+
+            Expanded(
+            flex: 1,
+            child: AnimatedContainer(
+              duration: const Duration(microseconds: 300),
+              child: screenSize.width <= 1100
+                  ? Container()
+                  : const MenuWebItems(),
+            ),
+          ),
+          
             // Friend List Title
             Container(
               padding: const EdgeInsets.all(10.0),
@@ -63,25 +75,7 @@ class DesktopLeftSide extends StatelessWidget {
                                             fontWeight: FontWeight.bold),
                                       ),
         
-                                      Text(
-                              'Owned By : ${creatorTeam['owner']}',
-                              style: TextStyle(
-                                fontSize: screenSize.width <=1500 ? 12 : Constants.desktopFontSize,
-                              ),
-                            ),
-                            Text(
-                              'Status: ${creatorTeam['status']}',
-                              style: TextStyle(
-                                fontSize: screenSize.width <=1500 ? 12 : Constants.desktopFontSize,
-                              ),
-                            ),
-                            Text(
-                              'Total Recipes : ${creatorTeam['totalRecipes']}',
-                              style: TextStyle(
-                                fontSize: screenSize.width <=1500 ? 12 : Constants.desktopFontSize,
-                              ),
-                            ),
-        
+                              
                             Text(
                               'Specialized in : ${creatorTeam['specializedIn']}',
                               style: TextStyle(

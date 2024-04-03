@@ -12,17 +12,17 @@ class HeadingTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+         Size screenSize = MediaQuery.of(context).size;
     return Align(
-      alignment: Alignment.topLeft,
+      alignment:Responsive.isDesktop(context) ? Alignment.center: Alignment.topLeft,
       child: Padding(
         padding: EdgeInsets.all(Responsive.isMobile(context) ? 16 : 32),
         child: Text(
+          textAlign: Responsive.isDesktop(context) ? TextAlign.center : null,
           title,
           style: TextStyle(
             color: Constants.primaryColor,
-            fontSize: Responsive.isMobile(context)
-                ? Constants.mobileHeadingTitleSize
-                : Constants.desktopHeadingTitleSize,
+            fontSize:screenSize.width <= 1100 ? 20 : 40,
           ),
         ),
       ),

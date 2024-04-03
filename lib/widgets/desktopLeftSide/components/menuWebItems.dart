@@ -36,7 +36,7 @@ class _MenuWebItemsState extends State<MenuWebItems> {
         child: Text(
           item,
           style:  TextStyle(
-            color: Colors.white,
+            color:Responsive.isMobile(context) ? Colors.white :Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: Responsive.isMobile(context) ? Constants.mobileFontSize : Constants.desktopFontSize
           ),

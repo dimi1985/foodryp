@@ -123,6 +123,7 @@ class DemoData {
       'username': 'JohnDoe123',
       'date': DateTime(2024, 3, 30),
       'color': Colors.orangeAccent,
+      'description': 'This flavorful chicken curry is a satisfying and warming meal. The combination of spices creates a rich and aromatic sauce, perfect for serving over fluffy rice.', 
     },
     {
       'image': 'https://picsum.photos/seed/picsum/200/300',
@@ -144,6 +145,7 @@ class DemoData {
       'username': 'JaneSmith87',
       'date': DateTime(2024, 3, 29),
       'color': Colors.redAccent,
+      'description': 'Thai Peanut Curry: This vibrant curry is packed with vegetables and coated in a flavorful peanut sauce. It'r's a healthy and delicious option that'r's perfect for a quick weeknight dinner. (Consider adding a spicy kick or a hint of sweetness depending on your taste)', 
     },
     {
       'image': 'https://picsum.photos/seed/picsum/200/300',
@@ -165,6 +167,7 @@ class DemoData {
       'username': 'HealthyEater2020',
       'date': DateTime(2024, 3, 28),
       'color': Colors.purpleAccent,
+      'description': 'One-Pot Pasta Primavera: This easy and convenient dish combines pasta, vegetables, and a light sauce for a flavorful and fuss-free meal. It'r's a great way to use up seasonal vegetables and get your daily dose of vitamins. (Suggest customizing with different types of cheese or protein)', 
     },
     {
       'image': 'https://picsum.photos/seed/picsum/200/300',
@@ -187,6 +190,7 @@ class DemoData {
       'username': 'TheGreenChef',
       'date': DateTime(2024, 3, 27),
       'color': Colors.lightBlue,
+      'description': 'Beef Stroganoff: This classic dish features tender strips of beef simmered in a creamy mushroom sauce with a touch of paprika. Serve it over egg noodles for a comforting and elegant meal.', 
     },
     // ... add more regular recipes
   ];

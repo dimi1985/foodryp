@@ -17,5 +17,6 @@ static const desktopFontSize = 15.0;
 static const mobileHeadingTitleSize = 14.0;
 static const tabletHeadingTitleSize = 16.0;
 static const desktopHeadingTitleSize = 18.0;
+static const topThreeTitleSize = 30.0;
 
 }

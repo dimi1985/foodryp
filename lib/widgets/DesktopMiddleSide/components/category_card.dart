@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/custom_category_topthree_mobile_card.dart';
 
 class CategoryCard extends StatefulWidget {
   const CategoryCard({
@@ -39,7 +39,7 @@ class _CategoryCardState extends State<CategoryCard> {
               itemCount: DemoData.categories.length,
               itemBuilder: (context, index) {
                 final category = DemoData.categories[index];
-                return CustomCard(
+                return CustomCategoryTopThreeMobileCard(
                   title: category['title'],
                   imageUrl: category['image'],
                   color: category['color'],
