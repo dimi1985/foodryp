@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_category_topthree_mobile_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/topthree_mobile_card.dart';
 
 class TopThreeRecipeCard extends StatefulWidget {
   const TopThreeRecipeCard({super.key});

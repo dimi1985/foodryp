@@ -1,19 +1,18 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/screens/recipe_detail_page.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_category_topthree_mobile_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 
-class RecipeCardMobile extends StatefulWidget {
-  const RecipeCardMobile({super.key});
+class RecipeSection extends StatefulWidget {
+  const RecipeSection({super.key});
 
   @override
-  State<RecipeCardMobile> createState() => _RecipeCardMobileState();
+  State<RecipeSection> createState() => _RecipeSectionState();
 }
 
-class _RecipeCardMobileState extends State<RecipeCardMobile> {
+class _RecipeSectionState extends State<RecipeSection> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -39,7 +38,7 @@ class _RecipeCardMobileState extends State<RecipeCardMobile> {
                 final regularRecipe = DemoData.regularRecipes[index];
                 return SizedBox(
                   width: 250,
-                  child: CustomCategoryTopThreeMobileCard(
+                  child: CustomRecipeCard(
                     title: regularRecipe['title'],
                     imageUrl: regularRecipe['image'],
                     color: regularRecipe['color'],
@@ -56,7 +55,7 @@ class _RecipeCardMobileState extends State<RecipeCardMobile> {
                     },
                     username: regularRecipe['username'],
                     userImageURL: 'https://picsum.photos/200/300',
-                    date: regularRecipe['date'],
+                     description: regularRecipe['description'],
                   ),
                 );
               },

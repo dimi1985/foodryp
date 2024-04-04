@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_category_topthree_mobile_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/custom_category_card.dart';
 
-class CategoryCard extends StatefulWidget {
-  const CategoryCard({
+class CategorySection extends StatefulWidget {
+  const CategorySection({
     super.key,
   });
 
   @override
-  State<CategoryCard> createState() => _CategoryCardState();
+  State<CategorySection> createState() => _CategorySectionState();
 }
 
-class _CategoryCardState extends State<CategoryCard> {
+class _CategorySectionState extends State<CategorySection> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -39,21 +39,11 @@ class _CategoryCardState extends State<CategoryCard> {
               itemCount: DemoData.categories.length,
               itemBuilder: (context, index) {
                 final category = DemoData.categories[index];
-                return CustomCategoryTopThreeMobileCard(
-                  title: category['title'],
-                  imageUrl: category['image'],
-                  color: category['color'],
-                  itemList: category.length.toString(),
-                  internalUse:
-                      'categories', // Example usage
-                  onTap: () {
-                    // Handle card tap here (optional)
-                  }, username: '', userImageURL: '', date: DateTime.now(),
-                );
+                return CustomCategoryCard(title: category['title'], image:category['image'], color:category['color']  );
               },
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(
-                  width: 10,
+                  width: 25,
                 );
               },
             ),

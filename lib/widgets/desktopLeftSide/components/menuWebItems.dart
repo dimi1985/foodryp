@@ -18,7 +18,7 @@ class _MenuWebItemsState extends State<MenuWebItems> {
   Widget build(BuildContext context) {
     return ListView(
       shrinkWrap: true,
-      scrollDirection: Axis.vertical,
+      scrollDirection: Axis.horizontal,
       children: DemoData.menuItems
           .map(
             (item) => _buildMenuItem(item),

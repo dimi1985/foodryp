@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodryp/screens/profile_screen/profile_screen.dart';
 
 
 import 'screens/mainScreen/main_screen.dart';
@@ -19,7 +20,7 @@ class Foodryp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const MainScreen(),
+      home:  MainScreen(),
     );
   }
 }

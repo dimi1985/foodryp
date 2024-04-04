@@ -38,8 +38,9 @@ class ReusableTextField extends StatelessWidget {
       case 'password':
         return const Icon(Icons.lock);
       case 'username':
+         return const Icon(Icons.account_circle);
       case 'email':
-        return const Icon(Icons.account_circle);
+        return const Icon(Icons.email);
       default:
         return null; // No icon for other cases
     }

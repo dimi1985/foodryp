@@ -25,9 +25,17 @@ class MainScreen extends StatelessWidget {
               children: [
                 const LogoWidget(),
                 const Text('Foodryp'),
-                //FOR NOW LEAVE IT  FOR DEBIG, REMEMBER TO DELETE AFTER PRODUCTION
-                if(!isAndroid)
-                Text(screenSize.toString()),
+                const Spacer(),
+                if(Responsive.isDesktop(context))
+                Expanded(
+                  child: SizedBox(
+                    width: screenSize.width,
+                    height: 100,
+                    child: MenuWebItems()),
+                )
+                // //FOR NOW LEAVE IT  FOR DEBIG, REMEMBER TO DELETE AFTER PRODUCTION
+                // if(!isAndroid)
+                // Text(screenSize.toString()),
               ],
             ),
             actions: const [],
