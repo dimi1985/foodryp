@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
+import 'package:foodryp/screens/add_recipe_page.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
+import 'package:foodryp/screens/profile_screen/profile_screen.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 
@@ -39,6 +41,20 @@ class _MenuWebItemsState extends State<MenuWebItems> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AuthScreen()),
+              );
+              break;
+                case 'ProfileDev':
+              // Navigate to Screen 1
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+              break;
+                case 'Add Recipe':
+              // Navigate to Screen 1
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddRecipePage()),
               );
               break;
            

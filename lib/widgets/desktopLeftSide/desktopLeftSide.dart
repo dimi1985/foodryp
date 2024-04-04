@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
-import 'package:foodryp/widgets/desktopLeftSide/components/menuWebItems.dart';
+import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 import '../../utils/contants.dart';
 
 class DesktopLeftSide extends StatelessWidget {

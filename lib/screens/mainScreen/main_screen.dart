@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/screens/mainScreen/components/logo_widget.dart';
-import 'package:foodryp/widgets/desktopLeftSide/components/menuWebItems.dart';
+import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 
 import '../../widgets/desktopLeftSide/desktopLeftSide.dart';
 import '../../widgets/DesktopMiddleSide/desktopMiddleSide.dart';

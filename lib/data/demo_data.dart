@@ -7,6 +7,8 @@ class DemoData {
     'Recipes',
     'My Fridge',
     'Login/Register'
+    'ProfileDev',
+    'Add Recipe'
   ];
 
   static final List<Map<String, dynamic>> categories = [
