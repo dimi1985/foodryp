@@ -3,7 +3,7 @@ import 'package:foodryp/screens/auth_screen/components/reusable_textfield.dart';
 import 'package:foodryp/utils/responsive.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  const AuthScreen({Key? key}) : super(key: key);
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -14,6 +14,8 @@ class _AuthScreenState extends State<AuthScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isLogin = false;
+  bool obscureText = true; // Initially password is obscured
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -23,8 +25,8 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Center(
           child: Container(
             constraints: BoxConstraints(
-                maxWidth:
-                    Responsive.isDesktop(context) ? 500 : screenSize.width),
+              maxWidth: Responsive.isDesktop(context) ? 500 : screenSize.width,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -35,25 +37,35 @@ class _AuthScreenState extends State<AuthScreen> {
                   width: Responsive.isMobile(context) ? 300 : 400,
                 ),
                 const SizedBox(height: 30.0),
-
                 ReusableTextField(
-                    hintText: 'Email', controller: emailController),
+                  hintText: 'Email',
+                  controller: emailController, togglePasswordVisibility: (bool ) {  },
+                ),
                 const SizedBox(height: 15.0),
-                if(!isLogin)
-                ReusableTextField(
-                    hintText: 'Username', controller: userNameController),
+                if (!isLogin)
+                  ReusableTextField(
+                    hintText: 'Username',
+                    controller: userNameController, togglePasswordVisibility: (bool ) {  },
+                  ),
                 const SizedBox(height: 15.0),
                 ReusableTextField(
-                    hintText: 'Password', controller: passwordController),
-
+                  hintText: 'Password',
+                  controller: passwordController,
+                  obscureText: obscureText,
+                  // Pass togglePasswordVisibility function to handle password visibility toggle
+                  togglePasswordVisibility: (isVisible) {
+                    setState(() {
+                      obscureText = isVisible;
+                    });
+                  },
+                ),
                 const SizedBox(height: 20.0),
-
                 // Login Button
                 SizedBox(
                   width: Responsive.isDesktop(context) ? 500 : screenSize.width,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle lo gin logic
+                      // Handle login/register logic
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -64,7 +76,6 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
                 const SizedBox(height: 15.0),
-
                 // Optional: Forgot Password Link
                 TextButton(
                   onPressed: () {
@@ -72,27 +83,24 @@ class _AuthScreenState extends State<AuthScreen> {
                   },
                   child: const Text('Forgot Password?'),
                 ),
-
                 const SizedBox(height: 75.0),
-                // Optional: Forgot Password Link
+                // Optional: Sign up/in toggle
                 Row(
-               mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(isLogin
                         ? 'Dont Have an Account?'
                         : 'Already Have an Account?'),
                     TextButton(
-                        onPressed: () {
-                          setState(() {
-                            isLogin = !isLogin;
-                          });
-                        },
-                        child: Text(isLogin ? 'Sign Up' : 'Sign In'))
+                      onPressed: () {
+                        setState(() {
+                          isLogin = !isLogin;
+                        });
+                      },
+                      child: Text(isLogin ? 'Sign Up' : 'Sign In'),
+                    ),
                   ],
-                )
-
-                // Optional: Social Login Buttons
-                // ... (Implement logic for social login buttons)
+                ),
               ],
             ),
           ),
@@ -100,6 +108,4 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
-
-  getCredetials(String p1) {}
 }

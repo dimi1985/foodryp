@@ -14,28 +14,29 @@ class MenuWebItems extends StatefulWidget {
 }
 
 class _MenuWebItemsState extends State<MenuWebItems> {
-
-
   @override
   Widget build(BuildContext context) {
+    bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     return ListView(
       shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
+      scrollDirection:
+          Responsive.isDesktop(context) ? Axis.horizontal : Axis.vertical,
       children: DemoData.menuItems
           .map(
-            (item) => _buildMenuItem(item),
+            (item) => _buildMenuItem(item, isAndroid),
           )
           .toList(),
     );
   }
 
-  Widget _buildMenuItem(String item) {
+  Widget _buildMenuItem(String item, bool isAndroid) {
     return Padding(
-      padding:  EdgeInsets.all(Responsive.isMobile(context) ? 0 : Constants.defaultPadding),
+      padding: EdgeInsets.all(
+          Responsive.isMobile(context) ? 0 : Constants.defaultPadding),
       child: TextButton(
         onPressed: () {
           // Handle menu item tap (e.g., navigate to a different screen)
-        switch (item) {
+          switch (item) {
             case 'Login/Register':
               // Navigate to Screen 1
               Navigator.push(
@@ -43,21 +44,21 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                 MaterialPageRoute(builder: (context) => const AuthScreen()),
               );
               break;
-                case 'ProfileDev':
+            case 'ProfileDev':
               // Navigate to Screen 1
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const ProfilePage()),
               );
               break;
-                case 'Add Recipe':
+            case 'Add Recipe':
               // Navigate to Screen 1
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AddRecipePage()),
               );
               break;
-           
+
             // Add more cases for other menu items
             default:
               // Handle default case (optional)
@@ -66,11 +67,17 @@ class _MenuWebItemsState extends State<MenuWebItems> {
         },
         child: Text(
           item,
-          style:  TextStyle(
-            color:Responsive.isMobile(context) || Responsive.isTablet(context)? Colors.white :Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: Responsive.isMobile(context) ? Constants.mobileFontSize : Constants.desktopFontSize
-          ),
+          style: TextStyle(
+              color:
+                  Responsive.isMobile(context) || Responsive.isTablet(context)
+                      ? Colors.white
+                      : Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: isAndroid
+                  ? 30
+                  : Responsive.isMobile(context)
+                      ? Constants.mobileFontSize
+                      : Constants.desktopFontSize),
         ),
       ),
     );

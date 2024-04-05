@@ -1,8 +1,13 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 
 class InstructionsAddContainer extends StatefulWidget {
-  const InstructionsAddContainer({Key? key}) : super(key: key);
+
+      final Map<String, dynamic>? selectedCategory;
+
+  const InstructionsAddContainer({super.key, this.selectedCategory});
 
   @override
   _InstructionsAddContainerState createState() => _InstructionsAddContainerState();
@@ -45,6 +50,9 @@ class _InstructionsAddContainerState extends State<InstructionsAddContainer> {
           child: CustomTextField(
           controller: _controllers[index],
           hintText: 'Instruction ${index + 1}',
+           borderColor: widget.selectedCategory != null
+                ? widget.selectedCategory!['color']
+                : null,
           suffixIcon: index == 0 ? Icons.add : Icons.delete,
           onSuffixIconPressed: index == 0 ? _addInstruction : () => _removeInstruction(index),
           maxLines: null, // Allow multiple lines for instructions

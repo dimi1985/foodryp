@@ -31,7 +31,7 @@ class MainScreen extends StatelessWidget {
                   child: SizedBox(
                     width: screenSize.width,
                     height: 100,
-                    child: MenuWebItems()),
+                    child: const MenuWebItems()),
                 )
                 // //FOR NOW LEAVE IT  FOR DEBIG, REMEMBER TO DELETE AFTER PRODUCTION
                 // if(!isAndroid)

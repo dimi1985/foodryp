@@ -23,13 +23,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
     Size screenSize = MediaQuery.of(context).size;
     bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
-      backgroundColor:     _selectedCategory != null
-          ? _selectedCategory!['color'].withOpacity(0.090)
-          : Colors.white,
       body: SingleChildScrollView(
         child: Center(
           child: Container(
-         
             constraints: BoxConstraints(
               maxWidth: Responsive.isDesktop(context) ? 600 : screenSize.width,
             ),
@@ -51,8 +47,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                               category; // Update the selected category
                         });
                       },
-                      defaultTappedIndex:
-                          0, // Specify the default tapped index here
+                    
                     ),
                   ),
 
@@ -66,6 +61,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   CustomTextField(
                     controller: TextEditingController(),
                     hintText: 'Recipe Title',
+                    borderColor: _selectedCategory != null
+                        ? _selectedCategory!['color']
+                        : null,
                   ),
                   const SizedBox(height: 20.0),
 
@@ -77,6 +75,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   CustomTextField(
                     controller: TextEditingController(),
                     hintText: 'Description',
+                    borderColor: _selectedCategory != null
+                        ? _selectedCategory!['color']
+                        : null,
                   ),
                   const SizedBox(height: 20.0),
 
@@ -100,7 +101,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                     isDesktop: isDesktop,
                   ),
 
-                  const IngredientsAddContainer(),
+                  IngredientsAddContainer(selectedCategory: _selectedCategory),
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
@@ -109,7 +110,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
 
                   const SizedBox(height: 20.0),
-                  const InstructionsAddContainer(),
+                   InstructionsAddContainer(selectedCategory: _selectedCategory),
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
@@ -121,6 +122,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   CustomTextField(
                     controller: TextEditingController(),
                     hintText: 'Serves  2-4 ',
+                    borderColor: _selectedCategory != null
+                        ? _selectedCategory!['color']
+                        : null,
                   ),
 
                   const SizedBox(height: 20.0),
@@ -134,6 +138,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   CustomTextField(
                     controller: TextEditingController(),
                     hintText: '45 minutes or 1h and 25 minutes e.t.c ',
+                    borderColor: _selectedCategory != null
+                        ? _selectedCategory!['color']
+                        : null,
                   ),
 
                   const SizedBox(height: 20.0),
@@ -147,12 +154,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   CustomTextField(
                     controller: TextEditingController(),
                     hintText: '45 minutes or 1h and 25 minutes e.t.c ',
+                    borderColor: _selectedCategory != null
+                        ? _selectedCategory!['color']
+                        : null,
                   ),
                   const SizedBox(height: 20.0),
 
                   ElevatedButton(
                     onPressed: () {},
-                    child: const Text('Save Recipe'),
+                    child: const Text('Preview Recipe'),
                   ),
                 ],
               ),

@@ -5,21 +5,26 @@ import 'package:flutter/material.dart';
 class CategoryListView extends StatefulWidget {
   final List<Map<String, dynamic>> categories;
   final Function(Map<String, dynamic>) onTap;
-  int defaultTappedIndex;
 
-   CategoryListView({
-    super.key,
+  CategoryListView({
+    Key? key,
     required this.categories,
     required this.onTap,
-    this.defaultTappedIndex = 0, // Default tapped index is set to 0
-  });
+  }) : super(key: key);
 
   @override
   State<CategoryListView> createState() => _CategoryListViewState();
 }
 
 class _CategoryListViewState extends State<CategoryListView> {
-  bool isTapped = false;
+  late int tappedIndex; // Variable to hold the tapped index
+
+  @override
+  void initState() {
+    super.initState();
+    tappedIndex = 0; // Initialize tapped index to 0 (first category)
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScrollConfiguration(
@@ -35,18 +40,14 @@ class _CategoryListViewState extends State<CategoryListView> {
         itemCount: widget.categories.length,
         itemBuilder: (context, index) {
           final category = widget.categories[index];
-          isTapped = index == widget.defaultTappedIndex; 
+          final isTapped = index == tappedIndex; // Check if current index is tapped
 
           return InkWell(
             onTap: () {
-
               setState(() {
-                widget.defaultTappedIndex = index; // Update tapped index
-
-                 
+                tappedIndex = index; // Update tapped index
               });
-
-              widget.onTap(category); 
+              widget.onTap(category); // Notify parent widget about the tapped category
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -57,7 +58,7 @@ class _CategoryListViewState extends State<CategoryListView> {
                   Text(
                     category['title'],
                     style: TextStyle(
-                      color: isTapped ? Colors.blue : category['color'].withOpacity(0.2), // Change color if tapped
+                      color: isTapped ? category['color'].withOpacity(0.2) : Colors.grey, // Change color if tapped
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -10,27 +10,29 @@ class DesktopMiddleSide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     return SafeArea(
       child: Scaffold(
-        body:  ListView(
-                children: const [
-                  SizedBox(
-                    height: 400,
-                    child: TopThreeRecipeCard(),
-                  ),
-                  SizedBox(height: 100,),
-                  HeadingTitleRow(
-                    title: 'Recipes',
-                  ),
-                  RecipeSection(),
-                  HeadingTitleRow(
-                    title: 'Categories',
-                  ),
-                  CategorySection(),
-                ],
-              )
-           
-      ),
+          body: ListView(
+        children: [
+          const SizedBox(
+            height: 400,
+            child: TopThreeRecipeCard(),
+          ),
+          SizedBox(
+            height: isAndroid ? 10 : 100,
+          ),
+          const HeadingTitleRow(
+            title: 'Recipes',
+          ),
+          const RecipeSection(),
+          if (isAndroid) const SizedBox(height: 25),
+          const HeadingTitleRow(
+            title: 'Categories',
+          ),
+          const CategorySection(),
+        ],
+      )),
     );
   }
 }

@@ -6,7 +6,7 @@ class DemoData {
     'Creators',
     'Recipes',
     'My Fridge',
-    'Login/Register'
+    'Login/Register',
     'ProfileDev',
     'Add Recipe'
   ];

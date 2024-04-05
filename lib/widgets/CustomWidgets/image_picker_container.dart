@@ -1,6 +1,9 @@
+// ignore_for_file: avoid_init_to_null, library_private_types_in_public_api
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerContainer extends StatefulWidget {
@@ -16,7 +19,7 @@ class ImagePickerContainer extends StatefulWidget {
 }
 
 class _ImagePickerContainerState extends State<ImagePickerContainer> {
-  File? _imageFile;
+  late File? _imageFile = null;
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
@@ -31,7 +34,8 @@ class _ImagePickerContainerState extends State<ImagePickerContainer> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        _pickImage(ImageSource.gallery); // You can change to camera if you prefer
+        _pickImage(
+            ImageSource.gallery); // You can change to camera if you prefer
       },
       child: Container(
         height: widget.containerSize,
@@ -43,18 +47,23 @@ class _ImagePickerContainerState extends State<ImagePickerContainer> {
         child: _imageFile != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  _imageFile!.path,
-                  fit: BoxFit.cover,
-                ),
+                child: kIsWeb
+                    ? Image.network(
+                        _imageFile!.path,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.file(
+                        _imageFile!,
+                        fit: BoxFit.cover,
+                      ),
               )
             : Center(
-              child: Icon(
+                child: Icon(
                   Icons.add_photo_alternate,
                   size: widget.containerSize / 4,
                   color: Colors.grey,
                 ),
-            ),
+              ),
       ),
     );
   }

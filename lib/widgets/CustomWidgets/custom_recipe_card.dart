@@ -31,6 +31,7 @@ class CustomRecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+           bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     return GestureDetector(
   onTap: onTap,
   child: Container(
@@ -40,7 +41,7 @@ class CustomRecipeCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(Constants.defaultPadding),
       boxShadow: [
         BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
+          color: Colors.grey.withOpacity(isAndroid ? 0.2: 0.5),
           spreadRadius: 2,
           blurRadius: 5,
           offset: const Offset(0, 3), // changes position of shadow
@@ -64,7 +65,7 @@ class CustomRecipeCard extends StatelessWidget {
           ),
         ),
         Expanded(
-          flex: 2,
+          flex:isAndroid ? 3 : 2,
           child: Container(
             padding: const EdgeInsets.all(Constants.defaultPadding),
             decoration: const BoxDecoration(
@@ -112,10 +113,11 @@ class CustomRecipeCard extends StatelessWidget {
             ),
           ),
         ),
+        if(isAndroid)
+        const SizedBox(height: 20,)
       ],
     ),
   ),
-)
-;
+);
   }
 }

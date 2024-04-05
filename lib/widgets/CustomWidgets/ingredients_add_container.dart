@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 
 class IngredientsAddContainer extends StatefulWidget {
-  const IngredientsAddContainer({Key? key}) : super(key: key);
+    final Map<String, dynamic>? selectedCategory;
+  const IngredientsAddContainer({Key? key, this.selectedCategory}) : super(key: key);
 
   @override
   _IngredientsAddContainerState createState() =>
@@ -50,6 +51,9 @@ class _IngredientsAddContainerState extends State<IngredientsAddContainer> {
           child: CustomTextField(
             controller: _controllers[index],
             hintText: 'Ingredient ${index + 1}',
+            borderColor: widget.selectedCategory != null
+                ? widget.selectedCategory!['color']
+                : null,
             suffixIcon: index == 0 ? Icons.add : Icons.delete,
             onSuffixIconPressed: index == 0
                 ? _addIngredient
