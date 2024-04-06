@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DemoData {
-  static final List<String> menuItems = [
-    'Home',
-    'Creators',
-    'Recipes',
-    'My Fridge',
-    'Login/Register',
-    'ProfileDev',
-    'Add Recipe'
-  ];
+
 
   static final List<Map<String, dynamic>> categories = [
     {

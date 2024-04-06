@@ -9,14 +9,14 @@ class ReusableTextField extends StatelessWidget {
   final Function(bool) togglePasswordVisibility; // Function to toggle password visibility
 
   const ReusableTextField({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.controller,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.autofocus = false,
     required this.togglePasswordVisibility, // Toggle password visibility function
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

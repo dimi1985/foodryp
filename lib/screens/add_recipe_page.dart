@@ -92,7 +92,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                     child: ImagePickerContainer(
                       containerSize: Responsive.isDesktop(context)
                           ? 600
-                          : screenSize.width,
+                          : screenSize.width, onImageSelected: (File ) {  },
                     ),
                   ),
                   const SizedBox(height: 20.0),

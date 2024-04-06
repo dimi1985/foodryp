@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/screens/add_recipe_page.dart';
-import 'package:foodryp/screens/profile_screen/profile_screen.dart';
+import 'package:foodryp/utils/user_service.dart';
+import 'package:provider/provider.dart';
 
 
 import 'screens/mainScreen/main_screen.dart';
 
+
 void main() {
-  runApp(const Foodryp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => UserService(),
+      child: const Foodryp(),
+    ),
+  );
 }
 
 class Foodryp extends StatelessWidget {

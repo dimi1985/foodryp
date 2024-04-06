@@ -35,6 +35,9 @@ dependencies:
   carousel_slider: ^4.2.1
   flutter_signin_button: ^2.0.0
   image_picker: ^1.0.7
+  http: ^1.2.1
+  shared_preferences: ^2.2.2
+  provider: ^6.1.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -66,6 +69,8 @@ flutter:
   assets:
     - assets/logo.png
     - assets/hero.jpg
+    - assets/default_avatar_female.jpg
+    - assets/default_avatar_male.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

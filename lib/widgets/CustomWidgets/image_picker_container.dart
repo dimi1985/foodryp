@@ -8,11 +8,15 @@ import 'package:image_picker/image_picker.dart';
 
 class ImagePickerContainer extends StatefulWidget {
   final double containerSize;
+  final Function(File) onImageSelected;
+  final String? initialImagePath; // Optional initial image path
 
   const ImagePickerContainer({
-    Key? key,
+    super.key,
     required this.containerSize,
-  }) : super(key: key);
+    required this.onImageSelected,
+    this.initialImagePath,
+  });
 
   @override
   _ImagePickerContainerState createState() => _ImagePickerContainerState();
@@ -20,18 +24,31 @@ class ImagePickerContainer extends StatefulWidget {
 
 class _ImagePickerContainerState extends State<ImagePickerContainer> {
   late File? _imageFile = null;
+  bool imageIsPicked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialImagePath != null) {
+      _imageFile = File(widget.initialImagePath!);
+    }
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
+        imageIsPicked = true;
       });
+      widget.onImageSelected(
+          _imageFile!); // Pass selected image file to callback function
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     return InkWell(
       onTap: () {
         _pickImage(
@@ -52,10 +69,17 @@ class _ImagePickerContainerState extends State<ImagePickerContainer> {
                         _imageFile!.path,
                         fit: BoxFit.cover,
                       )
-                    : Image.file(
-                        _imageFile!,
-                        fit: BoxFit.cover,
-                      ),
+                    : isAndroid
+                        ? imageIsPicked
+                            ? Image.file(
+                                _imageFile!,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(_imageFile!.path)
+                        : Image.file(
+                            _imageFile!,
+                            fit: BoxFit.cover,
+                          ),
               )
             : Center(
                 child: Icon(

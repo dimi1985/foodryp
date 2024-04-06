@@ -1,10 +1,13 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_screen/components/top_profile.dart';
+import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/top_creators.dart';
 import 'package:foodryp/widgets/DesktopMiddleSide/components/recipe_section.dart';
-
-import '../../widgets/CustomWidgets/heading_title_row.dart';
-import 'components/recipe_card_profile.dart';
+import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
+import 'package:foodryp/screens/profile_screen/components/recipe_card_profile.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,38 +17,49 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // User data (replace with your data fetching logic)
-  final String userName = 'John Doe';
-  final String userEmail = 'johndoe@example.com';
-  final String profileImage = 'https://picsum.photos/seed/picsum/200/300';
+ User user = User(id: '', username: '', email: '', profileImage: '', gender: '',);
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserProfile();
+  }
+
+Future<void> fetchUserProfile() async {
+  final userService = UserService(); 
+  final userProfile = await userService.getUserProfile(); 
+  setState(() {
+    user = userProfile ?? User(id: '', username: '', email: '', profileImage: '', gender: '');
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
-    //  final screenSize = MediaQuery.of(context).size;
-    //  bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     return Scaffold(
-        body: ListView(
-              children: [
-        TopProfile(profileImage:profileImage),
-        const SizedBox(height: 10.0),
-        const HeadingTitleRow(title: 'Weekly Menus'),
-        const SizedBox(height: 10.0),
-        const RecipeCardProfile(),
-               
-        const SizedBox(height: 25.0),
-         const HeadingTitleRow(title: 'Recipes'),
-               
-        const SizedBox(height: 10.0),
-        const RecipeSection(),
-        const SizedBox(height: 15.0),
-        const HeadingTitleRow(title: 'Following'),
-        const TopCreators(),
-        const SizedBox(height: 15.0),
-              ],
-            ));
+      body: ListView(
+        children: [
+          TopProfile(
+            profileImage: user.profileImage.isNotEmpty ? user.profileImage : 'assets/default_avatar_male.jpg',
+             gender: user.gender ?? '',
+             profileName: user.username
+          ),
+          const SizedBox(height: 10.0),
+          const HeadingTitleRow(title: 'Weekly Menus'),
+       const   SizedBox(height: 10.0),
+       const   RecipeCardProfile(),
+       const   SizedBox(height: 25.0),
+       const   HeadingTitleRow(title: 'Recipes'),
+       const   SizedBox(height: 10.0),
+      const    RecipeSection(),
+       const   SizedBox(height: 15.0),
+       const   HeadingTitleRow(title: 'Following'),
+       const   TopCreators(),
+       const   SizedBox(height: 15.0),
+        ],
+      ),
+    );
   }
-
-
-
- 
 }
