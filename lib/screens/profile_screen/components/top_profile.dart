@@ -44,6 +44,7 @@ class TopProfile extends StatelessWidget {
             color: Constants.secondaryColor,
           ),
         ),
+      
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -51,27 +52,30 @@ class TopProfile extends StatelessWidget {
             const SizedBox(
               height: 50,
             ),
+            
+           
             gender.contains('female')
                 ? ImagePickerContainer(
                     containerSize: 100.0,
                     initialImagePath: profileImage.isNotEmpty
                         ? 'assets/default_avatar_female.jpg'
-                        : profileImage,
+                        :  profileImage,
+                  
                     onImageSelected: (File imageFile) {
-                      updateStatusOfSelectedImage(context, imageFile);
+                      updateStatusOfSelectedImage(context,imageFile);
                     },
                   )
                 : gender.contains('male')
-                    ? ImagePickerContainer(
-                        containerSize: 100.0,
-                        initialImagePath: profileImage.isNotEmpty
-                            ? 'assets/default_avatar_male.jpg'
-                            : profileImage,
-                        onImageSelected: (File imageFile) {
-                          updateStatusOfSelectedImage(context, imageFile);
-                        },
-                      )
-                    : Container(),
+                ? ImagePickerContainer(
+                    containerSize: 100.0,
+                    initialImagePath: profileImage.isNotEmpty
+                        ? 'assets/default_avatar_male.jpg'
+                        :  profileImage,
+                  
+                    onImageSelected: (File imageFile) {
+                         updateStatusOfSelectedImage(context,imageFile);
+                    },
+                  ): Container(),
             Text(
               profileName,
               style: const TextStyle(
@@ -126,36 +130,43 @@ class TopProfile extends StatelessWidget {
       (route) => false,
     );
   }
+  
+   void updateStatusOfSelectedImage(BuildContext context, File imageFile) {
+  // Show SnackBar indicating file upload
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Row(
+        children: [
+          CircularProgressIndicator(), // Add a circular progress indicator
+          SizedBox(width: 16),
+          Text('Uploading file...'), // Text indicating file upload
+        ],
+      ),
+    ),
+  );
 
-  void updateStatusOfSelectedImage(BuildContext context, File imageFile) {
-    // Show SnackBar indicating file upload
+  // Call the uploadProfile method to upload the image file
+  UserService().uploadImageProfile(imageFile).then((_) {
+    // Once the upload is complete, hide the SnackBar
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    // Show a SnackBar indicating upload success
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Row(
-          children: [
-            CircularProgressIndicator(), // Add a circular progress indicator
-            SizedBox(width: 16),
-            Text('Uploading file...'), // Text indicating file upload
-          ],
-        ),
+        content: Text('File uploaded successfully'), // Show upload success message
       ),
     );
+  }).catchError((error) {
+    // If there's an error during upload, hide the SnackBar
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-    // Call the uploadProfile method to upload the image file
-    UserService().uploadImageProfile(imageFile).then((_) {
-      // Once the upload is complete, hide the SnackBar
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    // Show a SnackBar indicating upload failure
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error uploading file: $error'), // Show upload error message
+      ),
+    );
+  });
+}
 
-      // Show a SnackBar indicating upload success
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('File uploaded successfully'), // Show upload success message
-        ),
-      );
-    }).catchError((error) {
-      // If there's an error during upload, hide the SnackBar
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    });
-  }
 }
