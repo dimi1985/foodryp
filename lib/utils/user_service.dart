@@ -98,22 +98,31 @@ class UserService with ChangeNotifier {
     }
   }
 
-  Future<void> uploadImageProfile(File imageFile) async {
-    await _initPrefs();
-    final userId =
-        _prefs.getString('userId'); // Use 'userId' instead of 'userID'
+  Future<void> uploadImageProfile(dynamic image) async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
 
-    try {
-      String url = '$baseUrl/api/uploadProfilePic';
-      var request = http.MultipartRequest('POST', Uri.parse(url));
+  try {
+    String url = '$baseUrl/api/uploadProfilePic';
+    var request = http.MultipartRequest('POST', Uri.parse(url));
 
-      if (imageFile != null) {
-        var stream = imageFile.openRead();
-        var length = await imageFile.length();
-
-        String filename =
-            'user-$userId-${DateTime.now()}.jpg'; // Updated with user ID
-
+    if (image != null) {
+      String filename = 'user-$userId-${DateTime.now()}.jpg';
+      
+      if (kIsWeb) {
+        // For web platform
+        var multipartFile = http.MultipartFile.fromBytes(
+          'profilePicture',
+          image,
+          filename: filename,
+        );
+        request.fields['userId'] = userId!;
+        request.files.add(multipartFile);
+      } else {
+        // For non-web platforms
+        var stream = (image is Uint8List) ? Stream.fromIterable([image]) : image.openRead();
+        var length = (image is Uint8List) ? image.length : await image.length();
+        
         var multipartFile = http.MultipartFile(
           'profilePicture',
           stream,
@@ -122,23 +131,24 @@ class UserService with ChangeNotifier {
         );
         request.fields['userId'] = userId!;
         request.files.add(multipartFile);
-
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          // Profile picture uploaded successfully
-          // Handle the response data as needed
-        } else {
-          // Error uploading profile picture
-        }
-      } else {
-        // No image selected
-        print('No file selected');
       }
-    } catch (e) {
-      // Handle upload error
-      print('Error uploading profile picture: $e');
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        // Profile picture uploaded successfully
+        // Handle the response data as needed
+      } else {
+        // Error uploading profile picture
+      }
+    } else {
+      // No image selected
+      print('No file selected');
     }
+  } catch (e) {
+    // Handle upload error
+    print('Error uploading profile picture: $e');
   }
+}
 
   Future<void> _saveUserIDLocally(String userId) async {
     await _initPrefs(); // Initialize SharedPreferences

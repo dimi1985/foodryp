@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
@@ -35,16 +36,29 @@ class _ImagePickerContainerState extends State<ImagePickerContainer> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+  if (kIsWeb) {
+    // Use file picker for web
+    final FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      setState(() {
+        _imageFile = File(result.files.single.path!);
+        imageIsPicked = true;
+      });
+      widget.onImageSelected(_imageFile!);
+    }
+  } else {
+    // Use image picker for other platforms
     final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _imageFile = File(pickedFile.path); // Convert to XFile
         imageIsPicked = true;
       });
-      widget.onImageSelected(
-          _imageFile!); // Pass selected image file to callback function
+      widget.onImageSelected(_imageFile!);
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
