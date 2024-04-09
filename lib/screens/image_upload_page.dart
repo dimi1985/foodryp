@@ -37,9 +37,6 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
 
   String url = '$baseUrl/api/uploadProfilePic';
   var request = http.MultipartRequest('POST', Uri.parse(url));
-
-  request.headers['Authorization'] = 'Bearer YourAccessToken'; // Add any additional headers if needed
-
   request.fields['userId'] = userId;
   request.files.add(http.MultipartFile.fromBytes('profilePicture', bytes, filename: filename));
 

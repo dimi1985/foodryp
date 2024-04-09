@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
-import 'package:foodryp/widgets/CustomWidgets/image_picker_container.dart';
+import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/ingredients_add_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/instructions_add_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
@@ -89,7 +89,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
                   SizedBox(
                     height: Responsive.isDesktop(context) ? 350 : 200,
-                    child: ImagePickerContainer(
+                    child: ImagePickerPreviewContainer(allowSelection: true,
                       containerSize: Responsive.isDesktop(context)
                           ? 600
                           : screenSize.width, onImageSelected: (File ) {  },

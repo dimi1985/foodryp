@@ -4,10 +4,11 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
+import 'package:foodryp/screens/settings_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/image_picker_container.dart';
+import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 
 class TopProfile extends StatelessWidget {
   final String profileImage;
@@ -39,12 +40,11 @@ class TopProfile extends StatelessWidget {
           child: IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              signout(context, profileName);
+              _goToSettingsPage(context);
             },
             color: Constants.secondaryColor,
           ),
         ),
-      
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -52,30 +52,29 @@ class TopProfile extends StatelessWidget {
             const SizedBox(
               height: 50,
             ),
-            
-           
             gender.contains('female')
-                ? ImagePickerContainer(
+                ? ImagePickerPreviewContainer(
                     containerSize: 100.0,
                     initialImagePath: profileImage.isNotEmpty
                         ? 'assets/default_avatar_female.jpg'
-                        :  profileImage,
-                  
+                        : profileImage,
                     onImageSelected: (File imageFile) {
-                      updateStatusOfSelectedImage(context,imageFile);
+                     
                     },
+                    allowSelection: false,
                   )
                 : gender.contains('male')
-                ? ImagePickerContainer(
-                    containerSize: 100.0,
-                    initialImagePath: profileImage.isNotEmpty
-                        ? 'assets/default_avatar_male.jpg'
-                        :  profileImage,
-                  
-                    onImageSelected: (File imageFile) {
-                         updateStatusOfSelectedImage(context,imageFile);
-                    },
-                  ): Container(),
+                    ? ImagePickerPreviewContainer(
+                        containerSize: 100.0,
+                        initialImagePath: profileImage.isNotEmpty
+                            ? 'assets/default_avatar_male.jpg'
+                            : profileImage,
+                        onImageSelected: (File imageFile) {
+                         
+                        },
+                        allowSelection: false,
+                      )
+                    : Container(),
             Text(
               profileName,
               style: const TextStyle(
@@ -120,53 +119,20 @@ class TopProfile extends StatelessWidget {
     );
   }
 
-  void signout(BuildContext context, String profileName) async {
-    // Clear user ID from shared preferences
-    await UserService().clearUserId();
-    // Navigating to the main screen
-    Navigator.pushAndRemoveUntil(
+  
+
+  void _goToSettingsPage(BuildContext context) {
+    Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MainScreen()),
-      (route) => false,
+      MaterialPageRoute(
+        builder: (context) => SettingsPage(
+          profileName: profileName,
+          gender: gender,
+          profileImage: profileImage,
+        ),
+      ),
     );
   }
+
   
-   void updateStatusOfSelectedImage(BuildContext context, File imageFile) {
-  // Show SnackBar indicating file upload
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Row(
-        children: [
-          CircularProgressIndicator(), // Add a circular progress indicator
-          SizedBox(width: 16),
-          Text('Uploading file...'), // Text indicating file upload
-        ],
-      ),
-    ),
-  );
-
-  // Call the uploadProfile method to upload the image file
-  UserService().uploadImageProfile(imageFile).then((_) {
-    // Once the upload is complete, hide the SnackBar
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    // Show a SnackBar indicating upload success
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('File uploaded successfully'), // Show upload success message
-      ),
-    );
-  }).catchError((error) {
-    // If there's an error during upload, hide the SnackBar
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    // Show a SnackBar indicating upload failure
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Error uploading file: $error'), // Show upload error message
-      ),
-    );
-  });
-}
-
 }

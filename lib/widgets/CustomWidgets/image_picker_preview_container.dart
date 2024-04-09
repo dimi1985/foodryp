@@ -7,23 +7,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 
-class ImagePickerContainer extends StatefulWidget {
+class ImagePickerPreviewContainer extends StatefulWidget {
   final double containerSize;
   final Function(File) onImageSelected;
-  final String? initialImagePath; // Optional initial image path
+  final String? initialImagePath;
+  final bool allowSelection;
 
-  const ImagePickerContainer({
+  const ImagePickerPreviewContainer({
     super.key,
     required this.containerSize,
     required this.onImageSelected,
     this.initialImagePath,
+    this.allowSelection = true, // Allow selection by default
   });
 
   @override
-  _ImagePickerContainerState createState() => _ImagePickerContainerState();
+  _ImagePickerPreviewContainerState createState() => _ImagePickerPreviewContainerState();
 }
 
-class _ImagePickerContainerState extends State<ImagePickerContainer> {
+class _ImagePickerPreviewContainerState extends State<ImagePickerPreviewContainer> {
   late File? _imageFile = null;
   bool imageIsPicked = false;
 
@@ -36,37 +38,39 @@ class _ImagePickerContainerState extends State<ImagePickerContainer> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-  if (kIsWeb) {
-    // Use file picker for web
-    final FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      setState(() {
-        _imageFile = File(result.files.single.path!);
-        imageIsPicked = true;
-      });
-      widget.onImageSelected(_imageFile!);
-    }
-  } else {
-    // Use image picker for other platforms
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path); // Convert to XFile
-        imageIsPicked = true;
-      });
-      widget.onImageSelected(_imageFile!);
+    if (kIsWeb) {
+      // Use file picker for web
+      final FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result != null) {
+        setState(() {
+          _imageFile = File(result.files.single.path!);
+          imageIsPicked = true;
+        });
+        widget.onImageSelected(_imageFile!);
+      }
+    } else {
+      // Use image picker for other platforms
+      final pickedFile = await ImagePicker().pickImage(source: source);
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path); // Convert to XFile
+          imageIsPicked = true;
+        });
+        widget.onImageSelected(_imageFile!);
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     return InkWell(
       onTap: () {
-        _pickImage(
-            ImageSource.gallery); // You can change to camera if you prefer
+        if (widget.allowSelection && widget.onImageSelected != null) {
+          _pickImage(ImageSource.gallery);
+        } else {
+          _showImagePreview(context, _imageFile);
+        }
       },
       child: Container(
         height: widget.containerSize,
@@ -103,6 +107,33 @@ class _ImagePickerContainerState extends State<ImagePickerContainer> {
                 ),
               ),
       ),
+    );
+  }
+
+  void _showImagePreview(BuildContext context, File? imageFile) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Hero(
+              tag: 'imageHero',
+              child: kIsWeb
+                  ? Image.network(
+                      _imageFile!.path,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.file(
+                      _imageFile!,
+                      fit: BoxFit.cover,
+                    )),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
