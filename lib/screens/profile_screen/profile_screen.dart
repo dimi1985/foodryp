@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_screen/components/top_profile.dart';
@@ -17,7 +18,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
- User user = User(id: '', username: '', email: '', profileImage: '', gender: '',);
+ User user = User(id: '', username: '', email: '', profileImage: '', gender: '', memberSince: null, role: '',);
 
 
 
@@ -31,20 +32,21 @@ Future<void> fetchUserProfile() async {
   final userService = UserService(); 
   final userProfile = await userService.getUserProfile(); 
   setState(() {
-    user = userProfile ?? User(id: '', username: '', email: '', profileImage: '', gender: '');
+    user = userProfile ?? User(id: '', username: '', email: '', profileImage: '', gender: '', memberSince: null, role: '');
   });
 }
 
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
     return Scaffold(
       body: ListView(
         children: [
           TopProfile(
-            profileImage: user.profileImage.isNotEmpty ? user.profileImage : 'assets/default_avatar_male.jpg',
+            profileImage:  user.profileImage,
              gender: user.gender ?? '',
-             profileName: user.username
+             profileName: user.username,
+             role: user.role,
           ),
           const SizedBox(height: 10.0),
           const HeadingTitleRow(title: 'Weekly Menus'),

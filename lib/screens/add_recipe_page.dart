@@ -89,10 +89,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
                   SizedBox(
                     height: Responsive.isDesktop(context) ? 350 : 200,
-                    child: ImagePickerPreviewContainer(allowSelection: true,
+                    child: ImagePickerPreviewContainer(
+                      initialImagePath: '',
+                      allowSelection: true,
                       containerSize: Responsive.isDesktop(context)
                           ? 600
-                          : screenSize.width, onImageSelected: (File ) {  },
+                          : screenSize.width,onImageSelected: (p0, p1) {
+                            
+                          }, gender: '',
+                          isFor: 'Recipe'
                     ),
                   ),
                   const SizedBox(height: 20.0),

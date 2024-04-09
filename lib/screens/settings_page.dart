@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:foodryp/screens/admin/admin_panel_screen.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -13,12 +14,13 @@ class SettingsPage extends StatefulWidget {
   String profileName;
   String gender;
   String profileImage;
+  String? role;
 
   SettingsPage({
     super.key,
     required this.profileName,
     required this.gender,
-    required this.profileImage,
+    required this.profileImage, this.role,
   });
 
   @override
@@ -35,6 +37,17 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Settings'),
+          actions: [
+            if(widget.role!.contains('admin'))
+            TextButton(onPressed: (){
+               Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) =>  AdminPanelScreen()),
+              );
+
+
+            }, child: const Text('Admin Panel'))
+          ],
         ),
         body: ListView(
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
@@ -141,24 +154,20 @@ class _SettingsPageState extends State<SettingsPage> {
           widget.gender.contains('female')
               ? ImagePickerPreviewContainer(
                   containerSize: 100.0,
-                  initialImagePath: widget.profileImage.isNotEmpty
-                      ? 'assets/default_avatar_female.jpg'
-                      : widget.profileImage,
-                  onImageSelected: (File imageFile) {
-                    updateStatusOfSelectedImage(context, imageFile);
+                  initialImagePath:  widget.profileImage,
+                  onImageSelected: (File imageFile, List<int> bytes) {
+                    updateStatusOfSelectedImage(context, imageFile, bytes);
                   },
-                  allowSelection: true,
+                  allowSelection: true, gender: widget.gender, isFor: '',
                 )
               : widget.gender.contains('male')
                   ? ImagePickerPreviewContainer(
                       containerSize: 100.0,
-                      initialImagePath: widget.profileImage.isNotEmpty
-                          ? 'assets/default_avatar_male.jpg'
-                          : widget.profileImage,
-                      onImageSelected: (File imageFile) {
-                        updateStatusOfSelectedImage(context, imageFile);
+                      initialImagePath:  widget.profileImage,
+                      onImageSelected: (File imageFile,List<int> bytes) {
+                        updateStatusOfSelectedImage(context, imageFile,bytes);
                       },
-                      allowSelection: true,
+                      allowSelection: true, gender: widget.gender, isFor: '',
                     )
                   : Container(),
           const SizedBox(
@@ -177,7 +186,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void updateStatusOfSelectedImage(BuildContext context, File imageFile) {
+  void updateStatusOfSelectedImage(BuildContext context, File imageFile, List<int> bytes) {
     // Show SnackBar indicating file upload
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -192,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
 
     // Call the uploadProfile method to upload the image file
-    UserService().uploadImageProfile(imageFile).then((_) {
+    UserService().uploadImageProfile(imageFile,bytes).then((_) {
       // Once the upload is complete, hide the SnackBar
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 

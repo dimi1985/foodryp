@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_screen/profile_screen.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/screens/mainScreen/components/logo_widget.dart';
 import 'package:foodryp/utils/user_service.dart';
@@ -28,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
     username: '',
     email: '',
     profileImage: '',
-    gender: '',
+    gender: '', memberSince: null, role: '',
   );
 
   @override
@@ -48,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
         isAuthenticated = true;
       }
       user = userProfile ??
-          User(id: '', username: '', email: '', profileImage: '', gender: '');
+          User(id: '', username: '', email: '', profileImage: '', gender: '', memberSince: null, role: '');
     });
   }
 
@@ -56,6 +57,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isDesktop = Responsive.isDesktop(context);
+    final finalProfileImageURL = ('${Constants.baseUrl}/${user.profileImage}').replaceAll('\\', '/');
 
     return SafeArea(
       child: Scaffold(
@@ -84,8 +86,8 @@ class _MainScreenState extends State<MainScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       user.profileImage.isNotEmpty
-                          ? CircleAvatar(
-                              backgroundImage: NetworkImage(user.profileImage),
+                          ?  CircleAvatar(
+                              backgroundImage: NetworkImage(finalProfileImageURL),
                             )
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(50),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/add_recipe_page.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
-import 'package:foodryp/screens/image_upload_page.dart';
-import 'package:foodryp/screens/profile_screen/profile_screen.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,7 +36,6 @@ class _MenuWebItemsState extends State<MenuWebItems> {
       'Home',
       'Creators',
       'Recipes',
-      if (isAuthenticated) 'ImageUploadPage',
       if (isAuthenticated) 'My Fridge',
       if (!isAuthenticated) 'Sign Up/Sign In',
       if (isAuthenticated) 'Add Recipe',
@@ -76,13 +73,6 @@ class _MenuWebItemsState extends State<MenuWebItems> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AddRecipePage()),
-              );
-              break;
-               case 'ImageUploadPage':
-              // Navigate to AuthScreen
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  ImageUploadPage()),
               );
               break;
             // Add more cases for other menu items

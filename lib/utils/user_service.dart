@@ -2,13 +2,13 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService with ChangeNotifier {
-  static const baseUrl =
-      kIsWeb ? 'http://localhost:3000' : 'http://192.168.106.229:3000';
+  
 
   late SharedPreferences _prefs; // SharedPreferences instance
 
@@ -24,13 +24,16 @@ class UserService with ChangeNotifier {
       String username, String email, String password, String gender) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/register'),
+        Uri.parse('${Constants.baseUrl}/api/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'username': username,
           'email': email,
           'password': password,
           'gender': gender,
+          'profileImage': '',
+         'memberSince': DateTime.now().toIso8601String(),
+          'role': 'user',
         }),
       );
       if (response.statusCode == 201) {
@@ -44,7 +47,7 @@ class UserService with ChangeNotifier {
             username: username,
             email: email,
             profileImage: '',
-            gender: gender);
+            gender: gender, memberSince: null, role: '');
         notifyListeners();
         return true;
       }
@@ -58,7 +61,7 @@ class UserService with ChangeNotifier {
   Future<bool> loginUser(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/login'),
+        Uri.parse('${Constants.baseUrl}/api/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': email,
@@ -85,7 +88,7 @@ class UserService with ChangeNotifier {
     log(userId ?? '');
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/api/userProfile/$userId'),
+        Uri.parse('${Constants.baseUrl}/api/userProfile/$userId'),
       );
       if (response.statusCode == 200) {
         final userData = jsonDecode(response.body);
@@ -98,39 +101,43 @@ class UserService with ChangeNotifier {
     }
   }
 
-  Future<void> uploadImageProfile(dynamic image) async {
+  Future<void> uploadImageProfile(File image, List<int>? bytes) async {
   await _initPrefs();
   final userId = _prefs.getString('userId');
 
   try {
-    String url = '$baseUrl/api/uploadProfilePic';
+    String url = '${Constants.baseUrl}/api/uploadProfilePic';
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     if (image != null) {
       String filename = 'user-$userId-${DateTime.now()}.jpg';
-      
+
       if (kIsWeb) {
         // For web platform
-        var multipartFile = http.MultipartFile.fromBytes(
-          'profilePicture',
-          image,
-          filename: filename,
-        );
         request.fields['userId'] = userId!;
-        request.files.add(multipartFile);
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'profilePicture',
+            bytes!,
+            filename: filename,
+          ),
+        );
       } else {
-        // For non-web platforms
-        var stream = (image is Uint8List) ? Stream.fromIterable([image]) : image.openRead();
-        var length = (image is Uint8List) ? image.length : await image.length();
-        
-        var multipartFile = http.MultipartFile(
-          'profilePicture',
-          stream,
-          length,
-          filename: filename,
-        );
-        request.fields['userId'] = userId!;
-        request.files.add(multipartFile);
+        // For Android platform
+       
+        if (image != null) {
+          request.fields['userId'] = userId!;
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'profilePicture',
+              image.path,
+            ),
+          );
+        } else {
+          // No image selected on Android
+          print('No file selected');
+          return;
+        }
       }
 
       var response = await request.send();
@@ -141,7 +148,7 @@ class UserService with ChangeNotifier {
         // Error uploading profile picture
       }
     } else {
-      // No image selected
+      // No image selected on web
       print('No file selected');
     }
   } catch (e) {
@@ -159,4 +166,48 @@ class UserService with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('userId');
   }
+
+
+
+//Admin Methods
+static Future<List<User>> getAllUsers() async {
+  try {
+    final response = await http.get(
+      Uri.parse('${Constants.baseUrl}/api/allUsers'), // Adjust the endpoint as per your API
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> userDataList = jsonDecode(response.body);
+      // Convert the list of dynamic data into a list of User objects
+      final List<User> userList = userDataList.map((userData) => User.fromJson(userData)).toList();
+      return userList;
+    } else {
+      log('Failed to load users: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Error fetching users: $e');
+    return [];
+  }
+}
+static Future<bool> updateUserRole(String userId, String newRole) async {
+  try {
+    final response = await http.put(
+      Uri.parse('${Constants.baseUrl}/api/userRole/$userId'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'role': newRole}),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      // Handle error response
+      print('Error updating user role: ${response.statusCode}');
+      return false;
+    }
+  } catch (e) {
+    // Handle network error
+    print('Network error: $e');
+    return false;
+  }
+}
 }

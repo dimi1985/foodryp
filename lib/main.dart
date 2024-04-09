@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/screens/image_upload_page.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:provider/provider.dart';
-
-
 import 'screens/mainScreen/main_screen.dart';
 
 

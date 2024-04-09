@@ -14,16 +14,16 @@ class TopProfile extends StatelessWidget {
   final String profileImage;
   final String gender;
   final String profileName;
+  final String? role;
   const TopProfile(
       {super.key,
       required this.profileImage,
       required this.gender,
-      required this.profileName});
+      required this.profileName, this.role});
 
   @override
   Widget build(BuildContext context) {
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
-
     return Stack(
       children: [
         SizedBox(
@@ -55,24 +55,22 @@ class TopProfile extends StatelessWidget {
             gender.contains('female')
                 ? ImagePickerPreviewContainer(
                     containerSize: 100.0,
-                    initialImagePath: profileImage.isNotEmpty
-                        ? 'assets/default_avatar_female.jpg'
-                        : profileImage,
-                    onImageSelected: (File imageFile) {
+                    initialImagePath: profileImage,
+                    onImageSelected: (File imageFile, List<int> bytes) {
                      
                     },
                     allowSelection: false,
+                     gender : gender, isFor: '',
                   )
                 : gender.contains('male')
                     ? ImagePickerPreviewContainer(
                         containerSize: 100.0,
-                        initialImagePath: profileImage.isNotEmpty
-                            ? 'assets/default_avatar_male.jpg'
-                            : profileImage,
-                        onImageSelected: (File imageFile) {
+                        initialImagePath:  profileImage,
+                        onImageSelected: (File imageFile, List<int> bytes) {
                          
                         },
                         allowSelection: false,
+                         gender : gender, isFor: '',
                       )
                     : Container(),
             Text(
@@ -129,6 +127,7 @@ class TopProfile extends StatelessWidget {
           profileName: profileName,
           gender: gender,
           profileImage: profileImage,
+          role: role
         ),
       ),
     );
