@@ -1,10 +1,11 @@
 import 'dart:ui';
-
+import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/category.dart';
 
 class CategoryListView extends StatefulWidget {
-  final List<Map<String, dynamic>> categories;
-  final Function(Map<String, dynamic>) onTap;
+  final List<CategoryModel> categories; // Change to CategoryModel type
+  final Function(CategoryModel) onTap; // Change callback parameter type
 
   CategoryListView({
     Key? key,
@@ -40,14 +41,14 @@ class _CategoryListViewState extends State<CategoryListView> {
         itemCount: widget.categories.length,
         itemBuilder: (context, index) {
           final category = widget.categories[index];
-          final isTapped = index == tappedIndex; // Check if current index is tapped
+          final isTapped = index == tappedIndex; 
 
           return InkWell(
             onTap: () {
               setState(() {
-                tappedIndex = index; // Update tapped index
+                tappedIndex = index; 
               });
-              widget.onTap(category); // Notify parent widget about the tapped category
+              widget.onTap(category); 
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -56,9 +57,9 @@ class _CategoryListViewState extends State<CategoryListView> {
                 children: [
                   const SizedBox(height: 8),
                   Text(
-                    category['title'],
+                    category.name,
                     style: TextStyle(
-                      color: isTapped ? category['color'].withOpacity(0.2) : Colors.grey, // Change color if tapped
+                      color: isTapped ? HexColor(category.color) : Colors.grey,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -70,4 +71,9 @@ class _CategoryListViewState extends State<CategoryListView> {
       ),
     );
   }
+
+  Color hexToColor(String hexString) {
+  final int colorInt = int.parse(hexString.substring(1), radix: 16);
+  return Color(colorInt);
+}
 }

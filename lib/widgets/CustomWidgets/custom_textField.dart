@@ -10,6 +10,8 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final void Function()? onSuffixIconPressed;
    final Color? borderColor; // Add this line
+   final void Function(String)? onChanged;
+
 
   const CustomTextField({
     Key? key,
@@ -21,7 +23,7 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.maxLines,
     this.onSuffixIconPressed,
-     this.borderColor,
+     this.borderColor, required String labelText,  this.onChanged,
   }) : super(key: key);
 
   @override
@@ -53,6 +55,7 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       maxLines: maxLines,
+       onChanged: onChanged,
     );
   }
 }

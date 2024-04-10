@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
-import 'package:intl/intl.dart';
-
 class CustomCategoryCard extends StatelessWidget {
   final String title;
   final String image;

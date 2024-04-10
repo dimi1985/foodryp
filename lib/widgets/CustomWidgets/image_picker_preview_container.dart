@@ -36,8 +36,8 @@ class ImagePickerPreviewContainer extends StatefulWidget {
 class _ImagePickerPreviewContainerState
     extends State<ImagePickerPreviewContainer> {
   late File? _imageFile = File('');
+    late Uint8List uint8list = Uint8List(0);
   bool imageIsPicked = false;
-  late Uint8List uint8list = Uint8List(0);
   String finalProfileImageURL = '';
 
   @override
@@ -97,8 +97,9 @@ class _ImagePickerPreviewContainerState
                 child: kIsWeb
                     ? imageIsPicked
                         ? Image.memory(uint8list)
-                        : widget.initialImagePath!.isEmpty
-                            ? widget.isFor.contains('Recipe')
+                        : widget.initialImagePath == null || widget.initialImagePath!.isEmpty
+
+                            ? widget.isFor.contains('Other')
                                 ? Center(
                                     child: Icon(
                                       Icons.add_photo_alternate,

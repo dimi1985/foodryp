@@ -1,0 +1,17 @@
+class Ingredient {
+  final String name;
+  final String? quantity; // Optional: "1 cup", "2 tbsp", etc.
+  final String? unit; // Optional: "g", "ml", etc.
+
+  Ingredient({
+    required this.name,
+    this.quantity,
+    this.unit,
+  });
+
+  factory Ingredient.fromJson(Map<String, dynamic> json) => Ingredient(
+        name: json['name'],
+        quantity: json['quantity'],
+        unit: json['unit'],
+      );
+}
