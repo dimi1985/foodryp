@@ -1,4 +1,5 @@
 class CategoryModel {
+    final String? id;
   final String name;
   final String font;
   final String color;
@@ -6,6 +7,7 @@ class CategoryModel {
   final List<String>? recipes; // List of recipe IDs (String type)
 
   CategoryModel({
+    this.id,
     required this.name,
     required this.font,
     required this.color,
@@ -14,6 +16,7 @@ class CategoryModel {
   });
 
  factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
+  id: json['_id'],
       name: json['name'],
       font: json['font'],
       color: json['color'],
@@ -22,6 +25,7 @@ class CategoryModel {
     );
 
 Map<String, dynamic> toJson() => {
+    '_id': id,
       'name': name,
       'font': font,
       'color': color,

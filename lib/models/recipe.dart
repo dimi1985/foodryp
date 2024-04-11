@@ -1,40 +1,56 @@
-
-
 class Recipe {
+   final String? id;
   final String recipeTitle;
-   final String  recipeImage;
-   final List<String> ingredients; // List of strings representing ingredients
-  final int duration; // Duration in minutes (optional)
-  final String difficulty; // "Easy", "Medium", "Hard"
-  final String username; // Username of the author (optional)
-  final String? useImage; // URL for recipe image (optional)
-  final String userId; // Unique ID of the recipe author
+  final String recipeImage;
+  final List<String> ingredients;
+  final List<String> instructions;
+  final String prepDuration;
+  final String cookDuration;
+  final String servingNumber;
+  final String difficulty;
+  final String username;
+  final String? useImage;
+  final String userId;
   final DateTime date;
   final String description;
+  final String categoryId;
+   final String categoryColor;
 
   Recipe({
+      this.id,
     required this.recipeTitle,
     required this.recipeImage,
     required this.ingredients,
-    required this.duration,
+    required this.instructions,
+    required this.prepDuration,
+    required this.cookDuration,
+    required this.servingNumber,
     required this.difficulty,
     required this.username,
-    this.useImage,
+    required this.useImage,
     required this.userId,
     required this.date,
     required this.description,
+    required this.categoryId,
+     required this.categoryColor,
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) => Recipe(
+      id: json['_id'],
         recipeTitle: json['recipeTitle'],
         recipeImage: json['recipeImage'],
-         ingredients: (json['ingredients'] as List)?.cast<String>() ?? [], // Handle null or non-string lists
-        duration: json['duration'], // Handle optional duration
+        ingredients: (json['ingredients'] as List)?.cast<String>() ?? [],
+        instructions: (json['instructions'] as List)?.cast<String>() ?? [],
+        prepDuration: json['prepDuration'],
+        cookDuration: json['cookDuration'],
+        servingNumber: json['servingNumber'],
         difficulty: json['difficulty'],
-        username: json['username'], // Handle optional username
+        username: json['username'],
         useImage: json['useImage'],
         userId: json['userId'],
         date: DateTime.parse(json['date']),
         description: json['description'],
+        categoryId: json['categoryId'],
+         categoryColor: json['categoryColor'],
       );
 }

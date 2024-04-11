@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:foodryp/models/recipe.dart';
 
 class RecipeDetailPage extends StatefulWidget {
-  final Map<String, dynamic> regularRecipe;
-  const RecipeDetailPage({super.key, required this.regularRecipe});
+  final Recipe recipe;
+  const RecipeDetailPage({super.key,required this.recipe});
 
   @override
   State<RecipeDetailPage> createState() => _RecipeDetailPageState();
@@ -47,7 +48,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Image.network(
-          widget.regularRecipe['image'],
+          widget.recipe.recipeImage,
           width: screenSize.width, // Take full width
           height: 250.0, // Adjust height as needed
           fit: BoxFit.cover,
@@ -74,13 +75,13 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.regularRecipe['title'],
+                      widget.recipe.recipeTitle,
                       style: const TextStyle(
                           fontSize: 24.0, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      widget.regularRecipe['description'],
+                      widget.recipe.description,
                       style: const TextStyle(fontSize: 16.0),
                     ),
                   ],
@@ -102,9 +103,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                     ListView.builder(
                       shrinkWrap:
                           true, // Prevent list view from taking unnecessary space
-                      itemCount: widget.regularRecipe['ingredients'].length,
+                      itemCount: widget.recipe.ingredients.length,
                       itemBuilder: (context, index) =>
-                          Text(widget.regularRecipe['ingredients'][index]),
+                          Text(widget.recipe.ingredients[index]),
                     ),
                   ],
                 ),
@@ -122,11 +123,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                           TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10.0),
-                    // ListView.builder(
-                    //   shrinkWrap: true,
-                    //   itemCount: steps.length,
-                    //   itemBuilder: (context, index) => Text('Step ${index + 1}: ${steps[index]}'),
-                    // ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount:  widget.recipe.instructions.length,
+                      itemBuilder: (context, index) => Text('Step ${index + 1}: ${widget.recipe.instructions[index]}'),
+                    ),
                   ],
                 ),
               ),

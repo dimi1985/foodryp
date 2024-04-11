@@ -32,17 +32,21 @@ class RecipeService with ChangeNotifier {
     }
   }
 
-  Future<bool> createCategory(
+  Future<bool> createRecipe(
     String recipeTitle,
-    String recipeImage,
     List<String> ingredients,
-    int duration,
+    List<String> instructions,
+    String prepDuration,
+    String cookDuration,
+    String servingNumber,
     String difficulty,
     String username,
     String useImage,
     String userId,
     DateTime date,
     String description,
+    String categoryId,
+    String categoryColor,
   ) async {
     try {
       final response = await http.post(
@@ -50,15 +54,19 @@ class RecipeService with ChangeNotifier {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'recipeTitle': recipeTitle,
-          'recipeImage': recipeImage,
           'ingredients': ingredients,
-          'duration': duration,
+          'instructions': instructions,
+          'prepDuration': prepDuration,
+          'cookDuration': cookDuration,
           'difficulty': difficulty,
+           'servingNumber': servingNumber,
           'username': username,
           'useImage': useImage,
           'userId': userId,
-          'date': date,
+          'date': date.toIso8601String(),
           'description': description,
+           'categoryId': categoryId,
+            'categoryColor': categoryColor,
         }),
       );
       if (response.statusCode == 201) {
@@ -66,19 +74,19 @@ class RecipeService with ChangeNotifier {
         final responseData = jsonDecode(response.body);
         String recipeId = responseData['recipeId'];
         // categoryId = id;
-        log('categoryId $recipeId');
+        log('recipeId $recipeId');
         await _saveRecipeIDLocally(recipeId);
         notifyListeners();
         return true;
       }
       return false;
     } catch (e) {
-      print('Error saving Category user: $e');
+      print('Error saving recipe : $e');
       return false;
     }
   }
 
-  Future<void> uploadCategoryImage(File image, List<int>? bytes) async {
+  Future<void> uploadRecipeImage(File image, List<int>? bytes) async {
     await _initPrefs();
     final recipeId = _prefs.getString('recipeId');
     try {
@@ -138,8 +146,8 @@ class RecipeService with ChangeNotifier {
     await _prefs.setString('recipeId', recipeId);
   }
 
-    Future<void> removeRecipeIDLocally() async {
-  await _initPrefs();
-  await _prefs.remove('recipeId');
-}
+  Future<void> removeRecipeIDLocally() async {
+    await _initPrefs();
+    await _prefs.remove('recipeId');
+  }
 }
