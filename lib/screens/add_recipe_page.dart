@@ -1,22 +1,14 @@
-import 'dart:developer';
 import 'dart:io';
-
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/category_service.dart';
-import 'package:foodryp/utils/ingredients_state.dart';
-import 'package:foodryp/utils/instructions_state.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
-import 'package:foodryp/widgets/CustomWidgets/ingredients_add_container.dart';
-import 'package:foodryp/widgets/CustomWidgets/instructions_add_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
-import 'package:foodryp/widgets/CustomWidgets/category_listView.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:provider/provider.dart';
 
 class AddRecipePage extends StatefulWidget {
   const AddRecipePage({super.key});
@@ -26,12 +18,26 @@ class AddRecipePage extends StatefulWidget {
 }
 
 class _AddRecipePageState extends State<AddRecipePage> {
-  CategoryModel? _selectedCategory; // Use CategoryModel type
-
   final categoryService = CategoryService();
-  List<CategoryModel> _categories = [];
+  List<CategoryModel> categories = [];
   late File? _imageFile = File('');
   late Uint8List uint8list = Uint8List(0);
+  List<String> ingredients = [];
+  List<String> instructions = [];
+  final List<TextEditingController> ingredientsControllers = [
+    TextEditingController()
+  ];
+  final List<TextEditingController> instructionControllers = [
+    TextEditingController()
+  ];
+
+  TextEditingController recipeTextController = TextEditingController();
+  TextEditingController descriptionTextController = TextEditingController();
+  TextEditingController servingTextController = TextEditingController();
+  TextEditingController prepDurationTextController = TextEditingController();
+  TextEditingController cookDurationTextController = TextEditingController();
+
+  late int tappedCategoryIndex = 0;
 
   @override
   void initState() {
@@ -41,22 +47,43 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   Future<void> _fetchCategories() async {
     try {
-      final categories = await categoryService.getAllCategories();
+      final categoriesGET = await categoryService.getAllCategories();
       setState(() {
-        _categories = categories;
+        categories = categoriesGET;
       });
     } catch (error) {
-      print('Error fetching categories: $error');
       // Handle errors gracefully, e.g., show an error message
     }
+  }
+
+  void _addIngredient() {
+    setState(() {
+      ingredientsControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeIngredient(int index) {
+    setState(() {
+      ingredientsControllers.removeAt(index);
+    });
+  }
+
+  void _addInstruction() {
+    setState(() {
+      instructionControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeInstruction(int index) {
+    setState(() {
+      instructionControllers.removeAt(index);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     bool isDesktop = Responsive.isDesktop(context);
-    final ingredientsState = Provider.of<IngredientsState>(context);
-    final instructionsState = Provider.of<InstructionsState>(context);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -71,36 +98,70 @@ class _AddRecipePageState extends State<AddRecipePage> {
                 children: [
                   // Form fields for recipe details
                   const SizedBox(height: 50.0),
-
-                  _categories.isEmpty
+                  //Get Categories
+                  categories.isEmpty
                       ? const Center(
                           child: LinearProgressIndicator(),
                         )
                       : SizedBox(
                           height: 50,
                           width: screenSize.width,
-                          child: CategoryListView(
-                            categories: _categories,
-                            onTap: (category) {
-                              setState(() {
-                                _selectedCategory = category;
-                              });
-                            },
-                          ),
-                        ),
+                          child: ScrollConfiguration(
+                            behavior: ScrollConfiguration.of(context).copyWith(
+                              dragDevices: {
+                                PointerDeviceKind.touch,
+                                PointerDeviceKind.mouse,
+                              },
+                            ),
+                            child: ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: categories.length,
+                              itemBuilder: (context, index) {
+                                final category = categories[index];
+                                final isTapped = index == tappedCategoryIndex;
+                                
+
+                                return InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      tappedCategoryIndex = index;
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          category.name,
+                                          style: TextStyle(
+                                            color: isTapped
+                                                ? HexColor(category.color)
+                                                : Colors.grey,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          )),
 
                   const SizedBox(height: 50.0),
-
                   SectionTitle(
                     title: 'Recipe Title:',
                     isDesktop: isDesktop,
                   ),
 
                   CustomTextField(
-                    controller: TextEditingController(),
+                    controller: recipeTextController,
                     hintText: 'Recipe Title',
                     labelText: '',
-                    onChanged: (value) {},
                   ),
                   const SizedBox(height: 20.0),
 
@@ -110,7 +171,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
 
                   CustomTextField(
-                    controller: TextEditingController(),
+                    controller: descriptionTextController =
+                        TextEditingController(),
                     hintText: 'Description',
                     labelText: '',
                     onChanged: (value) {},
@@ -148,9 +210,31 @@ class _AddRecipePageState extends State<AddRecipePage> {
                     isDesktop: isDesktop,
                   ),
 
-                  IngredientsAddContainer(
-                      onAddIngredient: ingredientsState.addIngredient,
-                      onRemoveIngredient: ingredientsState.removeIngredient),
+                  //Ingredient Section
+                  ListView.builder(
+                    // controller: _scrollController,
+                    shrinkWrap: true,
+                    itemCount: ingredientsControllers.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index == ingredientsControllers.length - 1
+                              ? 16.0
+                              : 8.0,
+                        ),
+                        child: CustomTextField(
+                          controller: ingredientsControllers[index],
+                          hintText: 'Ingredient ${index + 1}',
+                          borderColor: Colors.grey,
+                          suffixIcon: index == 0 ? Icons.add : Icons.delete,
+                          onSuffixIconPressed: index == 0
+                              ? _addIngredient
+                              : () => _removeIngredient(index),
+                          labelText: '',
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
@@ -159,9 +243,33 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
 
                   const SizedBox(height: 20.0),
-                  InstructionsAddContainer(
-                      onAddInstruction: instructionsState.addInstruction,
-                      onRemoveInstruction: instructionsState.removeInstruction),
+                  //Instruction section
+                  ListView.builder(
+                    // controller: _scrollController,
+                    shrinkWrap: true,
+                    itemCount: instructionControllers.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index == instructionControllers.length - 1
+                              ? 16.0
+                              : 8.0,
+                        ),
+                        child: CustomTextField(
+                          controller: instructionControllers[index],
+                          hintText: 'Instruction ${index + 1}',
+                          borderColor: Colors.grey,
+                          suffixIcon: index == 0 ? Icons.add : Icons.delete,
+                          onSuffixIconPressed: index == 0
+                              ? _addInstruction
+                              : () => _removeInstruction(index),
+                          maxLines:
+                              null, // Allow multiple lines for instructions
+                          keyboardType: TextInputType.multiline, labelText: '',
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
@@ -171,10 +279,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
                   const SizedBox(height: 20.0),
                   CustomTextField(
-                    controller: TextEditingController(),
+                    controller: servingTextController = TextEditingController(),
                     hintText: 'Serves  2-4 ',
                     labelText: '',
-                    onChanged: (value) {},
                   ),
 
                   const SizedBox(height: 20.0),
@@ -186,7 +293,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
                   const SizedBox(height: 20.0),
                   CustomTextField(
-                    controller: TextEditingController(),
+                    controller: cookDurationTextController =
+                        TextEditingController(),
                     hintText: '45 minutes or 1h and 25 minutes e.t.c ',
                     labelText: '',
                     onChanged: (value) {},
@@ -201,7 +309,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
                   const SizedBox(height: 20.0),
                   CustomTextField(
-                    controller: TextEditingController(),
+                    controller: prepDurationTextController =
+                        TextEditingController(),
                     hintText: '45 minutes or 1h and 25 minutes e.t.c ',
                     labelText: '',
                     onChanged: (value) {},
@@ -210,12 +319,24 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
                   ElevatedButton(
                     onPressed: () {
-                      final ingredients = ingredientsState.ingredients;
-                      final instructions = instructionsState.instructions;
-                      // Process ingredients and instructions (e.g., save to database)
-
-                      log(ingredients.toList().toString());
-                      log(instructions.toList().toString());
+                      //  previewIngredientsAndInstructions();
+                      List<String> ingredients = getIngredients();
+                      List<String> instructions = getInstructions();
+                      String recipeValue = recipeTextController.text;
+                      String descriptionValue = descriptionTextController.text;
+                      String servingValue = servingTextController.text;
+                      String prepDurationValue =
+                          prepDurationTextController.text;
+                      String cookDurationValue =
+                          cookDurationTextController.text;
+                      // Use the values as needed
+                      print('Ingredients: $ingredients');
+                      print('Instructions: $instructions');
+                      print('recipeValue: $recipeValue');
+                      print('descriptionValue: $descriptionValue');
+                      print('servingValue: $servingValue');
+                      print('prepDurationValue: $prepDurationValue');
+                      print('cookDurationValue: $cookDurationValue');
                     },
                     child: const Text('Preview Recipe'),
                   ),
@@ -226,5 +347,13 @@ class _AddRecipePageState extends State<AddRecipePage> {
         ),
       ),
     );
+  }
+
+  List<String> getIngredients() {
+    return ingredientsControllers.map((controller) => controller.text).toList();
+  }
+
+  List<String> getInstructions() {
+    return instructionControllers.map((controller) => controller.text).toList();
   }
 }

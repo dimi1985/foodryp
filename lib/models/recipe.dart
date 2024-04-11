@@ -1,4 +1,4 @@
-import 'package:foodryp/models/ingredient';
+
 
 class Recipe {
   final String recipeTitle;
