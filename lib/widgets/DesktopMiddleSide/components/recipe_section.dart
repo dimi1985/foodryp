@@ -5,7 +5,7 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
 import 'package:foodryp/models/recipe.dart';
-import 'package:foodryp/screens/recipe_detail_page.dart';
+import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 
 class RecipeSection extends StatefulWidget {
@@ -76,8 +76,10 @@ class _RecipeSectionState extends State<RecipeSection> {
                     );
                   },
                   username: recipe.username,
-                  userImageURL: 'https://picsum.photos/200/300',
+                  userImageURL: recipe.useImage ?? '',
                   description: recipe.description,
+                  categoryColor: recipe.categoryColor,
+                  categoryFont: recipe.categoryFont,
                 ),
               );
             },

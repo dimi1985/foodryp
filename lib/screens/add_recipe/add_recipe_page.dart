@@ -4,7 +4,9 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
+import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -28,6 +30,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   late Uint8List uint8list = Uint8List(0);
   List<String> ingredients = [];
   List<String> instructions = [];
+  Map<String, Color> difficultyColors = {};
   final List<TextEditingController> ingredientsControllers = [
     TextEditingController()
   ];
@@ -45,8 +48,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   String _selectedDifficulty = 'Easy'; // Initial value
 
-   String selectedCategoryColor = '';
-   String selectedCategoryId = '';
+  String selectedCategoryColor = '';
+  String selectedCategoryId = '';
+  String selectedCategoryFont = '';
   late String recipeTitleValue;
   late String descriptionValue;
   late String servingValue;
@@ -60,13 +64,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
     setState(() {
       user = userProfile ??
           User(
-              id: '',
-              username: '',
-              email: '',
-              profileImage: '',
-              gender: '',
-              memberSince: null,
-              role: '');
+            id: '',
+            username: '',
+            email: '',
+            profileImage: '',
+            gender: '',
+            memberSince: null,
+            role: '',
+            recipes: [],
+          );
     });
   }
 
@@ -116,7 +122,13 @@ class _AddRecipePageState extends State<AddRecipePage> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     bool isDesktop = Responsive.isDesktop(context);
-
+    difficultyColors = {
+      AppLocalizations.of(context).translate('Easy'): Colors.green,
+      AppLocalizations.of(context).translate('Medium'): Colors.yellow,
+      AppLocalizations.of(context).translate('Hard'): Colors.orange,
+      AppLocalizations.of(context).translate('Chef'): Colors.red,
+      AppLocalizations.of(context).translate('Michelin'): Colors.blue,
+    };
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
@@ -162,6 +174,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                         selectedCategoryColor = category.color;
 
                                         selectedCategoryId = category.id!;
+                                        selectedCategoryFont = category.font;
                                       }
                                     });
                                   },
@@ -191,13 +204,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
                   const SizedBox(height: 50.0),
                   SectionTitle(
-                    title: 'Recipe Title:',
+                    title:
+                        '${AppLocalizations.of(context).translate('Recipe Title')}'
+                        ':',
                     isDesktop: isDesktop,
                   ),
 
                   CustomTextField(
                     controller: recipeTitleTextController,
-                    hintText: 'Recipe Title',
+                    hintText:
+                        AppLocalizations.of(context).translate('Recipe Title'),
                     labelText: '',
                     borderColor: selectedCategoryColor.isNotEmpty
                         ? HexColor(selectedCategoryColor)
@@ -206,13 +222,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
-                    title: 'Description:',
+                    title:
+                        '${AppLocalizations.of(context).translate('Description')}'
+                        ':',
                     isDesktop: isDesktop,
                   ),
 
                   CustomTextField(
                     controller: descriptionTextController,
-                    hintText: 'Description',
+                    hintText:
+                        AppLocalizations.of(context).translate('Description'),
                     labelText: '',
                     borderColor: selectedCategoryColor.isNotEmpty
                         ? HexColor(selectedCategoryColor)
@@ -221,7 +240,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
-                    title: 'Image Selection:',
+                    title: AppLocalizations.of(context)
+                        .translate('Image Selection:'),
                     isDesktop: isDesktop,
                   ),
 
@@ -247,7 +267,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
-                    title: 'Add Ingredients:',
+                    title: AppLocalizations.of(context)
+                        .translate('Add Ingredients:'),
                     isDesktop: isDesktop,
                   ),
 
@@ -265,7 +286,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         ),
                         child: CustomTextField(
                           controller: ingredientsControllers[index],
-                          hintText: 'Ingredient ${index + 1}',
+                          hintText:
+                              '${AppLocalizations.of(context).translate('Ingredient')}'
+                              ' ${index + 1}',
                           borderColor: selectedCategoryColor.isNotEmpty
                               ? HexColor(selectedCategoryColor)
                               : null,
@@ -281,7 +304,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
-                    title: 'Add Instructions:',
+                    title: AppLocalizations.of(context)
+                        .translate('Add Instructions:'),
                     isDesktop: isDesktop,
                   ),
 
@@ -300,7 +324,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         ),
                         child: CustomTextField(
                           controller: instructionControllers[index],
-                          hintText: 'Instruction ${index + 1}',
+
+                          hintText:
+                              '${AppLocalizations.of(context).translate('Instruction')}'
+                              ' ${index + 1}',
                           borderColor: selectedCategoryColor.isNotEmpty
                               ? HexColor(selectedCategoryColor)
                               : null,
@@ -318,14 +345,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
-                    title: 'How many people is this food for ?:',
+                    title: AppLocalizations.of(context)
+                        .translate('How many people is this food for ?:'),
                     isDesktop: isDesktop,
                   ),
 
                   const SizedBox(height: 20.0),
                   CustomTextField(
                     controller: servingTextController,
-                    hintText: 'Serves  2-4 ',
+                    hintText:
+                        AppLocalizations.of(context).translate('Serves  2-4'),
                     labelText: '',
                     borderColor: selectedCategoryColor.isNotEmpty
                         ? HexColor(selectedCategoryColor)
@@ -333,13 +362,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
                   const SizedBox(height: 20.0),
                   SectionTitle(
-                    title: 'How long does it take to cook ?:',
+                    title: AppLocalizations.of(context)
+                        .translate('How long does it take to cook ?:'),
                     isDesktop: isDesktop,
                   ),
                   const SizedBox(height: 20.0),
                   CustomTextField(
                     controller: cookDurationTextController,
-                    hintText: '45 minutes or 1h and 25 minutes e.t.c ',
+                    hintText: AppLocalizations.of(context)
+                        .translate('45 minutes or 1h and 25 minutes e.t.c'),
                     labelText: '',
                     borderColor: selectedCategoryColor.isNotEmpty
                         ? HexColor(selectedCategoryColor)
@@ -349,14 +380,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
 
                   SectionTitle(
-                    title: 'How long does the total preparation is ?:',
+                    title: AppLocalizations.of(context)
+                        .translate('How long does the total preparation is ?:'),
                     isDesktop: isDesktop,
                   ),
 
                   const SizedBox(height: 20.0),
                   CustomTextField(
                     controller: prepDurationTextController,
-                    hintText: '45 minutes or 1h and 25 minutes e.t.c ',
+                    hintText: AppLocalizations.of(context)
+                        .translate('45 minutes or 1h and 25 minutes e.t.c'),
                     labelText: '',
                     borderColor: selectedCategoryColor.isNotEmpty
                         ? HexColor(selectedCategoryColor)
@@ -364,7 +397,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
                   const SizedBox(height: 20.0),
                   SectionTitle(
-                    title: 'Difficulty: ',
+                    title: AppLocalizations.of(context).translate('Difficulty'),
                     isDesktop: isDesktop,
                   ),
                   const SizedBox(height: 20.0),
@@ -374,31 +407,39 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       color: Colors.grey[200],
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: DropdownButton<String>(
-                      value: _selectedDifficulty,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedDifficulty = newValue!;
-                        });
-                      },
-                      items: ['Easy', 'Medium', 'Hard', 'Chef', 'Michelin']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Row(
+                    child: Row(
+                      children: [
+                        for (String value in [
+                          AppLocalizations.of(context).translate('Easy'),
+                          AppLocalizations.of(context).translate('Medium'),
+                          AppLocalizations.of(context).translate('Hard'),
+                          AppLocalizations.of(context).translate('Chef'),
+                          AppLocalizations.of(context).translate('Michelin')
+                        ])
+                          Row(
                             children: [
-                              _buildIconForDifficulty(value),
-                              const SizedBox(width: 8),
-                              Text(value),
+                              ChoiceChip(
+                                label: Text(value),
+                                selected: _selectedDifficulty == value,
+                                backgroundColor: difficultyColors[
+                                    value], // Set background color based on difficulty
+                                selectedColor: Colors
+                                    .white, // Optional: Set selected color
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _selectedDifficulty =
+                                        (selected ? value : null)!;
+                                  });
+                                },
+                              ),
+                              const SizedBox(
+                                  width: 8), // Add space between the chips
                             ],
                           ),
-                        );
-                      }).toList(),
-                      isExpanded: true,
-                      underline: Container(),
-                      icon: const Icon(Icons.arrow_drop_down),
+                      ],
                     ),
                   ),
+
                   const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () {
@@ -448,11 +489,23 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          const Text(
-                                            'Recipe Title',
-                                            style: TextStyle(
-                                                fontSize: 20.0,
-                                                fontWeight: FontWeight.bold),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                AppLocalizations.of(context)
+                                                    .translate('Recipe Title'),
+                                                style: const TextStyle(
+                                                    fontSize: 20.0,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              const SizedBox(height: 32.0),
+                                              Text(
+                                                _selectedDifficulty,
+                                                style: const TextStyle(
+                                                    fontSize: 16.0),
+                                              ),
+                                            ],
                                           ),
                                           const SizedBox(height: 8.0),
                                           Text(
@@ -460,10 +513,17 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                             style:
                                                 const TextStyle(fontSize: 16.0),
                                           ),
+                                          const SizedBox(height: 8.0),
+                                          Text(
+                                            _selectedDifficulty,
+                                            style:
+                                                const TextStyle(fontSize: 16.0),
+                                          ),
                                           const SizedBox(height: 16.0),
-                                          const Text(
-                                            'Description',
-                                            style: TextStyle(
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate('Description'),
+                                            style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -474,9 +534,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 const TextStyle(fontSize: 16.0),
                                           ),
                                           const SizedBox(height: 16.0),
-                                          const Text(
-                                            'Serving',
-                                            style: TextStyle(
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate('Serving'),
+                                            style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -487,9 +548,11 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 const TextStyle(fontSize: 16.0),
                                           ),
                                           const SizedBox(height: 16.0),
-                                          const Text(
-                                            'Preparation Duration',
-                                            style: TextStyle(
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate(
+                                                    'Preparation Duration'),
+                                            style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -500,9 +563,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 const TextStyle(fontSize: 16.0),
                                           ),
                                           const SizedBox(height: 16.0),
-                                          const Text(
-                                            'Cooking Duration',
-                                            style: TextStyle(
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate('Cooking Duration'),
+                                            style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -513,9 +577,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 const TextStyle(fontSize: 16.0),
                                           ),
                                           const SizedBox(height: 16.0),
-                                          const Text(
-                                            'Ingredients:',
-                                            style: TextStyle(
+                                          Text(
+                                            '${AppLocalizations.of(context).translate('Ingredients')}'
+                                            ':',
+                                            style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -530,9 +595,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                             }).toList(),
                                           ),
                                           const SizedBox(height: 16.0),
-                                          const Text(
-                                            'Instructions:',
-                                            style: TextStyle(
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate('Instructions:'),
+                                            style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -556,7 +622,22 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             actions: [
                               ElevatedButton(
                                 onPressed: () {
-                                  log(selectedCategoryId);
+                                  // Show SnackBar indicating recipe creation process
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Row(
+                                        children: [
+                                          CircularProgressIndicator(), // Add a circular progress indicator
+                                          SizedBox(width: 16),
+                                          Text(AppLocalizations.of(context)
+                                              .translate(
+                                                  'Creating recipe...')), // Text indicating recipe creation
+                                        ],
+                                      ),
+                                    ),
+                                  );
+
+// Call the createRecipe method to create the recipe
                                   RecipeService()
                                       .createRecipe(
                                     recipeTitleValue,
@@ -572,16 +653,56 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                     DateTime.now(),
                                     descriptionValue,
                                     selectedCategoryId,
-                                    selectedCategoryColor
+                                    selectedCategoryColor,
+                                    selectedCategoryFont,
                                   )
                                       .then((value) {
+                                    // Once the recipe creation process is complete, hide the SnackBar
+                                    ScaffoldMessenger.of(context)
+                                        .hideCurrentSnackBar();
+
                                     if (value) {
+                                      // Show a SnackBar indicating recipe creation success
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(AppLocalizations.of(
+                                                  context)
+                                              .translate(
+                                                  'Recipe created successfully')), // Show recipe creation success message
+                                        ),
+                                      );
+
+                                      // Upload the recipe image
                                       RecipeService().uploadRecipeImage(
                                           _imageFile!, uint8list);
 
                                       Navigator.of(context)
                                           .pop(); // Close the dialog
+                                    } else {
+                                      // Show a SnackBar indicating recipe creation failure
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(AppLocalizations.of(
+                                                  context)
+                                              .translate(
+                                                  'Failed to create recipe')), // Show recipe creation failure message
+                                        ),
+                                      );
                                     }
+                                  }).catchError((error) {
+                                    // If there's an error during recipe creation, hide the SnackBar
+                                    ScaffoldMessenger.of(context)
+                                        .hideCurrentSnackBar();
+
+                                    // Show a SnackBar indicating recipe creation failure due to error
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            '${AppLocalizations.of(context).translate('Error creating recipe:')} $error'), // Show recipe creation error message
+                                      ),
+                                    );
                                   });
                                 },
                                 child: const Text('Save'),

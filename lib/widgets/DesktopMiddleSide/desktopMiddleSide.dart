@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
 import 'package:foodryp/widgets/DesktopMiddleSide/components/recipe_section.dart';
 import 'package:foodryp/widgets/DesktopMiddleSide/components/top_three_recipe_card.dart';
@@ -22,13 +22,15 @@ class DesktopMiddleSide extends StatelessWidget {
           SizedBox(
             height: isAndroid ? 10 : 100,
           ),
-          const HeadingTitleRow(
-            title: 'Recipes',
+           HeadingTitleRow(
+            title: AppLocalizations.of(context)
+                                  .translate('Recipes'),
           ),
           const RecipeSection(),
           if (isAndroid) const SizedBox(height: 25),
-          const HeadingTitleRow(
-            title: 'Categories',
+           HeadingTitleRow(
+            title: AppLocalizations.of(context)
+                                  .translate('Categories'),
           ),
           const CategorySection(),
         ],

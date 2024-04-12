@@ -15,9 +15,9 @@ static const defaultPadding = 16.0;
 static const mobileFontSize = 12.0;
 static const tabletFontSize = 14.0;
 static const desktopFontSize = 15.0;
-static const mobileHeadingTitleSize = 14.0;
-static const tabletHeadingTitleSize = 16.0;
-static const desktopHeadingTitleSize = 18.0;
+static const mobileHeadingTitleSize = 18.0;
+static const tabletHeadingTitleSize = 22.0;
+static const desktopHeadingTitleSize = 24.0;
 static const topThreeTitleSize = 30.0;
 
 static const imageURL = kIsWeb ? 'http://localhost:3000' : 'http://192.168.106.229:3000';

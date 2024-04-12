@@ -6,10 +6,10 @@ class SectionTitle extends StatelessWidget {
   final bool isDesktop;
 
   const SectionTitle({
-    Key? key,
+    super.key,
     required this.title,
     required this.isDesktop,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

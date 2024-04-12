@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_screen/components/top_profile.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/top_creators.dart';
 import 'package:foodryp/widgets/DesktopMiddleSide/components/recipe_section.dart';
@@ -18,9 +19,16 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
- User user = User(id: '', username: '', email: '', profileImage: '', gender: '', memberSince: null, role: '',);
-
-
+  User user = User(
+    id: '',
+    username: '',
+    email: '',
+    profileImage: '',
+    gender: '',
+    memberSince: null,
+    role: '',
+    recipes: [],
+  );
 
   @override
   void initState() {
@@ -28,38 +36,49 @@ class _ProfilePageState extends State<ProfilePage> {
     fetchUserProfile();
   }
 
-Future<void> fetchUserProfile() async {
-  final userService = UserService(); 
-  final userProfile = await userService.getUserProfile(); 
-  setState(() {
-    user = userProfile ?? User(id: '', username: '', email: '', profileImage: '', gender: '', memberSince: null, role: '');
-  });
-}
-
+  Future<void> fetchUserProfile() async {
+    final userService = UserService();
+    final userProfile = await userService.getUserProfile();
+    setState(() {
+      user = userProfile ??
+          User(
+              id: '',
+              username: '',
+              email: '',
+              profileImage: '',
+              gender: '',
+              memberSince: null,
+              role: '',
+              recipes: []);
+    });
+  }
 
   @override
-  Widget build(BuildContext context) {  
+  Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
         children: [
           TopProfile(
-            profileImage:  user.profileImage,
-             gender: user.gender ?? '',
-             profileName: user.username,
-             role: user.role,
+            profileImage: user.profileImage,
+            gender: user.gender ?? '',
+            profileName: user.username,
+            role: user.role,
           ),
           const SizedBox(height: 10.0),
-          const HeadingTitleRow(title: 'Weekly Menus'),
-       const   SizedBox(height: 10.0),
-       const   RecipeCardProfile(),
-       const   SizedBox(height: 25.0),
-       const   HeadingTitleRow(title: 'Recipes'),
-       const   SizedBox(height: 10.0),
-      const    RecipeSection(),
-       const   SizedBox(height: 15.0),
-       const   HeadingTitleRow(title: 'Following'),
-       const   TopCreators(),
-       const   SizedBox(height: 15.0),
+          HeadingTitleRow(
+              title: AppLocalizations.of(context).translate('Weekly Menus')),
+          const SizedBox(height: 10.0),
+          const RecipeCardProfile(),
+          const SizedBox(height: 25.0),
+          HeadingTitleRow(
+              title: AppLocalizations.of(context).translate('Recipes')),
+          const SizedBox(height: 10.0),
+          const RecipeSection(),
+          const SizedBox(height: 15.0),
+          HeadingTitleRow(
+              title: AppLocalizations.of(context).translate('Following')),
+          const TopCreators(),
+          const SizedBox(height: 15.0),
         ],
       ),
     );

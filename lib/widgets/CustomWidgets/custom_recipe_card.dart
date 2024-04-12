@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomRecipeCard extends StatelessWidget {
   final String title;
@@ -12,6 +13,8 @@ class CustomRecipeCard extends StatelessWidget {
   final String username;
   final String userImageURL;
   final String description;
+  final String categoryColor;
+  final String categoryFont;
 
   const CustomRecipeCard({
     super.key,
@@ -23,14 +26,15 @@ class CustomRecipeCard extends StatelessWidget {
     required this.onTap,
     required this.username,
     required this.userImageURL,
-    required this.description,
+    required this.description, required this.categoryColor, required this.categoryFont,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
            bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
-    return GestureDetector(
+            final recipeImage = '${Constants.imageURL}/$imageUrl';
+    return InkWell(
   onTap: onTap,
   child: Container(
     height: 150,
@@ -57,7 +61,7 @@ class CustomRecipeCard extends StatelessWidget {
               topRight: Radius.circular(Constants.defaultPadding),
             ),
             child: Image.network(
-              imageUrl,
+              recipeImage,
               fit: BoxFit.cover,
             ),
           ),
@@ -98,13 +102,14 @@ class CustomRecipeCard extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: Responsive.isDesktop(context)
-                        ? Constants.desktopFontSize
-                        : Constants.mobileFontSize,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                  style: GoogleFonts.getFont(
+                  categoryFont,
+                  fontSize: Responsive.isDesktop(context)
+                      ? Constants.desktopFontSize
+                      : Constants.mobileFontSize,
+                  fontWeight: FontWeight.bold,
+                  color: color.withOpacity(0.7),
+                ),
                 ),
                 // You can add more widgets here if needed
               ],

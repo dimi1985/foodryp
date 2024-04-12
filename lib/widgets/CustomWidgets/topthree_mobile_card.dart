@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
-import 'package:intl/intl.dart';
 
 class CustomCategoryTopThreeMobileCard extends StatelessWidget {
   final String title;

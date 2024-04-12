@@ -3,8 +3,8 @@ class CategoryModel {
   final String name;
   final String font;
   final String color;
-  final String? categoryImage; // nullable for optional image
-  final List<String>? recipes; // List of recipe IDs (String type)
+  final String? categoryImage; 
+  final List<String>? recipes; 
 
   CategoryModel({
     this.id,
@@ -30,7 +30,7 @@ Map<String, dynamic> toJson() => {
       'font': font,
       'color': color,
       'categoryImage': categoryImage,
-      'recipes': recipes, // No changes needed here (already List<String>)
+      'recipes': recipes, 
     };
 
 }

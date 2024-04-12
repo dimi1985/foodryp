@@ -21,7 +21,7 @@ class UserService with ChangeNotifier {
   }
 
   Future<bool> registerUser(
-      String username, String email, String password, String gender) async {
+      String username, String email, String password, String gender,List<String> recipes) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/register'),
@@ -34,6 +34,7 @@ class UserService with ChangeNotifier {
           'profileImage': '',
          'memberSince': DateTime.now().toIso8601String(),
           'role': 'user',
+           'recipes': recipes,
         }),
       );
       if (response.statusCode == 201) {
@@ -47,7 +48,7 @@ class UserService with ChangeNotifier {
             username: username,
             email: email,
             profileImage: '',
-            gender: gender, memberSince: null, role: '');
+            gender: gender, memberSince: null, role: '', recipes: []);
         notifyListeners();
         return true;
       }
@@ -157,15 +158,6 @@ class UserService with ChangeNotifier {
   }
 }
 
-  Future<void> _saveUserIDLocally(String userId) async {
-    await _initPrefs(); // Initialize SharedPreferences
-    await _prefs.setString('userId', userId); // Save userID locally
-  }
-
-  Future<void> clearUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userId');
-  }
 
 
 
@@ -210,4 +202,39 @@ static Future<bool> updateUserRole(String userId, String newRole) async {
     return false;
   }
 }
+
+Future<void> deleteUser() async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  try {
+    final url = Uri.parse('${Constants.baseUrl}/api/deleteUser/$userId');
+    final response = await http.delete(url);
+
+    if (response.statusCode == 200) {
+      // User deleted successfully
+      clearUserId();
+      print('User deleted successfully');
+    } else {
+      // Handle error deleting user
+      print('Error deleting user: ${response.statusCode}');
+    }
+  } catch (e) {
+    // Handle network error
+    print('Network error: $e');
+  }
+}
+
+
+  Future<void> _saveUserIDLocally(String userId) async {
+    await _initPrefs(); // Initialize SharedPreferences
+    await _prefs.setString('userId', userId); // Save userID locally
+  }
+
+  Future<void> clearUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
+  }
+
+
+
 }

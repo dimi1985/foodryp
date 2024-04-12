@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
     username: '',
     email: '',
     profileImage: '',
-    gender: '', memberSince: null, role: '',
+    gender: '', memberSince: null, role: '', recipes: [],
   );
 
   @override
@@ -49,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
         isAuthenticated = true;
       }
       user = userProfile ??
-          User(id: '', username: '', email: '', profileImage: '', gender: '', memberSince: null, role: '');
+          User(id: '', username: '', email: '', profileImage: '', gender: '', memberSince: null, role: '', recipes: []);
     });
   }
 

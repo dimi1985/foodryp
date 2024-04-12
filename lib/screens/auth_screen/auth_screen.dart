@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/auth_screen/components/reusable_textfield.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:provider/provider.dart';
 
@@ -59,20 +60,22 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(height: 30.0),
                     ReusableTextField(
-                      hintText: 'Email',
+                      hintText: AppLocalizations.of(context).translate('Email'),
                       controller: emailController,
                       togglePasswordVisibility: (isVisible) {},
                     ),
                     const SizedBox(height: 15.0),
                     if (!isLogin)
                       ReusableTextField(
-                        hintText: 'Username',
+                        hintText:
+                            AppLocalizations.of(context).translate('Username'),
                         controller: userNameController,
                         togglePasswordVisibility: (isVisible) {},
                       ),
                     const SizedBox(height: 15.0),
                     ReusableTextField(
-                      hintText: 'Password',
+                      hintText:
+                          AppLocalizations.of(context).translate('Password'),
                       controller: passwordController,
                       obscureText: obscureText,
                       togglePasswordVisibility: (isVisible) {
@@ -88,27 +91,50 @@ class _AuthScreenState extends State<AuthScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          const Expanded(flex: 1, child: Text('Pick Gender: ')),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              AppLocalizations.of(context)
+                                  .translate('Pick Gender: '),
+                            ),
+                          ),
                           const Spacer(),
                           Expanded(
                             flex: 3,
-                            child: DropdownButton<Gender>(
-                              value: _selectedGender,
-                              onChanged: (Gender? newValue) {
-                                setState(() {
-                                  _selectedGender = newValue;
-                                });
-                              },
-                              items: <Gender>[
-                                Gender.male,
-                                Gender.female,
-                              ].map<DropdownMenuItem<Gender>>((Gender value) {
-                                return DropdownMenuItem<Gender>(
-                                  value: value,
-                                  child: Text(
-                                      value == Gender.male ? 'Male' : 'Female'),
-                                );
-                              }).toList(),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                    10.0), // Adjust the radius as needed
+                                color: Colors
+                                    .grey[200], // Adjust the color as needed
+                              ),
+                              child: DropdownButton<Gender>(
+                                value: _selectedGender,
+                                onChanged: (Gender? newValue) {
+                                  setState(() {
+                                    _selectedGender = newValue;
+                                  });
+                                },
+                                items: <Gender>[
+                                  Gender.male,
+                                  Gender.female,
+                                ].map<DropdownMenuItem<Gender>>((Gender value) {
+                                  return DropdownMenuItem<Gender>(
+                                    value: value,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0),
+                                      child: Text(
+                                        value == Gender.male
+                                            ? AppLocalizations.of(context)
+                                                .translate('Male')
+                                            : AppLocalizations.of(context)
+                                                .translate('Female'),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
                             ),
                           ),
                         ],
@@ -127,7 +153,10 @@ class _AuthScreenState extends State<AuthScreen> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        child: Text(isLogin ? 'Login' : 'Register'),
+                        child: Text(isLogin
+                            ? AppLocalizations.of(context).translate('Login')
+                            : AppLocalizations.of(context)
+                                .translate('Register')),
                       ),
                     ),
                     const SizedBox(height: 15.0),
@@ -136,7 +165,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       onPressed: () {
                         // Handle forgot password logic
                       },
-                      child: const Text('Forgot Password?'),
+                      child: Text(AppLocalizations.of(context)
+                          .translate('Forgot Password?')),
                     ),
 
                     const SizedBox(height: 75.0),
@@ -146,15 +176,21 @@ class _AuthScreenState extends State<AuthScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(isLogin
-                            ? 'Dont Have an Account?'
-                            : 'Already Have an Account?'),
+                            ? AppLocalizations.of(context)
+                                .translate('Dont Have an Account?')
+                            : AppLocalizations.of(context)
+                                .translate('Already Have an Account?')),
                         TextButton(
                           onPressed: () {
                             setState(() {
                               isLogin = !isLogin;
                             });
                           },
-                          child: Text(isLogin ? 'Sign Up' : 'Sign In'),
+                          child: Text(isLogin
+                              ? AppLocalizations.of(context)
+                                  .translate('Sign Up')
+                              : AppLocalizations.of(context)
+                                  .translate('Sign In')),
                         ),
                       ],
                     ),
@@ -186,6 +222,7 @@ class _AuthScreenState extends State<AuthScreen> {
           emailController.text,
           passwordController.text,
           selectedGender.toString().split('.').last,
+          [],
         );
 
         if (success) {
@@ -220,7 +257,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> navigateToHomeScreen(BuildContext context) async {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) =>  MainScreen()),
+      MaterialPageRoute(builder: (context) => MainScreen()),
       (Route<dynamic> route) => false,
     );
   }

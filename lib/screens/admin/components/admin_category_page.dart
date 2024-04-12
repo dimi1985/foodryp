@@ -6,6 +6,7 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
@@ -267,23 +268,51 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
           actions: [
             ElevatedButton(
               onPressed: () async {
-                String? id;
-                bool success = await CategoryService().createCategory(
-                  categoryName,
-                  selectedFont!,
-                  selectedColor.hex,
-                  '',
+                // Show SnackBar indicating category creation process
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        CircularProgressIndicator(), // Add a circular progress indicator
+                        SizedBox(width: 16),
+                        Text(AppLocalizations.of(context).translate(
+                            'Creating category...')), // Text indicating category creation
+                      ],
+                    ),
+                  ),
                 );
 
+// Call the createCategory method to create the category
+                bool success = await CategoryService().createCategory(
+                    categoryName, selectedFont!, selectedColor.hex, '', []);
+
                 if (success) {
-                  // Category created successfully
-                  log('Category created successfully');
+                  // Once the category creation process is complete, hide the SnackBar
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                  // Show a SnackBar indicating category creation success
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context).translate(
+                          'Category created successfully')), // Show category creation success message
+                    ),
+                  );
+
+                  // Upload the category image
                   CategoryService().uploadCategoryImage(_imageFile!, uint8list);
                   CategoryService().removeCategoryIDLocally();
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Close the dialog
                 } else {
-                  // Handle creation error
-                  print('error');
+                  // If there's an error during category creation, hide the SnackBar
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                  // Show a SnackBar indicating category creation failure
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context).translate(
+                          'Failed to create category')), // Show category creation failure message
+                    ),
+                  );
                 }
               },
               style: ElevatedButton.styleFrom(

@@ -150,7 +150,11 @@ class _ImagePickerPreviewContainerState
                 ? imageIsPicked ? Image.memory(
                     uint8list,
                     fit: BoxFit.cover,
-                  ) : Image.network(
+                  ) :finalProfileImageURL == 'http://localhost:3000/' ? Image.asset(
+                                widget.gender.contains('female')
+                                    ? 'assets/default_avatar_female.jpg'
+                                    : 'assets/default_avatar_male.jpg',
+                              ): Image.network(
                                 finalProfileImageURL,
                                 fit: BoxFit.cover,
                               )

@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
 import 'package:foodryp/utils/contants.dart';

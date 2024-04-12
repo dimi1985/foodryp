@@ -32,9 +32,9 @@ class CategoryService with ChangeNotifier {
   }
 }
 
-
+ 
   Future<bool> createCategory(
-      String name, String font, String color, String categoryImage) async {
+      String name, String font, String color, String categoryImage,List<String> recipes) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/saveCategory'),
@@ -44,6 +44,7 @@ class CategoryService with ChangeNotifier {
           'font': font,
           'color': color,
           'categoryImage': categoryImage,
+             'recipes': recipes,
         }),
       );
       if (response.statusCode == 201) {

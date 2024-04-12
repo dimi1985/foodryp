@@ -2,6 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/responsive.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 class RecipeDetailPage extends StatefulWidget {
   final Recipe recipe;
@@ -16,13 +21,14 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     bool isANDROID = Theme.of(context).platform == TargetPlatform.android;
+     final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
           child: Column(
             children: [
               // Recipe image with optional Neomorphism effect
-              Container(
+              SizedBox(
   height: 250.0, // Adjust height as needed
   width: double.infinity, // Take full width
   child: Stack(
@@ -48,7 +54,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Image.network(
-          widget.recipe.recipeImage,
+          recipeImage,
           width: screenSize.width, // Take full width
           height: 250.0, // Adjust height as needed
           fit: BoxFit.cover,
@@ -76,8 +82,15 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   children: [
                     Text(
                       widget.recipe.recipeTitle,
-                      style: const TextStyle(
-                          fontSize: 24.0, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.getFont(
+                  widget.recipe.categoryFont,
+                  fontSize: Responsive.isDesktop(context)
+                      ? Constants.desktopHeadingTitleSize
+                      : Constants.mobileHeadingTitleSize,
+                  fontWeight: FontWeight.bold,
+                  color: HexColor(widget.recipe.categoryColor).withOpacity(0.7),
+                
+                ),
                     ),
                     const SizedBox(height: 10.0),
                     Text(
@@ -117,16 +130,18 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Steps',
+                    
+                    
+                     Text(
+                      AppLocalizations.of(context).translate('Steps'),
                       style:
-                          TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                        const  TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10.0),
                     ListView.builder(
                       shrinkWrap: true,
                       itemCount:  widget.recipe.instructions.length,
-                      itemBuilder: (context, index) => Text('Step ${index + 1}: ${widget.recipe.instructions[index]}'),
+                      itemBuilder: (context, index) => Text('${AppLocalizations.of(context).translate('Step')}' '${index + 1}: ${widget.recipe.instructions[index]}'),
                     ),
                   ],
                 ),

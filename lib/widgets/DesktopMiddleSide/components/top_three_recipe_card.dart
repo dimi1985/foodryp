@@ -1,8 +1,7 @@
-
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/data/demo_data.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/topthree_mobile_card.dart';
@@ -32,14 +31,15 @@ class _TopThreeRecipeCardState extends State<TopThreeRecipeCard> {
           ),
           child: Row(
             children: [
-              Text('Top\n Three Recipes \n Of\n The Week',
-              style: TextStyle(
-                fontSize:screenSize.width <=1500 ? 30: 50,
-                fontWeight: FontWeight.bold,
-                
-              ),),
+              Text(
+                AppLocalizations.of(context)
+                    .translate('Top\n Three Recipes \n Of\n The Week'),
+                style: TextStyle(
+                  fontSize: screenSize.width <= 1500 ? 30 : 50,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Expanded(
-                
                 child: ListView.separated(
                   physics: const AlwaysScrollableScrollPhysics(),
                   shrinkWrap: true,
@@ -48,22 +48,29 @@ class _TopThreeRecipeCardState extends State<TopThreeRecipeCard> {
                   itemBuilder: (context, index) {
                     final regularRecipe = DemoData.regularRecipes[index];
                     return SizedBox(
-                      width:screenSize.width <=1100 ? 260 :screenSize.width <=1400 ? screenSize.width / 7:screenSize.width / 8,
+                      width: screenSize.width <= 1100
+                          ? 260
+                          : screenSize.width <= 1400
+                              ? screenSize.width / 7
+                              : screenSize.width / 8,
                       height: screenSize.height,
                       child: CustomCategoryTopThreeMobileCard(
                         title: regularRecipe['title'],
                         imageUrl: regularRecipe['image'],
                         color: regularRecipe['color'],
                         itemList: regularRecipe.length.toString(),
-                        internalUse: 'top_three', 
+                        internalUse: 'top_three',
                         onTap: () {
                           // Handle card tap here (optional)
-                        }, username: regularRecipe['username'], userImageURL:  'https://picsum.photos/200/300', date: regularRecipe['date'],
+                        },
+                        username: regularRecipe['username'],
+                        userImageURL: 'https://picsum.photos/200/300',
+                        date: regularRecipe['date'],
                       ),
                     );
                   },
                   separatorBuilder: (BuildContext context, int index) {
-                    return  SizedBox(
+                    return SizedBox(
                       width: Responsive.isMobile(context) ? 10 : 50,
                     );
                   },

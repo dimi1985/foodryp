@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 import 'package:flutter/material.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 
 class IngredientsAddContainer extends StatefulWidget {
@@ -45,7 +46,8 @@ class _IngredientsAddContainerState extends State<IngredientsAddContainer> {
           ),
           child: CustomTextField(
             controller: _controllers[index],
-            hintText: 'Ingredient ${index + 1}',
+            hintText: '${AppLocalizations.of(context)
+                                  .translate('Ingredient')}${index + 1}',
             borderColor: Colors.grey,
             suffixIcon: index == 0 ? Icons.add : Icons.delete,
             onSuffixIconPressed: index == 0

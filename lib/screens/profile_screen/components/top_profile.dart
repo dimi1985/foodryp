@@ -4,7 +4,8 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
-import 'package:foodryp/screens/settings_page.dart';
+import 'package:foodryp/screens/settings_page/settings_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
@@ -86,11 +87,13 @@ class TopProfile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                
+                
                 TextButton(
                   onPressed: () {},
-                  child: const Text(
-                    'Message',
-                    style: TextStyle(
+                  child:  Text(
+                    AppLocalizations.of(context).translate('Message'),
+                    style:const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15.0,
                       color: Constants.secondaryColor,
@@ -100,9 +103,9 @@ class TopProfile extends StatelessWidget {
                 const SizedBox(width: 5.0),
                 TextButton(
                   onPressed: () {},
-                  child: const Text(
-                    'Following',
-                    style: TextStyle(
+                  child:  Text(
+                    AppLocalizations.of(context).translate('Following'),
+                    style:const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15.0,
                       color: Constants.secondaryColor,

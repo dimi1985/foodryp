@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/screens/add_recipe_page.dart';
+import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuWebItems extends StatefulWidget {
@@ -42,17 +45,18 @@ class _MenuWebItemsState extends State<MenuWebItems> {
     ];
 
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return ListView(
       shrinkWrap: true,
       scrollDirection:
           Responsive.isDesktop(context) ? Axis.horizontal : Axis.vertical,
       children:
-          menuItems.map((item) => _buildMenuItem(item, isAndroid)).toList(),
+          menuItems.map((item) => _buildMenuItem(item, isAndroid,themeProvider)).toList(),
     );
   }
 
-  Widget _buildMenuItem(String item, bool isAndroid) {
+  Widget _buildMenuItem(String item, bool isAndroid, ThemeProvider themeProvider) {
     return Padding(
       padding: EdgeInsets.all(
           Responsive.isMobile(context) ? 0 : Constants.defaultPadding),
@@ -82,9 +86,9 @@ class _MenuWebItemsState extends State<MenuWebItems> {
           }
         },
         child: Text(
-          item,
+           AppLocalizations.of(context).translate(item),
           style: TextStyle(
-            color: Responsive.isMobile(context) || Responsive.isTablet(context)
+            color: Responsive.isMobile(context) || Responsive.isTablet(context) || themeProvider.currentTheme == ThemeType.dark
                 ? Colors.white
                 : Colors.black,
             fontWeight: FontWeight.bold,

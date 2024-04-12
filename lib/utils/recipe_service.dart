@@ -14,6 +14,9 @@ class RecipeService with ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
   }
 
+
+
+
   Future<List<Recipe>> getAllRecipes() async {
     final response = await http.get(
       Uri.parse('${Constants.baseUrl}/api/recipes'),
@@ -32,6 +35,10 @@ class RecipeService with ChangeNotifier {
     }
   }
 
+
+
+
+
   Future<bool> createRecipe(
     String recipeTitle,
     List<String> ingredients,
@@ -47,6 +54,7 @@ class RecipeService with ChangeNotifier {
     String description,
     String categoryId,
     String categoryColor,
+    String categoryFont,
   ) async {
     try {
       final response = await http.post(
@@ -67,6 +75,7 @@ class RecipeService with ChangeNotifier {
           'description': description,
            'categoryId': categoryId,
             'categoryColor': categoryColor,
+             'categoryFont': categoryFont,
         }),
       );
       if (response.statusCode == 201) {

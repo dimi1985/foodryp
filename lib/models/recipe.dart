@@ -14,7 +14,8 @@ class Recipe {
   final DateTime date;
   final String description;
   final String categoryId;
-   final String categoryColor;
+  final String categoryColor;
+  final String categoryFont;
 
   Recipe({
       this.id,
@@ -32,25 +33,30 @@ class Recipe {
     required this.date,
     required this.description,
     required this.categoryId,
-     required this.categoryColor,
+    required this.categoryColor,
+    required this.categoryFont,
   });
 
-  factory Recipe.fromJson(Map<String, dynamic> json) => Recipe(
-      id: json['_id'],
-        recipeTitle: json['recipeTitle'],
-        recipeImage: json['recipeImage'],
-        ingredients: (json['ingredients'] as List)?.cast<String>() ?? [],
-        instructions: (json['instructions'] as List)?.cast<String>() ?? [],
-        prepDuration: json['prepDuration'],
-        cookDuration: json['cookDuration'],
-        servingNumber: json['servingNumber'],
-        difficulty: json['difficulty'],
-        username: json['username'],
-        useImage: json['useImage'],
-        userId: json['userId'],
-        date: DateTime.parse(json['date']),
-        description: json['description'],
-        categoryId: json['categoryId'],
-         categoryColor: json['categoryColor'],
-      );
+  factory Recipe.fromJson(Map<String, dynamic> json) {
+  return Recipe(
+    id: json['_id']?.toString(),
+    recipeTitle: json['recipeTitle'] ?? '',
+    recipeImage: json['recipeImage'] ?? '',
+    ingredients: (json['ingredients'] as List<dynamic>?)?.cast<String>()?.toList() ?? [],
+    instructions: (json['instructions'] as List<dynamic>?)?.cast<String>()?.toList() ?? [],
+    prepDuration: json['prepDuration'] ?? '',
+    cookDuration: json['cookDuration'] ?? '',
+    servingNumber: json['servingNumber'] ?? '',
+    difficulty: json['difficulty'] ?? '',
+    username: json['username'] ?? '',
+    useImage: json['useImage'] ?? '',
+    userId: json['userId']?.toString() ?? '',
+    date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
+    description: json['description'] ?? '',
+    categoryId: json['categoryId']?.toString() ?? '',
+    categoryColor: json['categoryColor'] ?? '',
+     categoryFont: json['categoryFont'] ?? '',
+  );
+}
+
 }
