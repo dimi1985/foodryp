@@ -6,7 +6,7 @@ import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_screen/components/top_profile.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/top_creators.dart';
+import 'package:foodryp/widgets/CustomWidgets/creators.dart';
 import 'package:foodryp/widgets/DesktopMiddleSide/components/recipe_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
 import 'package:foodryp/screens/profile_screen/components/recipe_card_profile.dart';
@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
     gender: '',
     memberSince: null,
     role: '',
-    recipes: [],
+    recipes: [], following: [], followedBy: [], likedRecipes: [],
   );
 
   @override
@@ -49,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
               gender: '',
               memberSince: null,
               role: '',
-              recipes: []);
+              recipes: [], following: [], followedBy: [], likedRecipes: []);
     });
   }
 
@@ -77,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 15.0),
           HeadingTitleRow(
               title: AppLocalizations.of(context).translate('Following')),
-          const TopCreators(),
+          const Creators(showAllUsers: false,),
           const SizedBox(height: 15.0),
         ],
       ),

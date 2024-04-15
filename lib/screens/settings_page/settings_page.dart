@@ -279,7 +279,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   allowSelection: true,
                   gender: widget.gender,
-                  isFor: '',
+                  isFor: '', isForEdit: false,
                 )
               : widget.gender.contains('male')
                   ? ImagePickerPreviewContainer(
@@ -290,7 +290,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                       allowSelection: true,
                       gender: widget.gender,
-                      isFor: '',
+                      isFor: '', isForEdit: false,
                     )
                   : Container(),
           const SizedBox(

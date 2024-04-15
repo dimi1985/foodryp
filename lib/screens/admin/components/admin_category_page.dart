@@ -204,7 +204,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                     uint8list = Uint8List.fromList(bytes);
                   });
                 },
-                gender: '', isFor: 'Other', // Add your gender here
+                gender: '', isFor: 'Other', isForEdit: false,
               ),
             ),
             const SizedBox(height: 16),

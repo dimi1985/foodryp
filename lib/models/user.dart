@@ -7,6 +7,10 @@ class User {
   final DateTime? memberSince;
   final String? role;
   final List<String>? recipes;
+   final List<String>? following;
+   final List<String>? followedBy;
+   final List<String>? likedRecipes;
+   
 
   User({
     required this.id,
@@ -17,6 +21,9 @@ class User {
     required this.memberSince,
     required this.role,
     required this.recipes,
+      required this.following,
+      required this.followedBy,
+      required this.likedRecipes,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -31,6 +38,9 @@ class User {
           : null, // Parse string to DateTime object
       role: json['role'],
       recipes: json['recipes']?.cast<String>(),
+      following: json['following']?.cast<String>(),
+       followedBy: json['followedBy']?.cast<String>(),
+         likedRecipes: json['likedRecipes']?.cast<String>(),
     );
   }
 
@@ -43,5 +53,8 @@ class User {
         'memberSince': memberSince,
         'role': role,
         'recipes': recipes,
+        'following': following,
+         'followedBy': followedBy,
+          'likedRecipes': likedRecipes,
       };
 }

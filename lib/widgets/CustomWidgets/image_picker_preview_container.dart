@@ -17,6 +17,7 @@ class ImagePickerPreviewContainer extends StatefulWidget {
   final bool allowSelection;
   final String gender;
   final String isFor;
+  final bool isForEdit;
 
   const ImagePickerPreviewContainer({
     super.key,
@@ -25,7 +26,7 @@ class ImagePickerPreviewContainer extends StatefulWidget {
     this.initialImagePath,
     this.allowSelection = true,
     required this.gender,
-    required this.isFor,
+    required this.isFor, required this.isForEdit,
   });
 
   @override
@@ -36,7 +37,7 @@ class ImagePickerPreviewContainer extends StatefulWidget {
 class _ImagePickerPreviewContainerState
     extends State<ImagePickerPreviewContainer> {
   late File? _imageFile = File('');
-    late Uint8List uint8list = Uint8List(0);
+  late Uint8List uint8list = Uint8List(0);
   bool imageIsPicked = false;
   String finalProfileImageURL = '';
 

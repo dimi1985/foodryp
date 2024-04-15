@@ -218,12 +218,10 @@ class _AuthScreenState extends State<AuthScreen> {
         String selectedGender = _selectedGender.toString().split('.').last;
 
         final success = await _userService.registerUser(
-          userNameController.text,
-          emailController.text,
-          passwordController.text,
-          selectedGender.toString().split('.').last,
-          [],
-        );
+            userNameController.text,
+            emailController.text,
+            passwordController.text,
+            selectedGender.toString().split('.').last, [], [], [], []);
 
         if (success) {
           // Registration successful

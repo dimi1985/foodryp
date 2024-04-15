@@ -76,7 +76,7 @@ class _MenuWebItemsState extends State<MenuWebItems> {
               // Navigate to AddRecipePage
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddRecipePage()),
+                MaterialPageRoute(builder: (context) => const AddRecipePage(recipe: null, isForEdit: false,)),
               );
               break;
             // Add more cases for other menu items

@@ -8,8 +8,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService with ChangeNotifier {
-  
-
   late SharedPreferences _prefs; // SharedPreferences instance
 
   User? _user;
@@ -20,8 +18,8 @@ class UserService with ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<bool> registerUser(
-      String username, String email, String password, String gender,List<String> recipes) async {
+  Future<bool> registerUser(String username, String email, String password,
+      String gender, List<String> recipes, List<String> following,List<String> followedBy,List<String> likedRecipes) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/register'),
@@ -32,9 +30,14 @@ class UserService with ChangeNotifier {
           'password': password,
           'gender': gender,
           'profileImage': '',
-         'memberSince': DateTime.now().toIso8601String(),
+          'memberSince': DateTime.now().toIso8601String(),
           'role': 'user',
-           'recipes': recipes,
+          'recipes': recipes,
+          'following': following,
+          'followedBy': followedBy,
+          'likedRecipes': likedRecipes,
+          
+          
         }),
       );
       if (response.statusCode == 201) {
@@ -48,7 +51,11 @@ class UserService with ChangeNotifier {
             username: username,
             email: email,
             profileImage: '',
-            gender: gender, memberSince: null, role: '', recipes: []);
+            gender: gender,
+            memberSince: null,
+            role: '',
+            recipes: [],
+            following: [], followedBy: [], likedRecipes: []);
         notifyListeners();
         return true;
       }
@@ -103,124 +110,196 @@ class UserService with ChangeNotifier {
   }
 
   Future<void> uploadImageProfile(File image, List<int>? bytes) async {
-  await _initPrefs();
-  final userId = _prefs.getString('userId');
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
 
-  try {
-    String url = '${Constants.baseUrl}/api/uploadProfilePic';
-    var request = http.MultipartRequest('POST', Uri.parse(url));
+    try {
+      String url = '${Constants.baseUrl}/api/uploadProfilePic';
+      var request = http.MultipartRequest('POST', Uri.parse(url));
 
-    if (image != null) {
-      String filename = 'user-$userId-${DateTime.now()}.jpg';
+      if (image != null) {
+        String filename = 'user-$userId-${DateTime.now()}.jpg';
 
-      if (kIsWeb) {
-        // For web platform
-        request.fields['userId'] = userId!;
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            'profilePicture',
-            bytes!,
-            filename: filename,
-          ),
-        );
-      } else {
-        // For Android platform
-       
-        if (image != null) {
+        if (kIsWeb) {
+          // For web platform
           request.fields['userId'] = userId!;
           request.files.add(
-            await http.MultipartFile.fromPath(
+            http.MultipartFile.fromBytes(
               'profilePicture',
-              image.path,
+              bytes!,
+              filename: filename,
             ),
           );
         } else {
-          // No image selected on Android
-          print('No file selected');
-          return;
+          // For Android platform
+
+          if (image != null) {
+            request.fields['userId'] = userId!;
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                'profilePicture',
+                image.path,
+              ),
+            );
+          } else {
+            // No image selected on Android
+            print('No file selected');
+            return;
+          }
         }
-      }
 
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        // Profile picture uploaded successfully
-        // Handle the response data as needed
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          // Profile picture uploaded successfully
+          // Handle the response data as needed
+        } else {
+          // Error uploading profile picture
+        }
       } else {
-        // Error uploading profile picture
+        // No image selected on web
+        print('No file selected');
       }
-    } else {
-      // No image selected on web
-      print('No file selected');
+    } catch (e) {
+      // Handle upload error
+      print('Error uploading profile picture: $e');
     }
-  } catch (e) {
-    // Handle upload error
-    print('Error uploading profile picture: $e');
   }
-}
-
-
-
 
 //Admin Methods
-static Future<List<User>> getAllUsers() async {
-  try {
-    final response = await http.get(
-      Uri.parse('${Constants.baseUrl}/api/allUsers'), // Adjust the endpoint as per your API
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> userDataList = jsonDecode(response.body);
-      // Convert the list of dynamic data into a list of User objects
-      final List<User> userList = userDataList.map((userData) => User.fromJson(userData)).toList();
-      return userList;
-    } else {
-      log('Failed to load users: ${response.statusCode}');
+  static Future<List<User>> getAllUsers() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '${Constants.baseUrl}/api/allUsers'), // Adjust the endpoint as per your API
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> userDataList = jsonDecode(response.body);
+        // Convert the list of dynamic data into a list of User objects
+        final List<User> userList =
+            userDataList.map((userData) => User.fromJson(userData)).toList();
+        return userList;
+      } else {
+        log('Failed to load All users: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching users: $e');
       return [];
     }
-  } catch (e) {
-    print('Error fetching users: $e');
-    return [];
+  }
+
+  static Future<bool> updateUserRole(String userId, String newRole) async {
+    try {
+      final response = await http.put(
+        Uri.parse('${Constants.baseUrl}/api/userRole/$userId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'role': newRole}),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        // Handle error response
+        print('Error updating user role: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      // Handle network error
+      print('Network error: $e');
+      return false;
+    }
+  }
+
+  Future<void> deleteUser() async {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
+    try {
+      final url = Uri.parse('${Constants.baseUrl}/api/deleteUser/$userId');
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        // User deleted successfully
+        clearUserId();
+        print('User deleted successfully');
+      } else {
+        // Handle error deleting user
+        print('Error deleting user: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle network error
+      print('Network error: $e');
+    }
+  }
+
+  Future<List<User>> getFollowingUsers() async {
+  await _initPrefs(); // Initialize SharedPreferences
+  final currentUserId = _prefs.getString('userId');
+  final url = '${Constants.baseUrl}/api/getFollowingUsers/$currentUserId';
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    final List<dynamic> userDataList = jsonDecode(response.body);
+    final List<User> followedUsers = userDataList.map((userData) => User.fromJson(userData)).toList();
+    return followedUsers;
+  } else {
+    throw Exception('Failed to load followed users');
   }
 }
-static Future<bool> updateUserRole(String userId, String newRole) async {
+
+
+
+  Future<void> followUser(String userToFollow) async {
+    await _initPrefs(); // Initialize SharedPreferences
+    final userId = _prefs.getString('userId');
+    try {
+      const url = '${Constants.baseUrl}/api/followUser';
+      final response = await http.post(
+        Uri.parse(url),
+        body: {'userToFollow': userToFollow, 'userId': userId},
+      );
+
+      if (response.statusCode == 200) {
+        // Handle success
+        print('User followed successfully');
+      } else if (response.statusCode == 404) {
+        // Handle user not found error
+        print('User not found');
+      } else {
+        // Handle other errors
+        print('Failed to follow user: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle exception
+      print('Error following user: $e');
+    }
+  }
+
+   Future<void> unfollowUser(String userToUnfollow) async {
+  await _initPrefs(); // Initialize SharedPreferences
+  final userId = _prefs.getString('userId');
   try {
-    final response = await http.put(
-      Uri.parse('${Constants.baseUrl}/api/userRole/$userId'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'role': newRole}),
+    const url = '${Constants.baseUrl}/api/unfollowUser';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'userToUnfollow': userToUnfollow,
+        'userId': userId
+      },
     );
 
     if (response.statusCode == 200) {
-      return true;
+      // Handle success
+      print('User unfollowed successfully');
+    } else if (response.statusCode == 404) {
+      // Handle user not found error
+      print('User not found');
     } else {
-      // Handle error response
-      print('Error updating user role: ${response.statusCode}');
-      return false;
+      // Handle other errors
+      print('Failed to unfollow user: ${response.statusCode}');
     }
   } catch (e) {
-    // Handle network error
-    print('Network error: $e');
-    return false;
-  }
-}
-
-Future<void> deleteUser() async {
-  await _initPrefs();
-  final userId = _prefs.getString('userId');
-  try {
-    final url = Uri.parse('${Constants.baseUrl}/api/deleteUser/$userId');
-    final response = await http.delete(url);
-
-    if (response.statusCode == 200) {
-      // User deleted successfully
-      clearUserId();
-      print('User deleted successfully');
-    } else {
-      // Handle error deleting user
-      print('Error deleting user: ${response.statusCode}');
-    }
-  } catch (e) {
-    // Handle network error
-    print('Network error: $e');
+    // Handle exception
+    print('Error unfollowing user: $e');
   }
 }
 
@@ -235,6 +314,10 @@ Future<void> deleteUser() async {
     await prefs.remove('userId');
   }
 
-
-
+  Future<String> getCurrentUserId() async {
+    await _initPrefs(); // Initialize SharedPreferences
+    String? userId =
+        _prefs.getString('userId'); // Retrieve user ID from SharedPreferences
+    return userId ?? ''; // Return user ID, or an empty string if not found
+  }
 }

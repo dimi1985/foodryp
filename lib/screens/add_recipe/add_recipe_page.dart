@@ -8,6 +8,7 @@ import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
@@ -17,7 +18,9 @@ import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class AddRecipePage extends StatefulWidget {
-  const AddRecipePage({super.key});
+  final Recipe? recipe;
+  final bool isForEdit;
+  const AddRecipePage({super.key, this.recipe, required this.isForEdit});
 
   @override
   State<AddRecipePage> createState() => _AddRecipePageState();
@@ -46,11 +49,13 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   late int tappedCategoryIndex = 0;
 
-  String _selectedDifficulty = 'Easy'; // Initial value
+  String _selectedDifficulty = 'Easy';
 
   String selectedCategoryColor = '';
   String selectedCategoryId = '';
   String selectedCategoryFont = '';
+  String selectedCategoryName = '';
+
   late String recipeTitleValue;
   late String descriptionValue;
   late String servingValue;
@@ -72,6 +77,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
             memberSince: null,
             role: '',
             recipes: [],
+            following: [],
+            followedBy: [],
+            likedRecipes: [],
           );
     });
   }
@@ -81,6 +89,31 @@ class _AddRecipePageState extends State<AddRecipePage> {
     super.initState();
     _fetchCategories();
     fetchUserProfile();
+
+    if (widget.recipe != null) {
+      // Populate text controllers with recipe data for editing
+      recipeTitleTextController.text = widget.recipe!.recipeTitle;
+      descriptionTextController.text = widget.recipe!.description;
+      servingTextController.text = widget.recipe!.servingNumber;
+      prepDurationTextController.text = widget.recipe!.prepDuration;
+      cookDurationTextController.text = widget.recipe!.cookDuration;
+
+      // Populate ingredients text controllers
+      ingredientsControllers.clear(); // Clear existing controllers
+      for (var ingredient in widget.recipe!.ingredients) {
+        TextEditingController controller =
+            TextEditingController(text: ingredient);
+        ingredientsControllers.add(controller);
+      }
+
+      // Populate instructions text controllers
+      instructionControllers.clear(); // Clear existing controllers
+      for (var instruction in widget.recipe!.instructions) {
+        TextEditingController controller =
+            TextEditingController(text: instruction);
+        instructionControllers.add(controller);
+      }
+    }
   }
 
   Future<void> _fetchCategories() async {
@@ -89,6 +122,18 @@ class _AddRecipePageState extends State<AddRecipePage> {
       setState(() {
         categories = categoriesGET;
       });
+
+      if (widget.isForEdit) {
+        int categoryIndex = categories.indexWhere(
+            (category) => category.name == widget.recipe!.categoryName);
+
+        if (categoryIndex != -1) {
+          setState(() {
+            tappedCategoryIndex = categoryIndex;
+            selectedCategoryColor = categories[categoryIndex].color;
+          });
+        }
+      }
     } catch (error) {
       // Handle errors gracefully, e.g., show an error message
     }
@@ -169,13 +214,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                   onTap: () {
                                     setState(() {
                                       tappedCategoryIndex = index;
-                                      if (isTapped ||
-                                          tappedCategoryIndex == 0) {
-                                        selectedCategoryColor = category.color;
-
-                                        selectedCategoryId = category.id!;
-                                        selectedCategoryFont = category.font;
-                                      }
+                                      selectedCategoryColor = category.color;
+                                      selectedCategoryId = category.id!;
+                                      selectedCategoryFont = category.font;
+                                      selectedCategoryName = category.name;
                                     });
                                   },
                                   child: Padding(
@@ -249,20 +291,23 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   SizedBox(
                     height: Responsive.isDesktop(context) ? 350 : 200,
                     child: ImagePickerPreviewContainer(
-                        initialImagePath: '',
-                        allowSelection: true,
-                        containerSize: Responsive.isDesktop(context)
-                            ? 600
-                            : screenSize.width,
-                        onImageSelected: (file, bytes) {
-                          // Handle image selection
-                          setState(() {
-                            _imageFile = file;
-                            uint8list = Uint8List.fromList(bytes);
-                          });
-                        },
-                        gender: '',
-                        isFor: 'Other'),
+                      initialImagePath:
+                          widget.isForEdit ? widget.recipe!.recipeImage : '',
+                      allowSelection: true,
+                      containerSize: Responsive.isDesktop(context)
+                          ? 600
+                          : screenSize.width,
+                      onImageSelected: (file, bytes) {
+                        // Handle image selection
+                        setState(() {
+                          _imageFile = file;
+                          uint8list = Uint8List.fromList(bytes);
+                        });
+                      },
+                      gender: '',
+                      isFor: 'Other',
+                      isForEdit: widget.isForEdit,
+                    ),
                   ),
                   const SizedBox(height: 20.0),
 
@@ -420,15 +465,19 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             children: [
                               ChoiceChip(
                                 label: Text(value),
-                                selected: _selectedDifficulty == value,
+                                selected: widget.isForEdit
+                                    ? widget.recipe!.difficulty == value
+                                    : _selectedDifficulty == value,
                                 backgroundColor: difficultyColors[
                                     value], // Set background color based on difficulty
                                 selectedColor: Colors
                                     .white, // Optional: Set selected color
                                 onSelected: (selected) {
                                   setState(() {
-                                    _selectedDifficulty =
-                                        (selected ? value : null)!;
+                                    widget.isForEdit
+                                        ? widget.recipe!.difficulty
+                                        : _selectedDifficulty =
+                                            (selected ? value : null)!;
                                   });
                                 },
                               ),
@@ -443,6 +492,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () {
+                      String finalProfileImageURL =
+                          ('${Constants.baseUrl}/${widget.recipe!.recipeImage}')
+                              .replaceAll('\\', '/');
                       //  previewIngredientsAndInstructions();
                       ingredients = getIngredients();
                       instructions = getInstructions();
@@ -452,7 +504,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       prepDurationValue = prepDurationTextController.text;
                       cookDurationValue = cookDurationTextController.text;
                       // Use the values as needed
-
+                      log('recipe image: ${widget.recipe!.recipeImage}');
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -471,55 +523,65 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: const BorderRadius.vertical(
-                                          top: Radius.circular(16.0)),
-                                      child: kIsWeb
-                                          ? Image.memory(uint8list)
-                                          : Image.file(
-                                              _imageFile!, // Replace with your image path
+                                    widget.isForEdit
+                                        ? ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                                    top: Radius.circular(16.0)),
+                                            child: Image.network(
+                                              finalProfileImageURL,
                                               fit: BoxFit.cover,
-                                              width: double.infinity,
-                                              height: 200.0,
                                             ),
-                                    ),
+                                          )
+                                        : ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                                    top: Radius.circular(16.0)),
+                                            child: kIsWeb
+                                                ? Image.memory(uint8list)
+                                                : Image.file(
+                                                    _imageFile!,
+                                                    fit: BoxFit.cover,
+                                                    width: double.infinity,
+                                                    height: 200.0,
+                                                  ),
+                                          ),
                                     Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                AppLocalizations.of(context)
-                                                    .translate('Recipe Title'),
-                                                style: const TextStyle(
-                                                    fontSize: 20.0,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              const SizedBox(height: 32.0),
-                                              Text(
-                                                _selectedDifficulty,
-                                                style: const TextStyle(
-                                                    fontSize: 16.0),
-                                              ),
-                                            ],
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate('Recipe Title'),
+                                            style: const TextStyle(
+                                                fontSize: 20.0,
+                                                fontWeight: FontWeight.bold),
                                           ),
-                                          const SizedBox(height: 8.0),
+                                          const SizedBox(height: 16.0),
                                           Text(
                                             recipeTitleValue,
                                             style:
                                                 const TextStyle(fontSize: 16.0),
                                           ),
+                                          const SizedBox(height: 16.0),
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate('Category'),
+                                            style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                           const SizedBox(height: 8.0),
                                           Text(
-                                            _selectedDifficulty,
+                                            widget.isForEdit
+                                                ? widget.recipe!.categoryName
+                                                : selectedCategoryName,
                                             style:
                                                 const TextStyle(fontSize: 16.0),
                                           ),
-                                          const SizedBox(height: 16.0),
+                                          const SizedBox(height: 8.0),
                                           Text(
                                             AppLocalizations.of(context)
                                                 .translate('Description'),
@@ -612,6 +674,18 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                       fontSize: 16.0));
                                             }).toList(),
                                           ),
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate('Difficulty:'),
+                                            style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            _selectedDifficulty,
+                                            style:
+                                                const TextStyle(fontSize: 16.0),
+                                          )
                                         ],
                                       ),
                                     ),
@@ -627,26 +701,26 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                     SnackBar(
                                       content: Row(
                                         children: [
-                                          CircularProgressIndicator(), // Add a circular progress indicator
-                                          SizedBox(width: 16),
-                                          Text(AppLocalizations.of(context)
-                                              .translate(
-                                                  'Creating recipe...')), // Text indicating recipe creation
+                                          const CircularProgressIndicator(),
+                                          const SizedBox(width: 16),
+                                          Text(
+                                            AppLocalizations.of(context)
+                                                .translate(
+                                                    'Creating recipe...'),
+                                          ),
                                         ],
                                       ),
                                     ),
                                   );
 
-// Call the createRecipe method to create the recipe
-                                  RecipeService()
-                                      .createRecipe(
+                                  RecipeService().createRecipe(
                                     recipeTitleValue,
                                     ingredients,
                                     instructions,
                                     prepDurationValue,
                                     cookDurationValue,
-                                    _selectedDifficulty,
                                     servingValue,
+                                    _selectedDifficulty,
                                     user.username,
                                     user.profileImage,
                                     user.id,
@@ -655,21 +729,20 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                     selectedCategoryId,
                                     selectedCategoryColor,
                                     selectedCategoryFont,
-                                  )
-                                      .then((value) {
-                                    // Once the recipe creation process is complete, hide the SnackBar
+                                    selectedCategoryName,
+                                    [],
+                                  ).then((value) {
                                     ScaffoldMessenger.of(context)
                                         .hideCurrentSnackBar();
 
                                     if (value) {
-                                      // Show a SnackBar indicating recipe creation success
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(
                                           content: Text(AppLocalizations.of(
                                                   context)
                                               .translate(
-                                                  'Recipe created successfully')), // Show recipe creation success message
+                                                  'Recipe created successfully')),
                                         ),
                                       );
 
@@ -729,29 +802,5 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   List<String> getInstructions() {
     return instructionControllers.map((controller) => controller.text).toList();
-  }
-
-  Widget _buildIconForDifficulty(String difficulty) {
-    IconData iconData;
-    switch (difficulty) {
-      case 'Easy':
-        iconData = Icons.thumb_up;
-        break;
-      case 'Medium':
-        iconData = Icons.check_circle_outline;
-        break;
-      case 'Hard':
-        iconData = Icons.warning;
-        break;
-      case 'Chef':
-        iconData = Icons.restaurant;
-        break;
-      case 'Michelin':
-        iconData = Icons.star;
-        break;
-      default:
-        iconData = Icons.error;
-    }
-    return Icon(iconData);
   }
 }

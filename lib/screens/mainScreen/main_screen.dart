@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_screen/profile_screen.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/screens/mainScreen/components/logo_widget.dart';
+import 'package:foodryp/utils/user_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../widgets/desktopLeftSide/desktopLeftSide.dart';
@@ -23,33 +27,53 @@ class _MainScreenState extends State<MainScreen> {
   bool isAuthenticated = false;
   late SharedPreferences _prefs;
   String userId = '';
+  late List<User> users = [];
+  bool valueSet = false;
+  UsersProvider usersProvider = UsersProvider();
 
   User user = User(
     id: '',
     username: '',
     email: '',
     profileImage: '',
-    gender: '', memberSince: null, role: '', recipes: [],
+    gender: '',
+    memberSince: null,
+    role: '',
+    recipes: [],
+    following: [],
+    followedBy: [], likedRecipes: [],
   );
 
   @override
   void initState() {
     super.initState();
     fetchUserProfile();
+   
   }
+
+  
 
   Future<void> fetchUserProfile() async {
     final userService = UserService();
     final userProfile = await userService.getUserProfile();
     _prefs = await SharedPreferences.getInstance();
-    userId =
-        _prefs.getString('userId') ?? '';
+    userId = _prefs.getString('userId') ?? '';
     setState(() {
       if (userId.isNotEmpty) {
         isAuthenticated = true;
       }
       user = userProfile ??
-          User(id: '', username: '', email: '', profileImage: '', gender: '', memberSince: null, role: '', recipes: []);
+          User(
+              id: '',
+              username: '',
+              email: '',
+              profileImage: '',
+              gender: '',
+              memberSince: null,
+              role: '',
+              recipes: [],
+              following: [],
+              followedBy: [], likedRecipes: []);
     });
   }
 
@@ -57,7 +81,8 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isDesktop = Responsive.isDesktop(context);
-    final finalProfileImageURL = ('${Constants.baseUrl}/${user.profileImage}').replaceAll('\\', '/');
+    final finalProfileImageURL =
+        ('${Constants.baseUrl}/${user.profileImage}').replaceAll('\\', '/');
 
     return SafeArea(
       child: Scaffold(
@@ -86,8 +111,9 @@ class _MainScreenState extends State<MainScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       user.profileImage.isNotEmpty
-                          ?  CircleAvatar(
-                              backgroundImage: NetworkImage(finalProfileImageURL),
+                          ? CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(finalProfileImageURL),
                             )
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(50),
@@ -114,7 +140,12 @@ class _MainScreenState extends State<MainScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => const ProfilePage()),
-                            );
+                            ).then((value) {
+                              value = true;
+                              setState(() {
+                                valueSet = value;
+                              });
+                            });
                           },
                           child: Text(user.username)),
                     ],
@@ -133,7 +164,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: const DesktopLeftSide(),
               ),
             Expanded(
-              flex: isDesktop ? 4 : 3,
+              flex: isDesktop ? 3 : 2,
               child: const DesktopMiddleSide(),
             ),
             if (isDesktop)

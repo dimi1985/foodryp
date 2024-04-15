@@ -35,6 +35,25 @@ class RecipeService with ChangeNotifier {
     }
   }
 
+  Future<List<Recipe>> getRecipesByPage(int pageNumber, int pageSize) async {
+  final response = await http.get(
+    Uri.parse('${Constants.baseUrl}/api/recipes?page=$pageNumber&pageSize=$pageSize'),
+  );
+
+  if (response.statusCode == 200) {
+    final decodedData = jsonDecode(response.body) as List<dynamic>;
+
+    final recipes = decodedData
+        .map((recipeJson) => Recipe.fromJson(recipeJson))
+        .toList();
+    return recipes;
+  } else {
+    // Handle API errors gracefully (e.g., throw an exception)
+    throw Exception('Failed to load recipes');
+  }
+}
+
+
 
 
 
@@ -55,6 +74,8 @@ class RecipeService with ChangeNotifier {
     String categoryId,
     String categoryColor,
     String categoryFont,
+     String selectedCategoryName,
+     List<String> likedBy,
   ) async {
     try {
       final response = await http.post(
@@ -76,6 +97,8 @@ class RecipeService with ChangeNotifier {
            'categoryId': categoryId,
             'categoryColor': categoryColor,
              'categoryFont': categoryFont,
+              'categoryName': selectedCategoryName,
+               'likedBy': [],
         }),
       );
       if (response.statusCode == 201) {
@@ -149,6 +172,57 @@ class RecipeService with ChangeNotifier {
       print('Error uploading profile picture: $e');
     }
   }
+
+
+Future<List<Recipe>> getUserRecipes() async {
+
+  await _initPrefs();
+    final userId = _prefs.getString('userId');
+  final response = await http.get(
+    Uri.parse('${Constants.baseUrl}/api/getUserRecipes/$userId'),
+  );
+
+  if (response.statusCode == 200) {
+    final decodedData = jsonDecode(response.body) as List<dynamic>;
+
+    final recipes = decodedData.map((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+    log(recipes.toList().toString());
+    return recipes;
+  } else {
+    // Handle API errors gracefully (e.g., throw an exception)
+    throw Exception('Failed to load user recipes');
+  }
+}
+
+Future<void> likeRecipe(String recipeId) async {
+   await _initPrefs();
+    final userId = _prefs.getString('userId');
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/recipe/likeRecipe'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'recipeId': recipeId, 'userId': userId}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to like recipe');
+    }
+  }
+
+  Future<void> dislikeRecipe(String recipeId) async {
+     await _initPrefs();
+    final userId = _prefs.getString('userId');
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/recipe/dislikeRecipe'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'recipeId': recipeId, 'userId': userId}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to dislike recipe');
+    }
+  }
+
+
 
   Future<void> _saveRecipeIDLocally(String recipeId) async {
     await _initPrefs();

@@ -61,7 +61,7 @@ class TopProfile extends StatelessWidget {
                      
                     },
                     allowSelection: false,
-                     gender : gender, isFor: '',
+                     gender : gender, isFor: '', isForEdit: false,
                   )
                 : gender.contains('male')
                     ? ImagePickerPreviewContainer(
@@ -71,7 +71,7 @@ class TopProfile extends StatelessWidget {
                          
                         },
                         allowSelection: false,
-                         gender : gender, isFor: '',
+                         gender : gender, isFor: '', isForEdit: false,
                       )
                     : Container(),
             Text(

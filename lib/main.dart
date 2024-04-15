@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
+import 'package:foodryp/utils/user_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,7 +23,10 @@ void main() async {
         ChangeNotifierProvider(create: (_) => UserService()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(
-            create: (_) => LanguageProvider()), // Add LanguageProvider
+          create: (_) => LanguageProvider(),
+          
+        ), 
+         ChangeNotifierProvider(create: (_) => UsersProvider()),// Add LanguageProvider
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),
@@ -48,11 +52,10 @@ class Foodryp extends StatefulWidget {
 class _FoodrypState extends State<Foodryp> {
   late Locale _locale = const Locale('el');
 
- 
   @override
   Widget build(BuildContext context) {
     // Retrieve providers
-    
+
     // final languageProvider = Provider.of<LanguageProvider>(context);
 
     return ChangeNotifierProvider(
@@ -80,13 +83,13 @@ class _FoodrypState extends State<Foodryp> {
       ),
     );
   }
-  
-   void setLocale(Locale locale) async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('languageCode', locale.languageCode);
-      await prefs.setString('countryCode', locale.countryCode!);
-      setState(() {
-        _locale = locale;
-      });
-    }
+
+  void setLocale(Locale locale) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('languageCode', locale.languageCode);
+    await prefs.setString('countryCode', locale.countryCode!);
+    setState(() {
+      _locale = locale;
+    });
+  }
 }

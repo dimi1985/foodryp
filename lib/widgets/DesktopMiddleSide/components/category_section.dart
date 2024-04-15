@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -51,30 +52,39 @@ class _CategorySectionState extends State<CategorySection> {
         child: SizedBox(
           height: 200,
           width: screenSize.width,
-          child: ListView.separated(
-            physics: const AlwaysScrollableScrollPhysics(),
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              return InkWell(
-                onTap: () {
-                  
-                },
-                child: CustomCategoryCard(
-                  title: category.name,
-                  image: category.categoryImage ?? '',
-                  color: HexColor(category.color),
-                  font:category.font
-                ),
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return const SizedBox(
-                width: 25,
-              );
-            },
+
+          child: ScrollConfiguration(
+             behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              },
+            ),
+            child: ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                return InkWell(
+                  onTap: () {
+                    
+                  },
+                  child: CustomCategoryCard(
+                    title: category.name,
+                    image: category.categoryImage ?? '',
+                    color: HexColor(category.color),
+                    font:category.font
+                  ),
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(
+                  width: 25,
+                );
+              },
+            ),
           ),
         ),
       ),
