@@ -20,9 +20,9 @@ static const tabletHeadingTitleSize = 22.0;
 static const desktopHeadingTitleSize = 24.0;
 static const topThreeTitleSize = 30.0;
 
-static const imageURL = kIsWeb ? 'http://localhost:3000' : 'http://192.168.106.229:3000';
+static const imageURL = kIsWeb ? 'http://localhost:3000' : 'http://192.168.12.229:3000';
 
 static const baseUrl =
-      kIsWeb ? 'http://localhost:3000' : 'http://192.168.106.229:3000';
+      kIsWeb ? 'http://localhost:3000' : 'http://192.168.12.229:3000';
 
 }

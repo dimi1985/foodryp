@@ -54,10 +54,6 @@ class RecipeService with ChangeNotifier {
 }
 
 
-
-
-
-
   Future<bool> createRecipe(
     String recipeTitle,
     List<String> ingredients,
@@ -77,6 +73,7 @@ class RecipeService with ChangeNotifier {
      String selectedCategoryName,
      List<String> likedBy,
   ) async {
+    log('Creating Recipe');
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/saveRecipe'),
@@ -117,6 +114,64 @@ class RecipeService with ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> updateRecipe(
+    String recipeId,
+    String recipeTitle,
+    List<String> ingredients,
+    List<String> instructions,
+    String prepDuration,
+    String cookDuration,
+    String servingNumber,
+    String difficulty,
+    String username,
+    String useImage,
+    String userId,
+    DateTime date,
+    String description,
+    String categoryId,
+    String categoryColor,
+    String categoryFont,
+     String selectedCategoryName,
+     List<String> likedBy,
+  ) async {
+    log('Updating Recipe');
+    try {
+      final response = await http.put(
+        Uri.parse('${Constants.baseUrl}/api/updateRecipe/$recipeId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+       'recipeTitle': recipeTitle,
+          'ingredients': ingredients,
+          'instructions': instructions,
+          'prepDuration': prepDuration,
+          'cookDuration': cookDuration,
+          'difficulty': difficulty,
+           'servingNumber': servingNumber,
+          'username': username,
+          'useImage': useImage,
+          'userId': userId,
+          'date': date.toIso8601String(),
+          'description': description,
+           'categoryId': categoryId,
+            'categoryColor': categoryColor,
+             'categoryFont': categoryFont,
+              'categoryName': selectedCategoryName,
+               'likedBy': likedBy,
+        }),
+      );
+      if (response.statusCode == 200) {
+        // Update successful
+        notifyListeners(); // Notify listeners if needed
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error updating recipe: $e');
+      return false;
+    }
+  }
+
 
   Future<void> uploadRecipeImage(File image, List<int>? bytes) async {
     await _initPrefs();

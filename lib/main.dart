@@ -11,6 +11,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   // Initialize the language provider and load the language
+   // Ensure that the necessary bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? languageCode = prefs.getString('languageCode');
   String? countryCode = prefs.getString('countryCode');
