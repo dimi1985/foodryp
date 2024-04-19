@@ -40,7 +40,7 @@ class _RecipeSectionState extends State<RecipeSection> {
       child: Padding(
         padding: const EdgeInsets.all(Constants.defaultPadding),
         child: SizedBox(
-          height: 250,
+          height: 260,
           width: screenSize.width,
           child: ScrollConfiguration(
              behavior: ScrollConfiguration.of(context).copyWith(

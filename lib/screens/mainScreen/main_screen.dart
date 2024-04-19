@@ -139,7 +139,7 @@ class _MainScreenState extends State<MainScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const ProfilePage()),
+                                  builder: (context) => const ProfilePage(username: '',)),
                             ).then((value) {
                               value = true;
                               setState(() {

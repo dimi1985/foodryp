@@ -12,6 +12,7 @@ import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RecipeDetailPage extends StatefulWidget {
   final Recipe recipe;
@@ -24,11 +25,13 @@ class RecipeDetailPage extends StatefulWidget {
 class _RecipeDetailPageState extends State<RecipeDetailPage> {
   late bool isLiked = false;
   late bool isForEdit = false;
+   bool isAuthenticated = false; 
 
   @override
   void initState() {
     super.initState();
     initLikeStatus();
+     checkAuthenticationStatus();
   }
 
   void initLikeStatus() async {
@@ -36,6 +39,15 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     setState(() {
       isLiked = widget.recipe.likedBy.contains(getCurrentUserId);
       isForEdit = widget.recipe.userId.contains(getCurrentUserId);
+    });
+  }
+
+  Future<void> checkAuthenticationStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    setState(() {
+      isAuthenticated = userId !=
+          null; 
     });
   }
 
@@ -151,6 +163,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       ),
                     ),
                   ),
+                  if(isAuthenticated)
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(32),
@@ -210,7 +223,28 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                 );
                               },
                               icon: const Icon(Icons.edit),
-                            )
+                            ),
+                            IconButton(
+  onPressed: () {
+    // Show a SnackBar with a delete action
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Are you sure you want to delete this recipe?'),
+        duration: Duration(seconds: 5), // Set a short duration
+        action: SnackBarAction(
+          label: 'Delete',
+          onPressed: () {
+           
+            RecipeService().deleteRecipe(widget.recipe.id!);
+          },
+        ),
+      ),
+    );
+  },
+  icon: const Icon(Icons.delete),
+)
+
+
                         ],
                       ),
                     ),
@@ -249,4 +283,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       ),
     );
   }
+  
+
 }

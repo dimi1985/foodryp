@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:foodryp/screens/recipe_by_category_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
@@ -69,13 +70,13 @@ class _CategorySectionState extends State<CategorySection> {
                 final category = categories[index];
                 return InkWell(
                   onTap: () {
-                    
+                    Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) =>  RecipeByCategoryPage(category:category,)),
+              );
                   },
                   child: CustomCategoryCard(
-                    title: category.name,
-                    image: category.categoryImage ?? '',
-                    color: HexColor(category.color),
-                    font:category.font
+                    category:category
                   ),
                 );
               },

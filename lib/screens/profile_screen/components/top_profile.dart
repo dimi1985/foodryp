@@ -16,11 +16,12 @@ class TopProfile extends StatelessWidget {
   final String gender;
   final String profileName;
   final String? role;
+  final  String email;
   const TopProfile(
       {super.key,
       required this.profileImage,
       required this.gender,
-      required this.profileName, this.role});
+      required this.profileName, this.role, required this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +131,8 @@ class TopProfile extends StatelessWidget {
           profileName: profileName,
           gender: gender,
           profileImage: profileImage,
-          role: role
+          role: role,
+          email:email,
         ),
       ),
     );

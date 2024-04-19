@@ -27,8 +27,7 @@ class CustomRecipeCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        height: 150,
-        width: 150,
+      
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Constants.defaultPadding),
           boxShadow: [
@@ -77,7 +76,8 @@ class CustomRecipeCard extends StatelessWidget {
                           onImageSelected: (file, list) {},
                           gender: '',
                           isFor: '',
-                          initialImagePath: recipe.recipeImage, isForEdit: false,
+                          initialImagePath: recipe.useImage!,
+                          isForEdit: false,
                         ),
                         const SizedBox(width: 10),
                         Text(
@@ -118,24 +118,40 @@ class CustomRecipeCard extends StatelessWidget {
                     const SizedBox(height: 5),
 
                     Text(
-                          recipe.difficulty,
-                          style: TextStyle(
-                            fontSize: Responsive.isDesktop(context)
-                                ? Constants.desktopFontSize
-                                : Constants.mobileFontSize,
-                            color: Colors.black,
-                          ),
-                        ),
-                    Text(
-                      recipe.recipeTitle.toUpperCase(),
-                      style: GoogleFonts.getFont(
-                        recipe.categoryFont,
+                      recipe.difficulty,
+                      style: TextStyle(
                         fontSize: Responsive.isDesktop(context)
                             ? Constants.desktopFontSize
                             : Constants.mobileFontSize,
-                        fontWeight: FontWeight.bold,
-                        color: HexColor(recipe.categoryColor).withOpacity(0.7),
+                        color: Colors.black,
                       ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                    
+                        Text(
+                          recipe.recipeTitle.toUpperCase(),
+                          style: GoogleFonts.getFont(
+                            recipe.categoryFont,
+                            fontSize: Responsive.isDesktop(context)
+                                ? Constants.desktopFontSize
+                                : Constants.mobileFontSize,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                HexColor(recipe.categoryColor).withOpacity(0.7),
+                          ),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            const Icon(Icons.favorite_border),
+                            Text(
+                              recipe.likedBy.length.toString(),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                     // You can add more widgets here if needed
                   ],

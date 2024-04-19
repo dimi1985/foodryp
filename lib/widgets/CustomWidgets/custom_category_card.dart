@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 class CustomCategoryCard extends StatelessWidget {
-  final String title;
-  final String image;
-  final Color color;
-  final String font;
+ final CategoryModel category;
 
   const CustomCategoryCard({
     super.key,
-    required this.title,
-    required this.image,
-    required this.color,
-    required this.font,
+     required this.category,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final categoryImage = '${Constants.imageURL}/$image';
+    final categoryImage = '${Constants.imageURL}/${category.categoryImage}';
     return SizedBox(
       height: 150,
       width: 150,
@@ -50,16 +46,31 @@ class CustomCategoryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 10),
-              Text(
-                title,
-                style: GoogleFonts.getFont(
-                  font,
-                  fontSize: Responsive.isDesktop(context)
-                      ? Constants.desktopFontSize
-                      : Constants.mobileFontSize,
-                  fontWeight: FontWeight.bold,
-                  color: color.withOpacity(0.7),
-                ),
+              Row(
+                children: [
+                  Text(
+                    category.name,
+                    style: GoogleFonts.getFont(
+                      category.font,
+                      fontSize: Responsive.isDesktop(context)
+                          ? Constants.desktopFontSize
+                          : Constants.mobileFontSize,
+                      fontWeight: FontWeight.bold,
+                      color:HexColor(category.color).withOpacity(0.7),
+                    ),
+                  ),
+                  Text(
+                    (category.recipes!.length.toString()),
+                    style: GoogleFonts.getFont(
+                      category.font,
+                      fontSize: Responsive.isDesktop(context)
+                          ? Constants.desktopFontSize
+                          : Constants.mobileFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: HexColor(category.color).withOpacity(0.7),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

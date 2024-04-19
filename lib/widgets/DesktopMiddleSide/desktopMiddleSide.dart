@@ -21,7 +21,7 @@ class DesktopMiddleSide extends StatelessWidget {
             body: ListView(
               children: [
                 const SizedBox(
-                  height: 300,
+                  height: 400,
                   child: TopThreeRecipeCard(),
                 ),
                 SizedBox(height: isLargeScreen ? 100 : isAndroid ? 10 : 50),

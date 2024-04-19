@@ -16,12 +16,13 @@ class MenuWebItems extends StatefulWidget {
 }
 
 class _MenuWebItemsState extends State<MenuWebItems> {
-  bool isAuthenticated = false; // Track user's authentication status
+  bool isAuthenticated = false; 
 
   @override
   void initState() {
     super.initState();
-    checkAuthenticationStatus(); // Check authentication status when widget is initialized
+    checkAuthenticationStatus();
+    
   }
 
   Future<void> checkAuthenticationStatus() async {

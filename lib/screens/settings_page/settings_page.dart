@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodryp/main.dart';
 import 'package:foodryp/screens/admin/admin_panel_screen.dart';
+import 'package:foodryp/screens/profile_screen/profile_screen.dart';
 import 'package:foodryp/screens/settings_page/components/delete_account_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
@@ -15,6 +16,7 @@ import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:foodryp/widgets/CustomWidgets/changeFieldDialog.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/language_settings_tile.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +27,7 @@ class SettingsPage extends StatefulWidget {
   String gender;
   String profileImage;
   String? role;
+  String email;
 
   SettingsPage({
     super.key,
@@ -32,6 +35,7 @@ class SettingsPage extends StatefulWidget {
     required this.gender,
     required this.profileImage,
     this.role,
+    required this.email,
   });
 
   @override
@@ -41,6 +45,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   late List<Language> supportedLanguages;
   int _selectedLanguageIndex = 1;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void didChangeDependencies() {
@@ -83,160 +88,301 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return Padding(
       padding: const EdgeInsets.all(Constants.defaultPadding),
-      child: Scaffold(
-        appBar: AppBar(
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProfilePage(username: '',),
+            ),
+          );
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text(AppLocalizations.of(context).translate('Settings')),
+            actions: [
+              if (widget.role!.contains('admin'))
+                TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AdminPanelScreen()),
+                      );
+                    },
+                    child: Text(
+                        AppLocalizations.of(context).translate('Settings')))
+            ],
+          ),
+          body: ListView(
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+            children: [
+              _sectionTitle(AppLocalizations.of(context).translate('Account')),
 
-          
-          title:  Text(AppLocalizations.of(context).translate('Settings')),
-          actions: [
-            if (widget.role!.contains('admin'))
-              TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AdminPanelScreen()),
-                    );
-                  },
-                  child: 
-                   Text(AppLocalizations.of(context).translate('Settings')))
-          ],
-        ),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-          children: [
-            _sectionTitle(AppLocalizations.of(context).translate('Account')),
+              userImageSection(context, isDesktop),
+              //Maybe Later in Future update
+              // _settingTile(
+              //   context,
+              //   'Change Username',
+              //   Icons.account_circle,
+              //   () {
+              //     showDialog(
+              //       context: context,
+              //       builder: (BuildContext context) {
+              //         return ChangeFieldDialog(
+              //           context: context,
+              //           title:
+              //               'Change Username(${widget.profileName})\n(Signout is automatic after change)',
+              //           hintText: 'Enter new username',
+              //           newHintText: '',
+              //           onSave: (String newUsername, String nullValue) {
+              //             UserService().changeCredentials(
+              //                 oldPassword: '',
+              //                 newUsername: newUsername,
+              //                 newEmail: '',
+              //                 newPassword: '');
+              //           },
+              //           isForPassword: false,
+              //         );
+              //       },
+              //     );
+              //   },
+              // ),
+              _settingTile(
+                context,
+                'Change Email Address',
+                Icons.email,
+                () {
+                  showDialog(
+                    context:  _scaffoldKey.currentContext!,
+                    builder: (BuildContext context) {
+                      return ChangeFieldDialog(
+                        context: context,
+                        title:
+                            'Change Email(${widget.email})\n(Signout is automatic after change)',
+                        hintText: 'Enter new email',
+                        newHintText: '',
+                        onSave: (String newEmail, String nullValue) async {
+                          UserService()
+                              .changeCredentials(
+                            oldPassword: '',
+                            newUsername: '',
+                            newEmail: newEmail,
+                            newPassword: '',
+                          )
+                              .then((value) {
+                            if (value) {
+                              // Email changed successfully
+                              // Show success snackbar
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Email changed successfully'),
+                                  duration: Duration(
+                                      seconds: 2), // Adjust duration as needed
+                                ),
+                              );
 
-            userImageSection(context, isDesktop),
-            _settingTile(
-              context,
-              'Change Username',
-              Icons.account_circle,
-              () {
-                // Navigate to change username screen
-              },
-            ),
-            _settingTile(
-              context,
-              'Change Email Address',
-              Icons.email,
-              () {
-                // Navigate to change email screen
-              },
-            ),
-            _settingTile(
-              context,
-              'Change Password',
-              Icons.lock,
-              () {
-                // Navigate to change password screen
-              },
-            ),
-            _settingTile(
-              context,
-              'SignOut',
-              Icons.account_circle,
-              () {
-                signout(context);
-              },
-            ),
-            _settingTile(
-              context,
-              'Delete Account',
-              Icons.delete,
-              () {
-                // Show confirmation dialog and delete account
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: 
-                      
-                       Text(AppLocalizations.of(context).translate('Delete Account')),
-                       
-                      content:  Text(
-                          AppLocalizations.of(context).translate('Are you sure you want to delete your account along with its recipes?')),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            // Close dialog
-                            Navigator.of(context).pop();
-                          },
-                          child:  Text(AppLocalizations.of(context).translate('Cancel')),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DeleteAccountPage(),
+                              signout( _scaffoldKey.currentContext!);
+                            } else {
+                              // Failed to change email
+                              // Show error snackbar
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Failed to change email. Please try again.'),
+                                  duration: Duration(
+                                      seconds: 2), // Adjust duration as needed
+                                ),
+                              );
+                            }
+                          }).catchError((error) {
+                          
+                            // Show error snackbar if something went wrong
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Failed to change email($error). Please try again.'),
+                                duration: const Duration(
+                                    seconds: 2), // Adjust duration as needed
                               ),
-                              (Route<dynamic> route) => false,
                             );
-                          },
-                          child:  Text(AppLocalizations.of(context).translate('Delete')),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-
-            _sectionTitle(AppLocalizations.of(context).translate('App Theme')),
-            // Add app theme settings tiles here
-            SizedBox(
-              height: 50,
-              child: ListView(
-                children: [
-                  ListTile(
-                    
-                    title:  Text(AppLocalizations.of(context).translate('Dark Theme')),
-                    trailing: Consumer<ThemeProvider>(
-                      builder: (context, themeProvider, _) => Switch(
-                        value: themeProvider.currentTheme == ThemeType.dark,
-                        onChanged: (value) {
-                          themeProvider.toggleTheme();
+                          });
                         },
+                        isForPassword: false,
+                      );
+                    },
+                  );
+                },
+              ),
+              _settingTile(
+                context,
+                'Change Password',
+                Icons.lock,
+                () {
+                  showDialog(
+  context:  _scaffoldKey.currentContext!,
+  builder: (BuildContext context) {
+    return ChangeFieldDialog(
+      context: context,
+      title: 'Change Password\n(Signout is automatic after change)',
+      hintText: 'Enter old Password',
+      newHintText: 'Enter new Password',
+      onSave: (String oldPassword, String newPassword) async {
+        UserService().changeCredentials(
+          oldPassword: oldPassword,
+          newUsername: '',
+          newEmail: '',
+          newPassword: newPassword,
+        ).then((value) {
+          if (value) {
+            // Password changed successfully
+            // Show success snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Password changed successfully'),
+                duration: Duration(seconds: 2), // Adjust duration as needed
+              ),
+            );
+
+          signout( _scaffoldKey.currentContext!);
+          } else {
+            // Failed to change password
+            // Show error snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to change password. Please try again.'),
+                duration: Duration(seconds: 2), // Adjust duration as needed
+              ),
+            );
+          }
+        }).catchError((error) {
+
+          // Show error snackbar if something went wrong
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to change password($error). Please try again.'),
+              duration: const Duration(seconds: 2), // Adjust duration as needed
+            ),
+          );
+        });
+      },
+      isForPassword: true,
+    );
+  },
+);
+
+                },
+              ),
+              _settingTile(
+                context,
+                'SignOut',
+                Icons.account_circle,
+                () {
+                  signout(context);
+                },
+              ),
+              _settingTile(
+                context,
+                'Delete Account',
+                Icons.delete,
+                () {
+                  // Show confirmation dialog and delete account
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(AppLocalizations.of(context)
+                            .translate('Delete Account')),
+                        content: Text(AppLocalizations.of(context).translate(
+                            'Are you sure you want to delete your account along with its recipes?')),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              // Close dialog
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(AppLocalizations.of(context)
+                                .translate('Cancel')),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const DeleteAccountPage(),
+                                ),
+                                (Route<dynamic> route) => false,
+                              );
+                            },
+                            child: Text(AppLocalizations.of(context)
+                                .translate('Delete')),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+
+              _sectionTitle(
+                  AppLocalizations.of(context).translate('App Theme')),
+              // Add app theme settings tiles here
+              SizedBox(
+                height: 50,
+                child: ListView(
+                  children: [
+                    ListTile(
+                      title: Text(
+                          AppLocalizations.of(context).translate('Dark Theme')),
+                      trailing: Consumer<ThemeProvider>(
+                        builder: (context, themeProvider, _) => Switch(
+                          value: themeProvider.currentTheme == ThemeType.dark,
+                          onChanged: (value) {
+                            themeProvider.toggleTheme();
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            
-            
-            _sectionTitle(AppLocalizations.of(context).translate('Language')),
-            LanguageSettingsTile(
-              title: AppLocalizations.of(context).translate('English'),
-              isSelected: _selectedLanguageIndex ==
-                  0, // Assuming English is the first language in the supportedLanguages list
-              onTap: () {
-                setState(() {
-                  _selectedLanguageIndex =
-                      0; // Set the selected language index to English
-                });
-                final locale = supportedLanguages[0].locale;
-                Foodryp.setLocale(context, locale);
-              },
-            ),
-            LanguageSettingsTile(
-              title: AppLocalizations.of(context).translate('Greek'),
-              isSelected: _selectedLanguageIndex ==
-                  1, // Assuming Greek is the second language in the supportedLanguages list
-              onTap: () {
-                setState(() {
-                  _selectedLanguageIndex =
-                      1; // Set the selected language index to Greek
-                });
-                final locale = supportedLanguages[1].locale;
-                Foodryp.setLocale(context, locale);
-              },
-            ),
 
-            _sectionTitle('Units and Measurements'),
-            // Add units and measurements settings tiles here
-          ],
+              _sectionTitle(AppLocalizations.of(context).translate('Language')),
+              LanguageSettingsTile(
+                title: AppLocalizations.of(context).translate('English'),
+                isSelected: _selectedLanguageIndex ==
+                    0, // Assuming English is the first language in the supportedLanguages list
+                onTap: () {
+                  setState(() {
+                    _selectedLanguageIndex =
+                        0; // Set the selected language index to English
+                  });
+                  final locale = supportedLanguages[0].locale;
+                  Foodryp.setLocale(context, locale);
+                },
+              ),
+              LanguageSettingsTile(
+                title: AppLocalizations.of(context).translate('Greek'),
+                isSelected: _selectedLanguageIndex ==
+                    1, // Assuming Greek is the second language in the supportedLanguages list
+                onTap: () {
+                  setState(() {
+                    _selectedLanguageIndex =
+                        1; // Set the selected language index to Greek
+                  });
+                  final locale = supportedLanguages[1].locale;
+                  Foodryp.setLocale(context, locale);
+                },
+              ),
+
+              _sectionTitle('Units and Measurements'),
+              // Add units and measurements settings tiles here
+            ],
+          ),
         ),
       ),
     );
@@ -279,7 +425,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   allowSelection: true,
                   gender: widget.gender,
-                  isFor: '', isForEdit: false,
+                  isFor: '',
+                  isForEdit: false,
                 )
               : widget.gender.contains('male')
                   ? ImagePickerPreviewContainer(
@@ -290,13 +437,13 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                       allowSelection: true,
                       gender: widget.gender,
-                      isFor: '', isForEdit: false,
+                      isFor: '',
+                      isForEdit: false,
                     )
                   : Container(),
           const SizedBox(
             width: 10,
           ),
-          
           Text(
             AppLocalizations.of(context).translate('Change profile Pic'),
             style: TextStyle(
@@ -314,13 +461,14 @@ class _SettingsPageState extends State<SettingsPage> {
       BuildContext context, File imageFile, List<int> bytes) {
     // Show SnackBar indicating file upload
     ScaffoldMessenger.of(context).showSnackBar(
-       SnackBar(
+      SnackBar(
         content: Row(
           children: [
             CircularProgressIndicator(), // Add a circular progress indicator
             SizedBox(width: 16),
-            
-            Text(AppLocalizations.of(context).translate('Uploading file...')), // Text indicating file upload
+
+            Text(AppLocalizations.of(context)
+                .translate('Uploading file...')), // Text indicating file upload
           ],
         ),
       ),
@@ -333,10 +481,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
       // Show a SnackBar indicating upload success
       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(
-          content:
-          
-              Text(AppLocalizations.of(context).translate('File uploaded successfully')), // Show upload success message
+        SnackBar(
+          content: Text(AppLocalizations.of(context).translate(
+              'File uploaded successfully')), // Show upload success message
         ),
       );
     }).catchError((error) {
@@ -346,9 +493,9 @@ class _SettingsPageState extends State<SettingsPage> {
       // Show a SnackBar indicating upload failure
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          
-          content:
-              Text('${AppLocalizations.of(context).translate('Error uploading file:')}''$error'), // Show upload error message
+          content: Text(
+              '${AppLocalizations.of(context).translate('Error uploading file:')}'
+              '$error'), // Show upload error message
         ),
       );
     });

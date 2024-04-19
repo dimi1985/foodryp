@@ -109,6 +109,23 @@ class UserService with ChangeNotifier {
     }
   }
 
+
+Future<User?> getPublicUserProfile(String username) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${Constants.baseUrl}/api/getPublicUserProfile/$username'),
+      );
+      if (response.statusCode == 200) {
+        final userData = jsonDecode(response.body);
+        return User.fromJson(userData);
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching user profile: $e');
+      return null;
+    }
+  }
+
   Future<void> uploadImageProfile(File image, List<int>? bytes) async {
     await _initPrefs();
     final userId = _prefs.getString('userId');
@@ -320,4 +337,42 @@ class UserService with ChangeNotifier {
         _prefs.getString('userId'); // Retrieve user ID from SharedPreferences
     return userId ?? ''; // Return user ID, or an empty string if not found
   }
+
+  Future<bool> changeCredentials({
+  required String oldPassword,
+  required String newUsername,
+  required String newEmail,
+  required String newPassword,
+}) async {
+
+  await _initPrefs(); // Initialize SharedPreferences
+  final userId = _prefs.getString('userId');
+  try {
+    // Make API call to update user credentials
+    final response = await http.put(
+      Uri.parse('${Constants.baseUrl}/api/changeCredentials/$userId'),
+      body: jsonEncode({
+        'oldPassword': oldPassword,
+        'newUsername': newUsername,
+        'newEmail': newEmail,
+        'newPassword': newPassword,
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      // Credentials updated successfully
+      // Handle success
+    } else {
+      // Handle API errors
+      throw Exception('Failed to update credentials: ${response.body}');
+    }
+  } catch (e) {
+    // Handle exceptions
+    print('Error changing credentials: $e');
+    throw Exception('Error changing credentials');
+  }
+  return true;
+}
+
 }
