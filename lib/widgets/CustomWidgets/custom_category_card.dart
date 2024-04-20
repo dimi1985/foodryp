@@ -47,6 +47,8 @@ class CustomCategoryCard extends StatelessWidget {
             children: [
               const SizedBox(height: 10),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     category.name,
@@ -59,8 +61,9 @@ class CustomCategoryCard extends StatelessWidget {
                       color:HexColor(category.color).withOpacity(0.7),
                     ),
                   ),
+                  const SizedBox(width: 10,),
                   Text(
-                    (category.recipes!.length.toString()),
+                    ('(${category.recipes!.length.toString()})'),
                     style: GoogleFonts.getFont(
                       category.font,
                       fontSize: Responsive.isDesktop(context)

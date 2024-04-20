@@ -23,15 +23,17 @@ class _RecipeSectionState extends State<RecipeSection> {
   @override
   void initState() {
     super.initState();
-    fetchAllRecipes();
+    fetchixedRecipes();
   }
 
-  Future<void> fetchAllRecipes() async {
-  final fetchedRecipes = await RecipeService().getAllRecipes();
+  Future<void> fetchixedRecipes() async {
+  const int desiredLength = 4; 
+  final fetchedRecipes = await RecipeService().getFixedRecipes(desiredLength);
   setState(() {
     recipes = fetchedRecipes;
   });
 }
+
 
   @override
   Widget build(BuildContext context) {
@@ -56,20 +58,23 @@ class _RecipeSectionState extends State<RecipeSection> {
               itemCount: recipes.length,
               itemBuilder: (context, index) {
                 final recipe = recipes[index];
-                return SizedBox(
-                  width: 250,
-                  child: CustomRecipeCard(
-                    recipe: recipe,
-                    internalUse: 'recipes',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RecipeDetailPage(recipe: recipe),
-                        ),
-                      );
-                    },
-                    
+                return Padding(
+                  padding: const EdgeInsets.all(Constants.defaultPadding),
+                  child: SizedBox(
+                    width: 250,
+                    child: CustomRecipeCard(
+                      recipe: recipe,
+                      internalUse: 'recipes',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RecipeDetailPage(recipe: recipe),
+                          ),
+                        );
+                      },
+                      
+                    ),
                   ),
                 );
               },

@@ -139,7 +139,7 @@ class _MainScreenState extends State<MainScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const ProfilePage(username: '',)),
+                                  builder: (context) => ProfilePage(user: user,)),
                             ).then((value) {
                               value = true;
                               setState(() {
@@ -164,7 +164,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: const DesktopLeftSide(),
               ),
             Expanded(
-              flex: isDesktop ? 3 : 2,
+              flex: isDesktop ? 4 : 2,
               child: const DesktopMiddleSide(),
             ),
             if (isDesktop)

@@ -18,8 +18,15 @@ class UserService with ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<bool> registerUser(String username, String email, String password,
-      String gender, List<String> recipes, List<String> following,List<String> followedBy,List<String> likedRecipes) async {
+  Future<bool> registerUser(
+      String username,
+      String email,
+      String password,
+      String gender,
+      List<String> recipes,
+      List<String> following,
+      List<String> followedBy,
+      List<String> likedRecipes) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/register'),
@@ -36,15 +43,13 @@ class UserService with ChangeNotifier {
           'following': following,
           'followedBy': followedBy,
           'likedRecipes': likedRecipes,
-          
-          
         }),
       );
       if (response.statusCode == 201) {
         // Registration successful
         final responseData = jsonDecode(response.body);
         final userID = responseData['userId'];
-        log('registerUser $userID');
+
         await _saveUserIDLocally(userID);
         _user = User(
             id: userID,
@@ -55,7 +60,9 @@ class UserService with ChangeNotifier {
             memberSince: null,
             role: '',
             recipes: [],
-            following: [], followedBy: [], likedRecipes: []);
+            following: [],
+            followedBy: [],
+            likedRecipes: []);
         notifyListeners();
         return true;
       }
@@ -80,7 +87,7 @@ class UserService with ChangeNotifier {
 
       final responseData = jsonDecode(response.body);
       final userID = responseData['userId'];
-      log('loginUser $userID');
+
       await _saveUserIDLocally(userID);
       return response.statusCode == 200;
     } catch (e) {
@@ -93,7 +100,7 @@ class UserService with ChangeNotifier {
     await _initPrefs();
     final userId =
         _prefs.getString('userId'); // Use 'userId' instead of 'userID'
-    log(userId ?? '');
+
     try {
       final response = await http.get(
         Uri.parse('${Constants.baseUrl}/api/userProfile/$userId'),
@@ -109,8 +116,7 @@ class UserService with ChangeNotifier {
     }
   }
 
-
-Future<User?> getPublicUserProfile(String username) async {
+  Future<User?> getPublicUserProfile(String username) async {
     try {
       final response = await http.get(
         Uri.parse('${Constants.baseUrl}/api/getPublicUserProfile/$username'),
@@ -196,7 +202,29 @@ Future<User?> getPublicUserProfile(String username) async {
             userDataList.map((userData) => User.fromJson(userData)).toList();
         return userList;
       } else {
-        log('Failed to load All users: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching users: $e');
+      return [];
+    }
+  }
+
+  static getUsersByPage(int page, int pageSize) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '${Constants.baseUrl}/api/getUsersByPage?page=$page&pageSize=$pageSize',
+        ),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> userDataList = jsonDecode(response.body);
+        // Convert the list of dynamic data into a list of User objects
+        final List<User> userList =
+            userDataList.map((userData) => User.fromJson(userData)).toList();
+        return userList;
+      } else {
+        // Handle non-200 status code
         return [];
       }
     } catch (e) {
@@ -249,21 +277,20 @@ Future<User?> getPublicUserProfile(String username) async {
   }
 
   Future<List<User>> getFollowingUsers() async {
-  await _initPrefs(); // Initialize SharedPreferences
-  final currentUserId = _prefs.getString('userId');
-  final url = '${Constants.baseUrl}/api/getFollowingUsers/$currentUserId';
-  final response = await http.get(Uri.parse(url));
+    await _initPrefs(); // Initialize SharedPreferences
+    final currentUserId = _prefs.getString('userId');
+    final url = '${Constants.baseUrl}/api/getFollowingUsers/$currentUserId';
+    final response = await http.get(Uri.parse(url));
 
-  if (response.statusCode == 200) {
-    final List<dynamic> userDataList = jsonDecode(response.body);
-    final List<User> followedUsers = userDataList.map((userData) => User.fromJson(userData)).toList();
-    return followedUsers;
-  } else {
-    throw Exception('Failed to load followed users');
+    if (response.statusCode == 200) {
+      final List<dynamic> userDataList = jsonDecode(response.body);
+      final List<User> followedUsers =
+          userDataList.map((userData) => User.fromJson(userData)).toList();
+      return followedUsers;
+    } else {
+      throw Exception('Failed to load followed users');
+    }
   }
-}
-
-
 
   Future<void> followUser(String userToFollow) async {
     await _initPrefs(); // Initialize SharedPreferences
@@ -291,35 +318,31 @@ Future<User?> getPublicUserProfile(String username) async {
     }
   }
 
-   Future<void> unfollowUser(String userToUnfollow) async {
-  await _initPrefs(); // Initialize SharedPreferences
-  final userId = _prefs.getString('userId');
-  try {
-    const url = '${Constants.baseUrl}/api/unfollowUser';
-    final response = await http.post(
-      Uri.parse(url),
-      body: {
-        'userToUnfollow': userToUnfollow,
-        'userId': userId
-      },
-    );
+  Future<void> unfollowUser(String userToUnfollow) async {
+    await _initPrefs(); // Initialize SharedPreferences
+    final userId = _prefs.getString('userId');
+    try {
+      const url = '${Constants.baseUrl}/api/unfollowUser';
+      final response = await http.post(
+        Uri.parse(url),
+        body: {'userToUnfollow': userToUnfollow, 'userId': userId},
+      );
 
-    if (response.statusCode == 200) {
-      // Handle success
-      print('User unfollowed successfully');
-    } else if (response.statusCode == 404) {
-      // Handle user not found error
-      print('User not found');
-    } else {
-      // Handle other errors
-      print('Failed to unfollow user: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        // Handle success
+        print('User unfollowed successfully');
+      } else if (response.statusCode == 404) {
+        // Handle user not found error
+        print('User not found');
+      } else {
+        // Handle other errors
+        print('Failed to unfollow user: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle exception
+      print('Error unfollowing user: $e');
     }
-  } catch (e) {
-    // Handle exception
-    print('Error unfollowing user: $e');
   }
-}
-
 
   Future<void> _saveUserIDLocally(String userId) async {
     await _initPrefs(); // Initialize SharedPreferences
@@ -339,40 +362,38 @@ Future<User?> getPublicUserProfile(String username) async {
   }
 
   Future<bool> changeCredentials({
-  required String oldPassword,
-  required String newUsername,
-  required String newEmail,
-  required String newPassword,
-}) async {
+    required String oldPassword,
+    required String newUsername,
+    required String newEmail,
+    required String newPassword,
+  }) async {
+    await _initPrefs(); // Initialize SharedPreferences
+    final userId = _prefs.getString('userId');
+    try {
+      // Make API call to update user credentials
+      final response = await http.put(
+        Uri.parse('${Constants.baseUrl}/api/changeCredentials/$userId'),
+        body: jsonEncode({
+          'oldPassword': oldPassword,
+          'newUsername': newUsername,
+          'newEmail': newEmail,
+          'newPassword': newPassword,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
 
-  await _initPrefs(); // Initialize SharedPreferences
-  final userId = _prefs.getString('userId');
-  try {
-    // Make API call to update user credentials
-    final response = await http.put(
-      Uri.parse('${Constants.baseUrl}/api/changeCredentials/$userId'),
-      body: jsonEncode({
-        'oldPassword': oldPassword,
-        'newUsername': newUsername,
-        'newEmail': newEmail,
-        'newPassword': newPassword,
-      }),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 200) {
-      // Credentials updated successfully
-      // Handle success
-    } else {
-      // Handle API errors
-      throw Exception('Failed to update credentials: ${response.body}');
+      if (response.statusCode == 200) {
+        // Credentials updated successfully
+        // Handle success
+      } else {
+        // Handle API errors
+        throw Exception('Failed to update credentials: ${response.body}');
+      }
+    } catch (e) {
+      // Handle exceptions
+      print('Error changing credentials: $e');
+      throw Exception('Error changing credentials');
     }
-  } catch (e) {
-    // Handle exceptions
-    print('Error changing credentials: $e');
-    throw Exception('Error changing credentials');
+    return true;
   }
-  return true;
-}
-
 }

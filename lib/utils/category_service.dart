@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/category.dart';
@@ -13,18 +12,19 @@ class CategoryService with ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
   }
 
+
   Future<List<CategoryModel>> getAllCategories() async {
   final response = await http.get(
     Uri.parse('${Constants.baseUrl}/api/categories'),
   );
 
-  log('${Constants.baseUrl}/api/categories');
+
 
   if (response.statusCode == 200) {
     final decodedData = jsonDecode(response.body) as List<dynamic>;
 
     final categories = decodedData.map((categoryJson) => CategoryModel.fromJson(categoryJson)).toList();
-    log(categories.toList().toString());
+    
     return categories;
   } else {
     // Handle API errors gracefully (e.g., throw an exception)
@@ -32,6 +32,38 @@ class CategoryService with ChangeNotifier {
   }
 }
 
+  Future<List<CategoryModel>> getFixedCategories(int desiredLength) async {
+  final response = await http.get(
+    Uri.parse('${Constants.baseUrl}/api/categories/getFixedCategories?length=$desiredLength'),
+  );
+
+  if (response.statusCode == 200) {
+    final decodedData = jsonDecode(response.body) as List<dynamic>;
+
+    final categories = decodedData.map((categoryJson) => CategoryModel.fromJson(categoryJson)).toList();
+    return categories;
+  } else {
+    throw Exception('Failed to load categories');
+  }
+}
+
+ Future<List<CategoryModel>> getCategoriesByPage(int page, int pageSize) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${Constants.baseUrl}/api/getCategoriesByPage?page=$page&pageSize=$pageSize'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = jsonDecode(response.body);
+        final List<CategoryModel> categories = jsonData.map((categoryJson) => CategoryModel.fromJson(categoryJson)).toList();
+        return categories;
+      } else {
+        throw Exception('Failed to load categories');
+      }
+    } catch (e) {
+      throw Exception('Error fetching categories: $e');
+    }
+  }
  
   Future<bool> createCategory(
       String name, String font, String color, String categoryImage,List<String> recipes) async {
@@ -52,7 +84,7 @@ class CategoryService with ChangeNotifier {
         final responseData = jsonDecode(response.body);
         String categoryId = responseData['categoryId'];
         // categoryId = id;
-        log('categoryId $categoryId');
+      
         await _saveCategoryIDLocally(categoryId);
         notifyListeners();
         return true;

@@ -43,7 +43,7 @@ class CustomRecipeCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              flex: 3,
+              flex: 2,
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(Constants.defaultPadding),
@@ -126,32 +126,34 @@ class CustomRecipeCard extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                    
-                        Text(
-                          recipe.recipeTitle.toUpperCase(),
-                          style: GoogleFonts.getFont(
-                            recipe.categoryFont,
-                            fontSize: Responsive.isDesktop(context)
-                                ? Constants.desktopFontSize
-                                : Constants.mobileFontSize,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                HexColor(recipe.categoryColor).withOpacity(0.7),
-                          ),
-                        ),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            const Icon(Icons.favorite_border),
-                            Text(
-                              recipe.likedBy.length.toString(),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                      
+                          Text(
+                            recipe.recipeTitle.toUpperCase(),
+                            style: GoogleFonts.getFont(
+                              recipe.categoryFont,
+                              fontSize: Responsive.isDesktop(context)
+                                  ? Constants.desktopFontSize
+                                  : Constants.mobileFontSize,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  HexColor(recipe.categoryColor).withOpacity(0.7),
                             ),
-                          ],
-                        )
-                      ],
+                          ),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              const Icon(Icons.favorite_border),
+                              Text(
+                                recipe.likedBy.length.toString(),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                     // You can add more widgets here if needed
                   ],

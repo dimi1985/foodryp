@@ -25,13 +25,13 @@ class RecipeDetailPage extends StatefulWidget {
 class _RecipeDetailPageState extends State<RecipeDetailPage> {
   late bool isLiked = false;
   late bool isForEdit = false;
-   bool isAuthenticated = false; 
+  bool isAuthenticated = false;
 
   @override
   void initState() {
     super.initState();
     initLikeStatus();
-     checkAuthenticationStatus();
+    checkAuthenticationStatus();
   }
 
   void initLikeStatus() async {
@@ -46,8 +46,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     setState(() {
-      isAuthenticated = userId !=
-          null; 
+      isAuthenticated = userId != null;
     });
   }
 
@@ -163,92 +162,95 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       ),
                     ),
                   ),
-                  if(isAuthenticated)
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Row(
-                        children: [
-                          const Spacer(),
-                          IconButton(
-                            onPressed: () {
-                              // Call the likeRecipe method when the favorite icon is pressed
-                              if (isLiked) {
-                                // If already liked, call dislikeRecipe to unlike
-                                RecipeService()
-                                    .dislikeRecipe(widget.recipe.id ?? '')
-                                    .then((_) => setState(() {
-                                          // Update the UI state after the recipe is disliked
-                                          isLiked = false;
-                                        }))
-                                    .catchError((error) {
-                                  // Handle any errors that occur during the disliking process
-                                  print('Error disliking recipe: $error');
-                                });
-                              } else {
-                                // If not liked, call likeRecipe to like
-                                RecipeService()
-                                    .likeRecipe(widget.recipe.id ?? '')
-                                    .then((_) => setState(() {
-                                          // Update the UI state after the recipe is liked
-                                          isLiked = true;
-                                        }))
-                                    .catchError((error) {
-                                  // Handle any errors that occur during the liking process
-                                  print('Error liking recipe: $error');
-                                });
-                              }
-                            },
-                            // Use conditional rendering to change the icon based on whether the recipe is liked
-                            icon: Icon(
-                              isLiked ? Icons.favorite : Icons.favorite_border,
-                              color: isLiked ? Colors.red : null,
-                            ),
-                          ),
-                          const SizedBox(width: 10.0),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.save),
-                          ),
-                          if (isForEdit)
+                  if (isAuthenticated)
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Row(
+                          children: [
+                            const Spacer(),
                             IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddRecipePage(
-                                        recipe: widget.recipe,
-                                        isForEdit: isForEdit),
+                                // Call the likeRecipe method when the favorite icon is pressed
+                                if (isLiked) {
+                                  // If already liked, call dislikeRecipe to unlike
+                                  RecipeService()
+                                      .dislikeRecipe(widget.recipe.id ?? '')
+                                      .then((_) => setState(() {
+                                            // Update the UI state after the recipe is disliked
+                                            isLiked = false;
+                                          }))
+                                      .catchError((error) {
+                                    // Handle any errors that occur during the disliking process
+                                    print('Error disliking recipe: $error');
+                                  });
+                                } else {
+                                  // If not liked, call likeRecipe to like
+                                  RecipeService()
+                                      .likeRecipe(widget.recipe.id ?? '')
+                                      .then((_) => setState(() {
+                                            // Update the UI state after the recipe is liked
+                                            isLiked = true;
+                                          }))
+                                      .catchError((error) {
+                                    // Handle any errors that occur during the liking process
+                                    print('Error liking recipe: $error');
+                                  });
+                                }
+                              },
+                              // Use conditional rendering to change the icon based on whether the recipe is liked
+                              icon: Icon(
+                                isLiked
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isLiked ? Colors.red : null,
+                              ),
+                            ),
+                            const SizedBox(width: 10.0),
+                            IconButton(
+                              onPressed: () {},
+                              icon: const Icon(Icons.save),
+                            ),
+                            if (isForEdit)
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddRecipePage(
+                                          recipe: widget.recipe,
+                                          isForEdit: isForEdit),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.edit),
+                              ),
+                                          if(isAuthenticated)
+                            IconButton(
+                              onPressed: () {
+                                // Show a SnackBar with a delete action
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                        'Are you sure you want to delete this recipe?'),
+                                    duration: const Duration(
+                                        seconds: 5), // Set a short duration
+                                    action: SnackBarAction(
+                                      label: 'Delete',
+                                      onPressed: () {
+                                        RecipeService()
+                                            .deleteRecipe(widget.recipe.id!);
+                                      },
+                                    ),
                                   ),
                                 );
                               },
-                              icon: const Icon(Icons.edit),
-                            ),
-                            IconButton(
-  onPressed: () {
-    // Show a SnackBar with a delete action
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Are you sure you want to delete this recipe?'),
-        duration: Duration(seconds: 5), // Set a short duration
-        action: SnackBarAction(
-          label: 'Delete',
-          onPressed: () {
-           
-            RecipeService().deleteRecipe(widget.recipe.id!);
-          },
-        ),
-      ),
-    );
-  },
-  icon: const Icon(Icons.delete),
-)
-
-
-                        ],
+                              icon: const Icon(Icons.delete),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
               const SizedBox(height: 20.0),
@@ -283,6 +285,4 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       ),
     );
   }
-  
-
 }

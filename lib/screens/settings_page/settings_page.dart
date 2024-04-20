@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/main.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/admin/admin_panel_screen.dart';
 import 'package:foodryp/screens/profile_screen/profile_screen.dart';
 import 'package:foodryp/screens/settings_page/components/delete_account_page.dart';
@@ -23,19 +24,11 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
-  String profileName;
-  String gender;
-  String profileImage;
-  String? role;
-  String email;
-
+  
+User user;
   SettingsPage({
-    super.key,
-    required this.profileName,
-    required this.gender,
-    required this.profileImage,
-    this.role,
-    required this.email,
+    super.key, required this.user,
+   
   });
 
   @override
@@ -94,7 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const ProfilePage(username: '',),
+              builder: (context) =>  ProfilePage(user: widget.user,),
             ),
           );
         },
@@ -103,7 +96,7 @@ class _SettingsPageState extends State<SettingsPage> {
           appBar: AppBar(
             title: Text(AppLocalizations.of(context).translate('Settings')),
             actions: [
-              if (widget.role!.contains('admin'))
+              if (widget.user.role!.contains('admin'))
                 TextButton(
                     onPressed: () {
                       Navigator.push(
@@ -162,7 +155,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       return ChangeFieldDialog(
                         context: context,
                         title:
-                            'Change Email(${widget.email})\n(Signout is automatic after change)',
+                            'Change Email(${widget.user.email})\n(Signout is automatic after change)',
                         hintText: 'Enter new email',
                         newHintText: '',
                         onSave: (String newEmail, String nullValue) async {
@@ -416,27 +409,27 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: const EdgeInsets.all(10.0),
       child: Row(
         children: [
-          widget.gender.contains('female')
+          widget.user.gender!.contains('female')
               ? ImagePickerPreviewContainer(
                   containerSize: 100.0,
-                  initialImagePath: widget.profileImage,
+                  initialImagePath: widget.user.profileImage,
                   onImageSelected: (File imageFile, List<int> bytes) {
                     updateStatusOfSelectedImage(context, imageFile, bytes);
                   },
                   allowSelection: true,
-                  gender: widget.gender,
+                  gender: widget.user.gender!,
                   isFor: '',
                   isForEdit: false,
                 )
-              : widget.gender.contains('male')
+              : widget.user.gender!.contains('male')
                   ? ImagePickerPreviewContainer(
                       containerSize: 100.0,
-                      initialImagePath: widget.profileImage,
+                      initialImagePath: widget.user.profileImage,
                       onImageSelected: (File imageFile, List<int> bytes) {
                         updateStatusOfSelectedImage(context, imageFile, bytes);
                       },
                       allowSelection: true,
-                      gender: widget.gender,
+                      gender: widget.user.gender!,
                       isFor: '',
                       isForEdit: false,
                     )

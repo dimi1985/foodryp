@@ -3,7 +3,8 @@ import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:foodryp/screens/recipe_by_category_page.dart';
+import 'package:foodryp/screens/recipe_by_category_page/recipe_by_category_page.dart';
+import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
@@ -28,17 +29,14 @@ class _CategorySectionState extends State<CategorySection> {
 
   Future<void> fetchCategories() async {
     try {
-      final response = await http.get(Uri.parse('${Constants.baseUrl}/api/categories'));
-      if (response.statusCode == 200) {
-        final decodedData = jsonDecode(response.body) as List<dynamic>;
-        final List<CategoryModel> fetchedCategories =
-            decodedData.map((categoryJson) => CategoryModel.fromJson(categoryJson)).toList();
-        setState(() {
-          categories = fetchedCategories;
-        });
-      } else {
-        throw Exception('Failed to load categories');
-      }
+      const int desiredLength = 6;
+      final categoryService = CategoryService();
+      final fetchedCategories =
+          await categoryService.getFixedCategories(desiredLength);
+
+      setState(() {
+        categories = fetchedCategories;
+      });
     } catch (e) {
       print('Error fetching categories: $e');
     }
@@ -53,9 +51,8 @@ class _CategorySectionState extends State<CategorySection> {
         child: SizedBox(
           height: 200,
           width: screenSize.width,
-
           child: ScrollConfiguration(
-             behavior: ScrollConfiguration.of(context).copyWith(
+            behavior: ScrollConfiguration.of(context).copyWith(
               dragDevices: {
                 PointerDeviceKind.touch,
                 PointerDeviceKind.mouse,
@@ -71,13 +68,14 @@ class _CategorySectionState extends State<CategorySection> {
                 return InkWell(
                   onTap: () {
                     Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  RecipeByCategoryPage(category:category,)),
-              );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RecipeByCategoryPage(
+                                category: category,
+                              )),
+                    );
                   },
-                  child: CustomCategoryCard(
-                    category:category
-                  ),
+                  child: CustomCategoryCard(category: category),
                 );
               },
               separatorBuilder: (BuildContext context, int index) {

@@ -1,177 +1,160 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'dart:developer';
-import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
-import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
-import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
-import 'package:hexcolor/hexcolor.dart';
+import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 
 class RecipeCardProfile extends StatefulWidget {
   final String publicUsername;
-  final String currentUsername;
-  const RecipeCardProfile(
-      {Key? key, required this.publicUsername, required this.currentUsername});
+  const RecipeCardProfile({
+    Key? key,
+    required this.publicUsername,
+  });
 
   @override
   State<RecipeCardProfile> createState() => _RecipeCardProfileState();
 }
 
 class _RecipeCardProfileState extends State<RecipeCardProfile> {
-  List<Recipe> userRecipes = [];
+  late ScrollController _scrollController;
   List<Recipe> recipes = [];
+  bool _isLoading = false;
+  int _currentPage = 1;
+  final int _pageSize = 10;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserRecipes();
+    _scrollController = ScrollController()..addListener(_scrollListener);
+    _fetchRecipes(); // Fetch initial set of recipes
   }
 
-  Future<void> _fetchUserRecipes() async {
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (!_isLoading &&
+        _scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200) {
+      _fetchMoreRecipes();
+    }
+  }
+
+  Future<void> _fetchRecipes() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
-      if (widget.publicUsername == widget.currentUsername) {
-        // Fetch user profile if it's the logged-in user's profile
-
-        recipes = await RecipeService().getUserRecipes();
-      } else {
-        // Fetch public user profile if it's a different user's profile
-        recipes =
-            await RecipeService().getUserPublicRecipes(widget.publicUsername);
-      }
-
+      final fetchedRecipes = await _fetchRecipesData(_currentPage, _pageSize);
       setState(() {
-        userRecipes = recipes;
+        recipes = fetchedRecipes.reversed.toList();
+        _isLoading = false;
       });
+    } catch (_) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchMoreRecipes() async {
+    if (!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        final fetchedRecipes = await _fetchRecipesData(_currentPage, _pageSize);
+        for (var recipe in fetchedRecipes) {
+          if (!recipes
+              .any((existingRecipe) => existingRecipe.id == recipe.id)) {
+            recipes.add(recipe);
+          }
+        }
+        setState(() {
+          _currentPage++;
+          _isLoading = false;
+        });
+      } catch (_) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<List<Recipe>> _fetchRecipesData(int currentPage, int pageSize) async {
+    try {
+      List<Recipe> fetchedRecipes = [];
+      if (widget.publicUsername.isEmpty) {
+        fetchedRecipes = await RecipeService().getUserRecipesByPage(
+          currentPage,
+          pageSize,
+        );
+      } else {
+        fetchedRecipes = await RecipeService().getUserPublicRecipesByPage(
+          widget.publicUsername,
+          currentPage,
+          pageSize,
+        );
+      }
+      return fetchedRecipes;
     } catch (e) {
-      log('Error fetching user recipes: $e');
-      // Handle error gracefully (e.g., show an error message)
+      rethrow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    return _buildRecipeList();
+  }
 
-    return SizedBox(
-      height: Responsive.isDesktop(context)
-          ? screenSize.width * 0.3
-          : screenSize.width * 0.8,
-      child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-          },
-        ),
-        child: ListView.separated(
-          itemCount: userRecipes.length,
-          itemBuilder: (context, index) {
-            final userRecipe = userRecipes[index];
-            final recipeImage =
-                '${Constants.imageURL}/${userRecipe.recipeImage}';
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => RecipeDetailPage(recipe: userRecipe),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(left: 25, right: 25),
-                child: Card(
-                  elevation: 2.0,
-                  child: Container(
-                    height: 150,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(7.0),
-                      color: Colors.white,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const SizedBox(width: 10.0),
-                        Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              const SizedBox(height: 15.0),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0, vertical: 5.0),
-                                decoration: BoxDecoration(
-                                  color: HexColor(userRecipe.categoryColor),
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
-                                child: Text(
-                                  userRecipe.categoryName,
-                                  style: TextStyle(
-                                    fontSize: Responsive.isDesktop(context)
-                                        ? Constants.desktopFontSize
-                                        : Constants.mobileFontSize,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 7.0),
-                              Row(
-                                children: [
-                                  Text(
-                                    userRecipe.recipeTitle,
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: HexColor(userRecipe.categoryColor),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10.0),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.favorite_border_outlined,
-                                      ),
-                                      const SizedBox(width: 3.0),
-                                      Text(
-                                          userRecipe.likedBy.length.toString()),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10.0),
-                        const Spacer(),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            height: screenSize.height,
-                            width: screenSize.height / 2,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(recipeImage),
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.circular(7.0),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+  Widget _buildRecipeList() {
+    return Padding(
+      padding: EdgeInsets.all(Responsive.isDesktop(context) ? 32 : 16),
+      child: Center(
+        child: Column(
+          children: [
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: Responsive.isDesktop(context) ? 4 : 2,
+                  crossAxisSpacing: 20.0,
+                  mainAxisSpacing: 20.0,
+                  childAspectRatio: 1.0,
                 ),
+                controller: _scrollController,
+                itemCount: recipes.length,
+                itemBuilder: (context, index) {
+                  final recipe = recipes[index];
+                  return Padding(
+                    padding:
+                        EdgeInsets.all(Responsive.isDesktop(context) ? 25 : 8),
+                    child: SizedBox(
+                      height: 300,
+                      width: 300,
+                      child: CustomRecipeCard(
+                        internalUse: '',
+                        onTap: () {},
+                        recipe: recipe,
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(height: 20);
-          },
+            ),
+            if (_isLoading)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(), // Loading indicator
+              ),
+          ],
         ),
       ),
     );

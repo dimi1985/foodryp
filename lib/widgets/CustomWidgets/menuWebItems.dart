@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
+import 'package:foodryp/screens/creators_page/creators_page.dart';
+import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -16,13 +18,12 @@ class MenuWebItems extends StatefulWidget {
 }
 
 class _MenuWebItemsState extends State<MenuWebItems> {
-  bool isAuthenticated = false; 
+  bool isAuthenticated = false;
 
   @override
   void initState() {
     super.initState();
     checkAuthenticationStatus();
-    
   }
 
   Future<void> checkAuthenticationStatus() async {
@@ -52,12 +53,14 @@ class _MenuWebItemsState extends State<MenuWebItems> {
       shrinkWrap: true,
       scrollDirection:
           Responsive.isDesktop(context) ? Axis.horizontal : Axis.vertical,
-      children:
-          menuItems.map((item) => _buildMenuItem(item, isAndroid,themeProvider)).toList(),
+      children: menuItems
+          .map((item) => _buildMenuItem(item, isAndroid, themeProvider))
+          .toList(),
     );
   }
 
-  Widget _buildMenuItem(String item, bool isAndroid, ThemeProvider themeProvider) {
+  Widget _buildMenuItem(
+      String item, bool isAndroid, ThemeProvider themeProvider) {
     return Padding(
       padding: EdgeInsets.all(
           Responsive.isMobile(context) ? 0 : Constants.defaultPadding),
@@ -77,19 +80,41 @@ class _MenuWebItemsState extends State<MenuWebItems> {
               // Navigate to AddRecipePage
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddRecipePage(recipe: null, isForEdit: false,)),
+                MaterialPageRoute(
+                    builder: (context) => const AddRecipePage(
+                          recipe: null,
+                          isForEdit: false,
+                        )),
               );
               break;
             // Add more cases for other menu items
+            case 'Recipes':
+              // Navigate to AddRecipePage
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RecipePage()),
+              );
+              break;
+
+               case 'Creators':
+              // Navigate to AddRecipePage
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CreatorsPage()),
+              );
+              break;
+
             default:
               // Handle default case (optional)
               break;
           }
         },
         child: Text(
-           AppLocalizations.of(context).translate(item),
+          AppLocalizations.of(context).translate(item),
           style: TextStyle(
-            color: Responsive.isMobile(context) || Responsive.isTablet(context) || themeProvider.currentTheme == ThemeType.dark
+            color: Responsive.isMobile(context) ||
+                    Responsive.isTablet(context) ||
+                    themeProvider.currentTheme == ThemeType.dark
                 ? Colors.white
                 : Colors.black,
             fontWeight: FontWeight.bold,
@@ -103,6 +128,4 @@ class _MenuWebItemsState extends State<MenuWebItems> {
       ),
     );
   }
-
-  
 }
