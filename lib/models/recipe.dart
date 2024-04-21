@@ -1,3 +1,5 @@
+import 'package:foodryp/models/weeklyMenu.dart';
+
 class Recipe {
   final String? id;
   final String recipeTitle;
@@ -18,6 +20,7 @@ class Recipe {
   final String categoryFont;
   final String categoryName;
   final List<String> likedBy;
+  final List<String> meal;
 
   Recipe({
     this.id,
@@ -39,31 +42,39 @@ class Recipe {
     required this.categoryFont,
     required this.categoryName,
     required this.likedBy,
+    required this.meal,
   });
-  
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
-  return Recipe(
-    id: json['_id']?.toString() ?? '',
-    recipeTitle: json['recipeTitle'] ?? '',
-    recipeImage: json['recipeImage'] ?? '',
-    ingredients: (json['ingredients'] as List<dynamic>?)?.cast<String>()?.toList() ?? [],
-    instructions: (json['instructions'] as List<dynamic>?)?.cast<String>()?.toList() ?? [],
-    prepDuration: json['prepDuration'] ?? '',
-    cookDuration: json['cookDuration'] ?? '',
-    servingNumber: json['servingNumber'] ?? '',
-    difficulty: json['difficulty'] ?? '',
-    username: json['username'] ?? '',
-    useImage: json['useImage'] ?? '',
-    userId: json['userId']?.toString() ?? '',
-    date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
-    description: json['description'] ?? '',
-    categoryId: json['categoryId']?.toString() ?? '',
-    categoryColor: json['categoryColor'] ?? '',
-    categoryFont: json['categoryFont'] ?? '',
-    categoryName: json['categoryName'] ?? '',
-    likedBy: (json['likedBy'] as List<dynamic>?)?.cast<String>().toList() ?? [], // Handle null case by using empty list
-  );
-}
-
+    return Recipe(
+      id: json['_id']?.toString() ?? '',
+      recipeTitle: json['recipeTitle'] ?? '',
+      recipeImage: json['recipeImage'] ?? '',
+      ingredients:
+          (json['ingredients'] as List<dynamic>?)?.cast<String>()?.toList() ??
+              [],
+      instructions:
+          (json['instructions'] as List<dynamic>?)?.cast<String>()?.toList() ??
+              [],
+      prepDuration: json['prepDuration'] ?? '',
+      cookDuration: json['cookDuration'] ?? '',
+      servingNumber: json['servingNumber'] ?? '',
+      difficulty: json['difficulty'] ?? '',
+      username: json['username'] ?? '',
+      useImage: json['useImage'] ?? '',
+      userId: json['userId']?.toString() ?? '',
+      date:
+          json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
+      description: json['description'] ?? '',
+      categoryId: json['categoryId']?.toString() ?? '',
+      categoryColor: json['categoryColor'] ?? '',
+      categoryFont: json['categoryFont'] ?? '',
+      categoryName: json['categoryName'] ?? '',
+      likedBy:
+          (json['likedBy'] as List<dynamic>?)?.cast<String>().toList() ?? [],
+           meal:
+          (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
+      
+    );
+  }
 }

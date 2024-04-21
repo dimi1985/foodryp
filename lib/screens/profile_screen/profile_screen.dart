@@ -28,7 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     fetchUserProfile();
-    print('recieved: ${widget.user.username}');
+   
   }
 
   Future<void> fetchUserProfile() async {
@@ -59,16 +59,11 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 10.0),
           HeadingTitleRow(
             title: 'Weekly Menus',
-            onPressed: () {
-              // Navigate to the corresponding page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  WeeklyMenuPage()),
-              );
-            }, showSeeALl: true,
+            onPressed: (){},
+             showSeeALl: false,
           ),
           const SizedBox(height: 10.0),
-          const WeeklyMenuSection(),
+           WeeklyMenuSection(showAll: false, publicUsername: widget.user.username),
           const SizedBox(height: 25.0),
           HeadingTitleRow(
             title: 'Recipes',

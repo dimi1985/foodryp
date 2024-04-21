@@ -1,8 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -90,6 +90,7 @@ class RecipeService with ChangeNotifier {
     String categoryFont,
      String selectedCategoryName,
      List<String> likedBy,
+     List<WeeklyMenu> meal,
   ) async {
     
     try {

@@ -78,6 +78,7 @@ class CustomRecipeCard extends StatelessWidget {
                           isFor: '',
                           initialImagePath: recipe.useImage!,
                           isForEdit: false,
+                          allowSelection: false,
                         ),
                         const SizedBox(width: 10),
                         Text(
@@ -101,7 +102,7 @@ class CustomRecipeCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(
-                            width: 5), // Adjust the spacing as needed
+                            width: 5), 
 
                         Text(
                           DateFormat('dd MMM yyyy')

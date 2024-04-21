@@ -1,10 +1,9 @@
 import 'dart:developer';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/recipe_service.dart';
@@ -15,7 +14,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class AddWeeklyMenuPage extends StatefulWidget {
-  const AddWeeklyMenuPage({Key? key}) : super(key: key);
+  final WeeklyMenu? meal;
+  final bool isForEdit;
+  const AddWeeklyMenuPage(
+      {Key? key, required this.meal, required this.isForEdit})
+      : super(key: key);
 
   @override
   State<AddWeeklyMenuPage> createState() => _AddWeeklyMenuPageState();
@@ -47,6 +50,15 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
     super.initState();
     fetchUserProfileAndRecipes();
 
+    if (widget.isForEdit) {
+      setState(() {
+        titleController.text = widget.meal!.title;
+        for (var day in widget.meal!.dayOfWeek) {
+          final recipe = day;
+          selectedRecipes.add(recipe);
+        }
+      });
+    }
     // Add scroll listener
     _scrollController.addListener(_scrollListener);
   }
@@ -79,11 +91,16 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       // Fetch user profile
       userProfile = (await userService.getUserProfile())!;
 
-      // Inside fetchUserProfileAndRecipes method, after initializing userRecipes:
-      recipeCheckedState = {for (var recipe in userRecipes) recipe: false};
-
       // Fetch user recipes with pagination
       userRecipes = await recipeService.getUserRecipesByPage(1, 10);
+
+      for (var recipe in userRecipes) {
+        if (recipe.meal.contains(widget.meal?.id)) {
+          setState(() {
+            recipeCheckedState[recipe] = true;
+          });
+        }
+      }
 
       setState(() {
         isLoading = false;
@@ -164,7 +181,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Hi ${userProfile!.username} Here you can check and put the meals of the day',
+                      'Hi ${userProfile.username} Here you can check and put the meals of the day',
                     ),
                     CustomTextField(
                         controller: titleController,
@@ -179,11 +196,10 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                               });
                               MealService()
                                   .saveWeeklyMenu(
-                                titleController.text,
-                                selectedRecipes,
-                                userProfile.username,
-                                userProfile.profileImage,
-                              )
+                                      titleController.text,
+                                      selectedRecipes,
+                                      userProfile.username,
+                                      userProfile.profileImage)
                                   .then((value) {
                                 if (value) {
                                   print('Meal Saved');
@@ -262,31 +278,35 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                         onChanged: (isChecked) {
                                           setState(() {
                                             if (isChecked != null) {
-                                              if (isChecked) {
+                                              if (!isChecked!) {
+                                                // If the checkbox is unchecked, remove the recipe from selectedRecipes
+                                                selectedRecipes.removeWhere(
+                                                    (r) => r.id == recipe.id);
+                                                log(selectedRecipes.length
+                                                    .toString());
+                                              } else {
                                                 if (selectedRecipes.length <
                                                     7) {
                                                   // Assuming 7 as the maximum limit of selected recipes
-                                                  recipeCheckedState[recipe] =
-                                                      isChecked;
                                                   selectedRecipes.add(recipe);
+                                                  log(selectedRecipes.length
+                                                      .toString());
                                                 } else {
                                                   // If the maximum limit of selected recipes is reached, keep the checkbox unchecked
-                                                  recipeCheckedState[recipe] =
-                                                      false;
+                                                  isChecked = false;
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(
                                                     const SnackBar(
                                                       content: Text(
-                                                          'You have reached the maximum number of selected recipes.'),
+                                                        'You have reached the maximum number of selected recipes.',
+                                                      ),
                                                     ),
                                                   );
                                                 }
-                                              } else {
-                                                // Remove the recipe from the selected list and update the checkbox state
-                                                selectedRecipes.remove(recipe);
-                                                recipeCheckedState[recipe] =
-                                                    isChecked;
                                               }
+                                              // Update the checkbox state
+                                              recipeCheckedState[recipe] =
+                                                  isChecked!;
                                             }
                                           });
                                         },

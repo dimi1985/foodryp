@@ -772,6 +772,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                               selectedCategoryFont,
                                               selectedCategoryName,
                                               [],
+                                              []
                                             );
 
                                   // Handle the completion of the recipe operation

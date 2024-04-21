@@ -221,7 +221,7 @@ class _AuthScreenState extends State<AuthScreen> {
             userNameController.text,
             emailController.text,
             passwordController.text,
-            selectedGender.toString().split('.').last, [], [], [], []);
+            selectedGender.toString().split('.').last, [], [], [], [],[]);
 
         if (success) {
           // Registration successful

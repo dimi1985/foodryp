@@ -26,7 +26,7 @@ class UserService with ChangeNotifier {
       List<String> recipes,
       List<String> following,
       List<String> followedBy,
-      List<String> likedRecipes) async {
+      List<String> likedRecipes,List<String> mealId) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/register'),

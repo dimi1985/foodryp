@@ -10,6 +10,7 @@ import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/category_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/recipe_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/top_three_recipe_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
 
 class DesktopMiddleSide extends StatelessWidget {
   const DesktopMiddleSide({Key? key});
@@ -72,7 +73,7 @@ class DesktopMiddleSide extends StatelessWidget {
                     );
                   },showSeeALl: true,
                 ),
-                Container(),
+                const WeeklyMenuSection(showAll : true, publicUsername: '',),
                 const SizedBox(height: 15.0),
               ],
             ),

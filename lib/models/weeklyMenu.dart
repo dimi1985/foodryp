@@ -8,6 +8,7 @@ class WeeklyMenu {
   final String username;
   final String userProfileImage;
 
+
   WeeklyMenu({
     required this.id,
     required this.title,
@@ -15,12 +16,14 @@ class WeeklyMenu {
     required this.userId,
     required this.username,
     required this.userProfileImage,
+
   });
 
 factory WeeklyMenu.fromJson(Map<String, dynamic> json) {
   return WeeklyMenu(
     id: json['_id'],
     title: json['title'],
+
     dayOfWeek: json['dayOfWeek'] != null
         ? (json['dayOfWeek'] as List<dynamic>)
             .map((x) => Recipe.fromJson(x))
