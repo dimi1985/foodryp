@@ -4,8 +4,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/creators_page/creators_page.dart';
-import 'package:foodryp/screens/profile_screen/components/recipe_card_profile.dart';
-import 'package:foodryp/screens/profile_screen/components/top_profile.dart';
+import 'package:foodryp/screens/profile_page/components/recipe_card_profile.dart';
+import 'package:foodryp/screens/profile_page/components/top_profile.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
 import 'package:foodryp/utils/user_service.dart';
@@ -28,6 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     fetchUserProfile();
+    
    
   }
 
@@ -63,7 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
              showSeeALl: false,
           ),
           const SizedBox(height: 10.0),
-           WeeklyMenuSection(showAll: false, publicUsername: widget.user.username),
+           WeeklyMenuSection(showAll: false, publicUsername: widget.user.username,publicUserId:widget.user.id),
           const SizedBox(height: 25.0),
           HeadingTitleRow(
             title: 'Recipes',

@@ -1,4 +1,4 @@
-import 'package:foodryp/models/weeklyMenu.dart';
+
 
 class Recipe {
   final String? id;
@@ -51,10 +51,10 @@ class Recipe {
       recipeTitle: json['recipeTitle'] ?? '',
       recipeImage: json['recipeImage'] ?? '',
       ingredients:
-          (json['ingredients'] as List<dynamic>?)?.cast<String>()?.toList() ??
+          (json['ingredients'] as List<dynamic>?)?.cast<String>().toList() ??
               [],
       instructions:
-          (json['instructions'] as List<dynamic>?)?.cast<String>()?.toList() ??
+          (json['instructions'] as List<dynamic>?)?.cast<String>().toList() ??
               [],
       prepDuration: json['prepDuration'] ?? '',
       cookDuration: json['cookDuration'] ?? '',

@@ -27,7 +27,6 @@ class CustomRecipeCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-      
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Constants.defaultPadding),
           boxShadow: [
@@ -101,8 +100,7 @@ class CustomRecipeCard extends StatelessWidget {
                             color: Colors.black,
                           ),
                         ),
-                        const SizedBox(
-                            width: 5), 
+                        const SizedBox(width: 5),
 
                         Text(
                           DateFormat('dd MMM yyyy')
@@ -131,17 +129,18 @@ class CustomRecipeCard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                      
-                          Text(
-                            recipe.recipeTitle.toUpperCase(),
-                            style: GoogleFonts.getFont(
-                              recipe.categoryFont,
-                              fontSize: Responsive.isDesktop(context)
-                                  ? Constants.desktopFontSize
-                                  : Constants.mobileFontSize,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  HexColor(recipe.categoryColor).withOpacity(0.7),
+                          Expanded(
+                            child: Text(
+                              recipe.recipeTitle.toUpperCase(),
+                              style: GoogleFonts.getFont(
+                                recipe.categoryFont,
+                                fontSize: Responsive.isDesktop(context)
+                                    ? Constants.desktopFontSize
+                                    : Constants.mobileFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: HexColor(recipe.categoryColor)
+                                    .withOpacity(0.7),
+                              ),
                             ),
                           ),
                           const Spacer(),

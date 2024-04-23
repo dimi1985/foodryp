@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/profile_screen/profile_screen.dart';
+import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
@@ -18,7 +18,7 @@ class _CreatorsPageState extends State<CreatorsPage> {
   late List<User> users = [];
   late String loggedUserID;
  int _page = 1; // Initial page number
-  int _pageSize = 10; // Number of recipes per page
+  final int _pageSize = 10; // Number of recipes per page
   bool _isLoading = false;
 
   @override

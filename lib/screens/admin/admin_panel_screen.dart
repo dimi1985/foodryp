@@ -9,6 +9,8 @@ import 'package:foodryp/utils/responsive.dart';
 import 'components/widgets/custom_admin_card.dart';
 
 class AdminPanelScreen extends StatelessWidget {
+  const AdminPanelScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
       final isDesktop = Responsive.isDesktop(context);

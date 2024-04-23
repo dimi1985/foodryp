@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CategoryService with ChangeNotifier {
+class CategoryService {
   late SharedPreferences _prefs; // SharedPreferences instance
   Future<void> _initPrefs() async {
     _prefs = await SharedPreferences.getInstance();
@@ -86,7 +86,7 @@ class CategoryService with ChangeNotifier {
         // categoryId = id;
       
         await _saveCategoryIDLocally(categoryId);
-        notifyListeners();
+
         return true;
       }
       return false;

@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/profile_screen/profile_screen.dart';
+import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/screens/mainScreen/components/logo_widget.dart';

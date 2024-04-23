@@ -48,6 +48,7 @@ class MealService {
     }
   }
 
+
    Future<List<WeeklyMenu>> getWeeklyMenusByPage(
       int page, int pageSize) async {
     try {
@@ -85,6 +86,42 @@ class MealService {
     }
   }
 
+
+  Future<List<WeeklyMenu>> getWeeklyMenusFixedLength(int desiredLength) async {
+  try {
+    final response = await http.get(
+      Uri.parse('${Constants.baseUrl}/api/getWeeklyMenusFixedLength?length=$desiredLength'),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      if (jsonData == null) {
+        // Handle null response
+        return [];
+      }
+
+      if (jsonData is List) {
+        final List<dynamic> jsonList = jsonData;
+        return jsonList.map((json) => WeeklyMenu.fromJson(json)).toList();
+      } else if (jsonData is Map<String, dynamic>) {
+        // If jsonData is a single object, wrap it in a list
+        return [WeeklyMenu.fromJson(jsonData)];
+      } else {
+        // Handle unexpected response format
+        return [];
+      }
+    } else {
+      // Handle error response
+      return [];
+    }
+  } catch (e) {
+    print('Error fetching fixed-length weekly menus: $e');
+    // Handle error
+    return [];
+  }
+}
+
    Future<List<WeeklyMenu>> getWeeklyMenusByPageAndUser(
       int page, int pageSize) async {
     try {
@@ -93,6 +130,45 @@ class MealService {
       final response = await http.get(
         Uri.parse(
             '${Constants.baseUrl}/api/getWeeklyMenusByPageAndUser?page=$page&pageSize=$pageSize&userId=$userId'),
+      );
+      if (response.statusCode == 200) {
+        final dynamic jsonData = jsonDecode(response.body);
+
+        
+        if (jsonData == null) {
+          // Handle null response
+          return [];
+        }
+
+        if (jsonData is List) {
+          final List<dynamic> jsonList = jsonData;
+         
+          return jsonList.map((json) => WeeklyMenu.fromJson(json)).toList();
+        } else if (jsonData is Map<String, dynamic>) {
+          // If jsonData is a single object, wrap it in a list
+          return [WeeklyMenu.fromJson(jsonData)];
+        } else {
+          // Handle unexpected response format
+          return [];
+        }
+      } else {
+        // Handle error response
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching weekly menus: $e');
+      // Handle error
+      return [];
+    }
+  }
+
+Future<List<WeeklyMenu>> getWeeklyMenusByPageAndPublicUser(
+      int page, int pageSize,String publicUserId) async {
+    try {
+     
+      final response = await http.get(
+        Uri.parse(
+            '${Constants.baseUrl}/api/getWeeklyMenusByPageAndUser?page=$page&pageSize=$pageSize&userId=$publicUserId'),
       );
       if (response.statusCode == 200) {
         final dynamic jsonData = jsonDecode(response.body);

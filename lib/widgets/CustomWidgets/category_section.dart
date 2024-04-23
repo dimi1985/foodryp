@@ -18,6 +18,7 @@ class CategorySection extends StatefulWidget {
   State<CategorySection> createState() => _CategorySectionState();
 }
 
+
 class _CategorySectionState extends State<CategorySection> {
   List<CategoryModel> categories = [];
 

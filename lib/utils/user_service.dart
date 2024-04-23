@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserService with ChangeNotifier {
+class UserService  {
   late SharedPreferences _prefs; // SharedPreferences instance
 
   User? _user;
@@ -63,7 +63,7 @@ class UserService with ChangeNotifier {
             following: [],
             followedBy: [],
             likedRecipes: []);
-        notifyListeners();
+
         return true;
       }
       return false;
@@ -83,7 +83,7 @@ class UserService with ChangeNotifier {
           'password': password,
         }),
       );
-      notifyListeners();
+
 
       final responseData = jsonDecode(response.body);
       final userID = responseData['userId'];

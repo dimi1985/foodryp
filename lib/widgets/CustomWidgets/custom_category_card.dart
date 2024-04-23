@@ -27,20 +27,13 @@ class CustomCategoryCard extends StatelessWidget {
             height: 120,
             width: 120,
             child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(Constants.defaultPadding),
-                topRight: Radius.circular(Constants.defaultPadding),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: NetworkImage(categoryImage),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
+                        borderRadius: BorderRadius.circular(2),
+                        child: Image.network(
+                          categoryImage,
+                          fit: BoxFit.cover,
+                            filterQuality: FilterQuality.none,
+                        ),
+                      )
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,

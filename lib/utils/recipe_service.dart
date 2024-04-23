@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class RecipeService with ChangeNotifier {
+class RecipeService  {
   late SharedPreferences _prefs; // SharedPreferences instance
   Future<void> _initPrefs() async {
     _prefs = await SharedPreferences.getInstance();
@@ -34,6 +34,7 @@ class RecipeService with ChangeNotifier {
       throw Exception('Failed to load recipes');
     }
   }
+  
 
   Future<List<Recipe>> getFixedRecipes(int desiredLength) async {
   final response = await http.get(
@@ -44,7 +45,7 @@ class RecipeService with ChangeNotifier {
     final decodedData = jsonDecode(response.body) as List<dynamic>;
 
     final recipes = decodedData.map((recipeJson) => Recipe.fromJson(recipeJson)).toList();
-    log(recipes.toList().toString());
+
     return recipes;
   } else {
     // Handle API errors gracefully (e.g., throw an exception)
@@ -124,7 +125,6 @@ class RecipeService with ChangeNotifier {
         // categoryId = id;
         
         await _saveRecipeIDLocally(recipeId);
-        notifyListeners();
         return true;
       }
       return false;
@@ -181,7 +181,6 @@ class RecipeService with ChangeNotifier {
       );
       if (response.statusCode == 200) {
         // Update successful
-        notifyListeners(); // Notify listeners if needed
         return true;
       }
       return false;
@@ -350,7 +349,7 @@ Future<void> deleteRecipe(String recipeId) async {
   );
 
   if (response.statusCode != 200) {
-    log('response.statusCode ${response.statusCode}');
+
     throw Exception('Failed to delete recipe');
   } 
 }

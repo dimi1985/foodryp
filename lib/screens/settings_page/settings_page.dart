@@ -1,19 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/main.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/admin/admin_panel_screen.dart';
-import 'package:foodryp/screens/profile_screen/profile_screen.dart';
+import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/screens/settings_page/components/delete_account_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/language.dart';
-import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
@@ -25,8 +21,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   
-User user;
-  SettingsPage({
+final User user;
+  const SettingsPage({
     super.key, required this.user,
    
   });
