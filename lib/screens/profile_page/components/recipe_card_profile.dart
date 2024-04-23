@@ -141,7 +141,6 @@ class _RecipeCardProfileState extends State<RecipeCardProfile> {
                       width: 300,
                       child: CustomRecipeCard(
                         internalUse: '',
-                        onTap: () {},
                         recipe: recipe,
                       ),
                     ),

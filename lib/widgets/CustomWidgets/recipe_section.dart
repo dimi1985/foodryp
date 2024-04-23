@@ -63,9 +63,7 @@ class _RecipeSectionState extends State<RecipeSection> {
                   padding: const EdgeInsets.all(Constants.defaultPadding),
                   child: SizedBox(
                     width: 250,
-                    child: CustomRecipeCard(
-                      recipe: recipe,
-                      internalUse: 'recipes',
+                    child: InkWell(
                       onTap: () {
                         Navigator.push(
                           context,
@@ -74,7 +72,12 @@ class _RecipeSectionState extends State<RecipeSection> {
                           ),
                         );
                       },
-                      
+                      child: CustomRecipeCard(
+                        recipe: recipe,
+                        internalUse: 'recipes',
+                        
+                        
+                      ),
                     ),
                   ),
                 );

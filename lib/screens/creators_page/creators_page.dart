@@ -1,14 +1,15 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_page/profile_page.dart';
-import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 
 class CreatorsPage extends StatefulWidget {
-  const CreatorsPage({Key? key}) : super(key: key);
+  final User user;
+  const CreatorsPage({super.key, required this.user});
 
   @override
   _CreatorsPageState createState() => _CreatorsPageState();
@@ -17,14 +18,16 @@ class CreatorsPage extends StatefulWidget {
 class _CreatorsPageState extends State<CreatorsPage> {
   late List<User> users = [];
   late String loggedUserID;
- int _page = 1; // Initial page number
+  int _page = 1; // Initial page number
   final int _pageSize = 10; // Number of recipes per page
   bool _isLoading = false;
+  late String currentPage;
 
   @override
   void initState() {
     super.initState();
     _fetchUsers();
+    currentPage = 'Creators';
   }
 
   Future<void> _fetchUsers() async {
@@ -72,10 +75,25 @@ class _CreatorsPageState extends State<CreatorsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Creators'),
+      appBar: CustomAppBar(
+        isDesktop: true,
+        isAuthenticated: true,
+        profileImage: widget.user.profileImage,
+        username: widget.user.username,
+       
+        user: widget.user,
+        menuItems: isDesktop
+            ? MenuWebItems(
+                user: widget.user,
+                currentPage: currentPage,
+              )
+            : Container(),
       ),
+      endDrawer: !isDesktop
+          ? MenuWebItems(user: widget.user, currentPage: currentPage)
+          : null,
       body: NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification scrollInfo) {
           if (!_isLoading &&
@@ -91,14 +109,14 @@ class _CreatorsPageState extends State<CreatorsPage> {
             if (index < users.length) {
               final user = users[index];
               return InkWell(
-                  
-                  onTap: () {
-                    print('got : ${user.username}');
-                    Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  ProfilePage(user:user)),
-                );
-                  },
+                onTap: () {
+                  print('got : ${user.username}');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProfilePage(user: user,publicUsername:user.username)),
+                  );
+                },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Card(
@@ -118,12 +136,11 @@ class _CreatorsPageState extends State<CreatorsPage> {
                               ImagePickerPreviewContainer(
                                 initialImagePath: user.profileImage,
                                 containerSize: 100,
-                                onImageSelected:  (file, bytes) {},
+                                onImageSelected: (file, bytes) {},
                                 gender: user.gender!,
                                 isFor: '',
                                 isForEdit: false,
                               ),
-                              
                               Text(
                                 user.username,
                                 style: const TextStyle(

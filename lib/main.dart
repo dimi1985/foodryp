@@ -28,7 +28,7 @@ void main() async {
           create: (_) => LanguageProvider(),
           
         ), 
-         ChangeNotifierProvider(create: (_) => UsersProvider()),// Add LanguageProvider
+         ChangeNotifierProvider(create: (_) => UsersProvider()),
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),
@@ -67,6 +67,7 @@ class _FoodrypState extends State<Foodryp> {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Foodryp',
+            
             theme: themeProvider.themeData,
             localizationsDelegates: const [
               AppLocalizations.delegate,

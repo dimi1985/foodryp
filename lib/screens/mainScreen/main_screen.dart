@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_page/profile_page.dart';
@@ -8,6 +9,7 @@ import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/screens/mainScreen/components/logo_widget.dart';
 import 'package:foodryp/utils/user_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +19,8 @@ import '../../widgets/DesktopMiddleSide/desktopMiddleSide.dart';
 import '../../widgets/desktopRightSide/desktopRightSide.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key? key});
+  final User? user;
+  MainScreen({Key? key, this.user});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -30,6 +33,7 @@ class _MainScreenState extends State<MainScreen> {
   late List<User> users = [];
   bool valueSet = false;
   UsersProvider usersProvider = UsersProvider();
+  late String currentPage;
 
   User user = User(
     id: '',
@@ -41,17 +45,16 @@ class _MainScreenState extends State<MainScreen> {
     role: '',
     recipes: [],
     following: [],
-    followedBy: [], likedRecipes: [],
+    followedBy: [],
+    likedRecipes: [],
   );
 
   @override
   void initState() {
     super.initState();
     fetchUserProfile();
-   
+    currentPage = 'Home';
   }
-
-  
 
   Future<void> fetchUserProfile() async {
     final userService = UserService();
@@ -73,89 +76,35 @@ class _MainScreenState extends State<MainScreen> {
               role: '',
               recipes: [],
               following: [],
-              followedBy: [], likedRecipes: []);
+              followedBy: [],
+              likedRecipes: []);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
     final bool isDesktop = Responsive.isDesktop(context);
-    final finalProfileImageURL =
-        ('${Constants.baseUrl}/${user.profileImage}').replaceAll('\\', '/');
-
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          surfaceTintColor: Colors.white,
-          toolbarHeight: 80,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const LogoWidget(),
-              const Text('Foodryp'),
-              const Spacer(),
-              if (isDesktop)
-                Expanded(
-                  child: SizedBox(
-                    width: screenSize.width,
-                    height: 100,
-                    child: const MenuWebItems(),
-                  ),
-                ),
-              if (isAuthenticated)
-                Padding(
-                  padding: const EdgeInsets.only(right: 25),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      user.profileImage.isNotEmpty
-                          ? CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(finalProfileImageURL),
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: user.gender!.contains('female')
-                                  ? Image.asset(
-                                      'assets/default_avatar_female.jpg',
-                                      height: 30,
-                                      width: 30,
-                                    )
-                                  : user.gender!.contains('male')
-                                      ? Image.asset(
-                                          'assets/default_avatar_male.jpg',
-                                          height: 30,
-                                          width: 30,
-                                        )
-                                      : Container(),
-                            ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProfilePage(user: user,)),
-                            ).then((value) {
-                              value = true;
-                              setState(() {
-                                valueSet = value;
-                              });
-                            });
-                          },
-                          child: Text(user.username)),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          actions: const [],
-        ),
-        endDrawer: screenSize.width <= 1100 ? const MenuWebItems() : null,
+        appBar:kIsWeb ? CustomAppBar(
+          isDesktop: true,
+          isAuthenticated: true,
+          profileImage: user.profileImage,
+          username: user.username,
+          onTapProfile: () {
+            // Handle profile onTap action
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                        user: user,
+                      )),
+            );
+          },
+          user: user,
+          menuItems:isDesktop ?  MenuWebItems(user: user, currentPage: currentPage,):Container(),
+        ):AppBar(),
+        endDrawer: !isDesktop ?  MenuWebItems(user: user,currentPage: currentPage) : null,
         body: Row(
           children: [
             if (isDesktop)

@@ -7,6 +7,7 @@ import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/recipe_service.dart';
+import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
@@ -194,22 +195,39 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                               setState(() {
                                 isLoading = true;
                               });
-                              MealService()
-                                  .saveWeeklyMenu(
-                                      titleController.text,
-                                      selectedRecipes,
-                                      userProfile.username,
-                                      userProfile.profileImage)
-                                  .then((value) {
-                                if (value) {
-                                  print('Meal Saved');
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }
-                              });
+                              widget.isForEdit
+                                  ? MealService()
+                                      .updateWeeklyMenu(
+                                          widget.meal?.id ?? '',
+                                          titleController.text,
+                                          selectedRecipes,
+                                          userProfile.username,
+                                          userProfile.profileImage)
+                                      .then((value) {
+                                      if (value) {
+                                        print('Meal Updated');
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      }
+                                    })
+                                  : MealService()
+                                      .saveWeeklyMenu(
+                                          titleController.text,
+                                          selectedRecipes,
+                                          userProfile.username,
+                                          userProfile.profileImage)
+                                      .then((value) {
+                                      if (value) {
+                                        print('Meal Saved');
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      }
+                                    });
                             },
-                      child: const Text('Add Recipe'),
+                      child:
+                          Text(widget.isForEdit ? 'Update Menu' : 'Add Menu'),
                     )
                   ],
                 ),
@@ -265,7 +283,6 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                           width: 300,
                                           child: CustomRecipeCard(
                                             internalUse: '',
-                                            onTap: () {},
                                             recipe: recipe,
                                           ),
                                         ),
@@ -378,7 +395,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            getWeekdayName(index),
+                            getWeekdayName(index, recipe),
                             const SizedBox(height: 10),
                             // Recipe details
                             Text(
@@ -423,17 +440,6 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                 ),
               ),
             ),
-            //Divider maybe n Future updates
-            // Positioned(
-            //   right: 0,
-            //   bottom: 50,
-            //   child: Container(
-            //     width: 200, // Adjust divider length as needed
-            //     height: 1,
-            //     color: Colors.black, // Adjust divider color as needed
-            //     transform: Matrix4.skewX(-0.25),
-            //   ),
-            // ),
           ],
         ),
       );
@@ -442,22 +448,51 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
     }
   }
 
-  Widget getWeekdayName(int index) {
+  Widget getWeekdayName(int index, Recipe recipe) {
+    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont,
+        color: HexColor(
+          recipe.categoryColor,
+        ).withOpacity(0.7),
+        fontSize: Responsive.isDesktop(context)
+            ? Constants.desktopHeadingTitleSize
+            : Constants.mobileHeadingTitleSize);
+
     switch (index) {
       case 0:
-        return const Text('Monday');
+        return Text(
+          'Monday',
+          style: textStyle,
+        );
       case 1:
-        return const Text('Tuesday');
+        return Text(
+          'Tuesday',
+          style: textStyle,
+        );
       case 2:
-        return const Text('Wednesday');
+        return Text(
+          'Wednesday',
+          style: textStyle,
+        );
       case 3:
-        return const Text('Thursday');
+        return Text(
+          'Thursday',
+          style: textStyle,
+        );
       case 4:
-        return const Text('Friday');
+        return Text(
+          'Friday',
+          style: textStyle,
+        );
       case 5:
-        return const Text('Saturday');
+        return Text(
+          'Saturday',
+          style: textStyle,
+        );
       case 6:
-        return const Text('Sunday');
+        return Text(
+          'Sunday',
+          style: textStyle,
+        );
       default:
         return Container();
     }

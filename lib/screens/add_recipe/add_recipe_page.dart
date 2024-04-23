@@ -6,21 +6,26 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class AddRecipePage extends StatefulWidget {
   final Recipe? recipe;
   final bool isForEdit;
-  const AddRecipePage({super.key, this.recipe, required this.isForEdit});
+  final User? user;
+  const AddRecipePage(
+      {super.key, this.recipe, required this.isForEdit, this.user});
 
   @override
   State<AddRecipePage> createState() => _AddRecipePageState();
@@ -61,8 +66,23 @@ class _AddRecipePageState extends State<AddRecipePage> {
   late String servingValue;
   late String prepDurationValue;
   late String cookDurationValue;
-  late User user;
+
   bool imageIsPicked = false;
+  late String currentPage;
+
+  User user = User(
+    id: '',
+    username: '',
+    email: '',
+    profileImage: '',
+    gender: '',
+    memberSince: null,
+    role: '',
+    recipes: [],
+    following: [],
+    followedBy: [],
+    likedRecipes: [],
+  );
 
   Future<void> fetchUserProfile() async {
     final userService = UserService();
@@ -90,6 +110,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
     super.initState();
     _fetchCategories();
     fetchUserProfile();
+    currentPage = 'Add Recipe';
 
     if (widget.recipe != null) {
       // Populate text controllers with recipe data for editing
@@ -171,7 +192,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     bool isDesktop = Responsive.isDesktop(context);
-      
+
     difficultyColors = {
       AppLocalizations.of(context).translate('Easy'): Colors.green,
       AppLocalizations.of(context).translate('Medium'): Colors.yellow,
@@ -180,11 +201,35 @@ class _AddRecipePageState extends State<AddRecipePage> {
       AppLocalizations.of(context).translate('Michelin'): Colors.blue,
     };
     return Scaffold(
+      appBar: kIsWeb
+          ? CustomAppBar(
+              isDesktop: true,
+              isAuthenticated: true,
+              profileImage: user.profileImage,
+              username: user.username,
+              onTapProfile: () {
+                // Handle profile onTap action
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                            user: user,
+                          )),
+                );
+              },
+              user: user,
+              menuItems:isDesktop ? MenuWebItems(
+                user: user,
+                currentPage: currentPage,
+              ):Container(),
+            )
+          : AppBar(),
+           endDrawer: !isDesktop ?  MenuWebItems(user: user,currentPage: currentPage) : null,
       body: SingleChildScrollView(
         child: Center(
           child: Container(
             constraints: BoxConstraints(
-              maxWidth: Responsive.isDesktop(context) ? 600 : screenSize.width,
+              maxWidth: isDesktop ? 600 : screenSize.width,
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -294,12 +339,12 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
                   const SizedBox(height: 20.0),
                   SizedBox(
-                    height: Responsive.isDesktop(context) ? 350 : 200,
+                    height: isDesktop ? 350 : 200,
                     child: ImagePickerPreviewContainer(
                       initialImagePath:
                           widget.isForEdit ? widget.recipe!.recipeImage : '',
                       allowSelection: true,
-                      containerSize: Responsive.isDesktop(context)
+                      containerSize: isDesktop
                           ? 600
                           : screenSize.width,
                       onImageSelected: (file, bytes) {
@@ -502,7 +547,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () {
-                         log('ElevatedButton${ user.profileImage}');
+                      log('ElevatedButton${user.profileImage}');
 
                       String finalProfileImageURL =
                           ('${Constants.baseUrl}/${widget.recipe?.recipeImage}')
@@ -527,7 +572,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             ),
                             content: Container(
                               constraints: BoxConstraints(
-                                maxWidth: Responsive.isDesktop(context)
+                                maxWidth: isDesktop
                                     ? 700
                                     : MediaQuery.of(context).size.width,
                               ),
@@ -731,7 +776,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                   );
 
                                   // Call the appropriate recipe service method based on whether it's for creation or update
-                                  log('ElevatedButton${ user.username}');
+                                  log('ElevatedButton${user.username}');
                                   Future<bool> recipeOperation =
                                       widget.isForEdit
                                           ? RecipeService().updateRecipe(
@@ -770,10 +815,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                               selectedCategoryId,
                                               selectedCategoryColor,
                                               selectedCategoryFont,
-                                              selectedCategoryName,
-                                              [],
-                                              []
-                                            );
+                                              selectedCategoryName, [], []);
 
                                   // Handle the completion of the recipe operation
                                   recipeOperation.then((value) {

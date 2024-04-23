@@ -151,7 +151,7 @@ class _ImagePickerPreviewContainerState
                 ? imageIsPicked ? Image.memory(
                     uint8list,
                     fit: BoxFit.cover,
-                  ) :finalProfileImageURL == 'http://localhost:3000/' ? Image.asset(
+                  ) :finalProfileImageURL == Constants.imageURL ? Image.asset(
                                 widget.gender.contains('female')
                                     ? 'assets/default_avatar_female.jpg'
                                     : 'assets/default_avatar_male.jpg',

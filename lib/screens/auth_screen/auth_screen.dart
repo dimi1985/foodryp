@@ -27,14 +27,8 @@ class _AuthScreenState extends State<AuthScreen> {
   bool isLogin = false;
   bool obscureText = true;
   bool isLoading = false;
-  late UserService _userService;
+  final UserService _userService = UserService();
   Gender? _selectedGender;
-
-  @override
-  void initState() {
-    super.initState();
-    _userService = Provider.of<UserService>(context, listen: false);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +215,7 @@ class _AuthScreenState extends State<AuthScreen> {
             userNameController.text,
             emailController.text,
             passwordController.text,
-            selectedGender.toString().split('.').last, [], [], [], [],[]);
+            selectedGender.toString().split('.').last, [], [], [], [], []);
 
         if (success) {
           // Registration successful

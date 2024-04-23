@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
 import 'package:foodryp/screens/creators_page/creators_page.dart';
+import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -11,7 +14,11 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuWebItems extends StatefulWidget {
-  const MenuWebItems({Key? key}) : super(key: key);
+  final User? user;
+  final String currentPage; // Add this parameter
+
+  const MenuWebItems({Key? key, required this.user, required this.currentPage})
+      : super(key: key);
 
   @override
   State<MenuWebItems> createState() => _MenuWebItemsState();
@@ -30,8 +37,7 @@ class _MenuWebItemsState extends State<MenuWebItems> {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     setState(() {
-      isAuthenticated = userId !=
-          null; // Update authentication status based on userId existence
+      isAuthenticated = userId != null;
     });
   }
 
@@ -67,9 +73,27 @@ class _MenuWebItemsState extends State<MenuWebItems> {
       child: TextButton(
         onPressed: () {
           // Handle menu item tap (e.g., navigate to a different screen)
+          if (item == widget.currentPage) {
+            return; // Do nothing if the current page is selected
+          }
+
           switch (item) {
+            case 'Home':
+              kIsWeb
+                  ? Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MainScreen(user: widget.user!),
+                          maintainState: true),
+                      (Route<dynamic> route) => false)
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MainScreen(user: widget.user!)),
+                    );
+              break;
+
             case 'Sign Up/Sign In':
-              // Navigate to AuthScreen
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AuthScreen()),
@@ -77,42 +101,69 @@ class _MenuWebItemsState extends State<MenuWebItems> {
               break;
 
             case 'Add Recipe':
-              // Navigate to AddRecipePage
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const AddRecipePage(
+              kIsWeb
+                  ? Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddRecipePage(
+                                recipe: null,
+                                isForEdit: false,
+                                user: widget.user!,
+                              ),
+                          maintainState: true),
+                      (Route<dynamic> route) => false)
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddRecipePage(
                           recipe: null,
                           isForEdit: false,
-                        )),
-              );
-              break;
-            // Add more cases for other menu items
-            case 'Recipes':
-              // Navigate to AddRecipePage
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const RecipePage()),
-              );
+                          user: widget.user!,
+                        ),
+                      ),
+                    );
               break;
 
-               case 'Creators':
-              // Navigate to AddRecipePage
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CreatorsPage()),
-              );
+            case 'Recipes':
+              kIsWeb
+                  ? Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RecipePage(user: widget.user!),
+                          maintainState: true),
+                      (Route<dynamic> route) => false)
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RecipePage(user: widget.user!)),
+                    );
+              break;
+
+            case 'Creators':
+              kIsWeb
+                  ? Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              CreatorsPage(user: widget.user!),
+                          maintainState: true),
+                      (Route<dynamic> route) => false)
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              CreatorsPage(user: widget.user!)),
+                    );
               break;
 
             default:
-              // Handle default case (optional)
               break;
           }
         },
         child: Text(
           AppLocalizations.of(context).translate(item),
           style: TextStyle(
-            color: Responsive.isMobile(context) ||
+            color:item == widget.currentPage ? Colors.orange: Responsive.isMobile(context) ||
                     Responsive.isTablet(context) ||
                     themeProvider.currentTheme == ThemeType.dark
                 ? Colors.white

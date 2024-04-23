@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/screens/add_weekly_menu_page.dart';
+import 'package:foodryp/screens/weekly_menu_detail_page.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_weekly_menu_card.dart';
@@ -46,7 +47,6 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
 
       if (widget.showAll) {
         fetchedMenus = await mealService.getWeeklyMenusFixedLength(4);
-
       } else {
         if (widget.publicUserId.isEmpty) {
           // Fetch user profile if it's the logged-in user's profile
@@ -131,11 +131,17 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => AddWeeklyMenuPage(
-                                      meal: meal, isForEdit: true)),
+                                  builder: (context) =>
+                                      WeeklyMenuDetailPage(meal: meal)),
                             );
                           },
-                          child: CustomWeeklyMenuCard(meal: meal),
+                          child: CustomWeeklyMenuCard(
+                            meal: meal,
+                            currentPage: '',
+                            isForAll: widget.showAll,
+                            publicUserId: widget.publicUserId,
+                            currentUserId: currentUserId,
+                          ),
                         );
                       },
                     ),

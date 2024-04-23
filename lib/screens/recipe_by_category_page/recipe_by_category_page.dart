@@ -106,8 +106,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
                 return SizedBox(
                   height: 300,
                   width: 300,
-                  child: CustomRecipeCard(
-                    recipe: recipe,
+                  child: InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
@@ -116,7 +115,11 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
                         ),
                       );
                     },
-                    internalUse: '',
+                    child: CustomRecipeCard(
+                      recipe: recipe,
+                      
+                      internalUse: '',
+                    ),
                   ),
                 );
               } else {

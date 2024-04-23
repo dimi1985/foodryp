@@ -63,6 +63,7 @@ class MealService {
           // Handle null response
           return [];
         }
+        
 
         if (jsonData is List) {
           final List<dynamic> jsonList = jsonData;
@@ -200,6 +201,44 @@ Future<List<WeeklyMenu>> getWeeklyMenusByPageAndPublicUser(
       return [];
     }
   }
+
+  Future<bool> updateWeeklyMenu(
+  String menuId,
+   String title,
+    List<Recipe> selectedRecipes,
+    String username,
+    String userProfileImage,
+) async {
+  // Extract recipe IDs from selected recipes
+  List<String?> recipeIds =
+      selectedRecipes.map((recipe) => recipe.id).toList();
+
+  try {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
+    final response = await http.put(
+      Uri.parse('${Constants.baseUrl}/api/updateWeeklyMenu/$menuId'), // Adjust the endpoint if needed
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'title': title,
+        'dayOfWeek': recipeIds,
+        'userId': userId,
+        'username': username,
+        'userProfileImage': userProfileImage,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Menu updated successfully
+      return true;
+    }
+    return false;
+  } catch (e) {
+    print('Error updating weekly menu: $e');
+    return false;
+  }
+}
+
 
 
 }

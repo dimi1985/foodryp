@@ -219,7 +219,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                     MaterialPageRoute(
                                       builder: (context) => AddRecipePage(
                                           recipe: widget.recipe,
-                                          isForEdit: isForEdit),
+                                          isForEdit: isForEdit, user: null,),
                                     ),
                                   );
                                 },
