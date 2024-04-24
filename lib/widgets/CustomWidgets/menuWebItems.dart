@@ -5,6 +5,7 @@ import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
 import 'package:foodryp/screens/creators_page/creators_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
+import 'package:foodryp/screens/my_fridge_page.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -153,6 +154,21 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                       MaterialPageRoute(
                           builder: (context) =>
                               CreatorsPage(user: widget.user!)),
+                    );
+              break;
+
+              case 'My Fridge':
+              kIsWeb
+                  ? Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MyFridgePage(user: widget.user!),
+                          maintainState: true),
+                      (Route<dynamic> route) => false)
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MyFridgePage(user: widget.user!)),
                     );
               break;
 

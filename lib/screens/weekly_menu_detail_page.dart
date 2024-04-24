@@ -18,45 +18,51 @@ class WeeklyMenuDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
     return Scaffold(
-      body: SingleChildScrollView(
-        physics: const ScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.all(Constants.defaultPadding),
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 25,
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: SingleChildScrollView(
+            physics: const ScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(Constants.defaultPadding),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Text(
+                    meal.title,
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: isDesktop ? 75 : 20,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: meal.dayOfWeek.length,
+                    itemBuilder: (context, index) {
+                      final dayOfWeek = meal.dayOfWeek[index];
+                      final recipeImage =
+                          ('${Constants.baseUrl}/${dayOfWeek.recipeImage}')
+                              .replaceAll('\\', '/');
+                      if (index.isEven) {
+                        return _buildRow(
+                            dayOfWeek, recipeImage, isDesktop, index);
+                      } else {
+                        return _buildReversedRow(
+                            dayOfWeek, recipeImage, isDesktop, index);
+                      }
+                    },
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 20),
+                  ),
+                ],
               ),
-              Text(
-                meal.title,
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: isDesktop ? 75 : 20,
-                ),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: meal.dayOfWeek.length,
-                itemBuilder: (context, index) {
-                  final dayOfWeek = meal.dayOfWeek[index];
-                  final recipeImage =
-                      ('${Constants.baseUrl}/${dayOfWeek.recipeImage}')
-                          .replaceAll('\\', '/');
-                  if (index.isEven) {
-                    return _buildRow(dayOfWeek, recipeImage, isDesktop, index);
-                  } else {
-                    return _buildReversedRow(
-                        dayOfWeek, recipeImage, isDesktop, index);
-                  }
-                },
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 20),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -125,7 +131,7 @@ class WeeklyMenuDetailPage extends StatelessWidget {
   Widget _buildImageData(String recipeImage, bool isDesktop, int index) {
     return Container(
       width: 500, // Adjust width as needed
-      height: 500, // Adjust height as needed
+      height: 350, // Adjust height as needed
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
         image: DecorationImage(

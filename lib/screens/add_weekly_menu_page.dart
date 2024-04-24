@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -18,8 +17,7 @@ class AddWeeklyMenuPage extends StatefulWidget {
   final WeeklyMenu? meal;
   final bool isForEdit;
   const AddWeeklyMenuPage(
-      {Key? key, required this.meal, required this.isForEdit})
-      : super(key: key);
+      {super.key, required this.meal, required this.isForEdit});
 
   @override
   State<AddWeeklyMenuPage> createState() => _AddWeeklyMenuPageState();
@@ -44,7 +42,9 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   late Map<Recipe, bool> recipeCheckedState = {};
   bool isChecked = false;
   List<Recipe> selectedRecipes = [];
+  List<Recipe> unSelectedRecipes = [];
   TextEditingController titleController = TextEditingController();
+  int removedIndex = -1;
 
   @override
   void initState() {
@@ -137,7 +137,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
         isFetching = false;
       });
     } catch (e) {
-      print('Error fetching more recipes: $e');
+      
       setState(() {
         isFetching = false;
       });
@@ -198,8 +198,9 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                               widget.isForEdit
                                   ? MealService()
                                       .updateWeeklyMenu(
-                                          widget.meal?.id ?? '',
+                                          widget.meal!.id,
                                           titleController.text,
+                                          unSelectedRecipes,
                                           selectedRecipes,
                                           userProfile.username,
                                           userProfile.profileImage)
@@ -296,18 +297,31 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                           setState(() {
                                             if (isChecked != null) {
                                               if (!isChecked!) {
-                                                // If the checkbox is unchecked, remove the recipe from selectedRecipes
+                                                removedIndex = selectedRecipes
+                                                    .indexWhere((r) =>
+                                                        r.id == recipe.id);
+
                                                 selectedRecipes.removeWhere(
                                                     (r) => r.id == recipe.id);
-                                                log(selectedRecipes.length
-                                                    .toString());
+                                                unSelectedRecipes.add(recipe);
                                               } else {
                                                 if (selectedRecipes.length <
                                                     7) {
-                                                  // Assuming 7 as the maximum limit of selected recipes
-                                                  selectedRecipes.add(recipe);
-                                                  log(selectedRecipes.length
-                                                      .toString());
+                                                  // Check if there was a previously removed item
+                                                  if (removedIndex != -1) {
+                                                    // Insert the new recipe at the previously removed index
+                                                    selectedRecipes.insert(
+                                                        removedIndex, recipe);
+
+                                                    // Reset removedIndex to indicate that it has been used
+                                                    removedIndex = -1;
+                                                  } else {
+                                                    // If no item was previously removed, just add the recipe to the end
+                                                    selectedRecipes.add(recipe);
+                                                  }
+
+                                                  unSelectedRecipes.removeWhere(
+                                                      (r) => r.id == recipe.id);
                                                 } else {
                                                   // If the maximum limit of selected recipes is reached, keep the checkbox unchecked
                                                   isChecked = false;

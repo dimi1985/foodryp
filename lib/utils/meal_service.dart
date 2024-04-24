@@ -203,25 +203,29 @@ Future<List<WeeklyMenu>> getWeeklyMenusByPageAndPublicUser(
   }
 
   Future<bool> updateWeeklyMenu(
-  String menuId,
-   String title,
-    List<Recipe> selectedRecipes,
-    String username,
-    String userProfileImage,
+  String mealId,
+  String title,
+  List<Recipe> oldRecipes,
+  List<Recipe> newRecipes,
+  String username,
+  String userProfileImage,
 ) async {
-  // Extract recipe IDs from selected recipes
-  List<String?> recipeIds =
-      selectedRecipes.map((recipe) => recipe.id).toList();
+  // Extract recipe IDs from old and new recipes
+  List<String?> oldRecipeIds = oldRecipes.map((recipe) => recipe.id).toList();
+  List<String?> newRecipeIds = newRecipes.map((recipe) => recipe.id).toList();
 
   try {
     await _initPrefs();
     final userId = _prefs.getString('userId');
+  
     final response = await http.put(
-      Uri.parse('${Constants.baseUrl}/api/updateWeeklyMenu/$menuId'), // Adjust the endpoint if needed
+      Uri.parse('${Constants.baseUrl}/api/updateWeeklyMenu'), // Adjust the endpoint if needed
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
+         'mealId': mealId,
         'title': title,
-        'dayOfWeek': recipeIds,
+        'oldRecipes': oldRecipeIds,
+        'newRecipes': newRecipeIds,
         'userId': userId,
         'username': username,
         'userProfileImage': userProfileImage,
