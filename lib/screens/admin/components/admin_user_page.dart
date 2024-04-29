@@ -1,12 +1,14 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 class AdminUserPage extends StatefulWidget {
-  const AdminUserPage({Key? key}) : super(key: key);
+  const AdminUserPage({super.key});
 
   @override
   _AdminUserPageState createState() => _AdminUserPageState();
@@ -14,9 +16,14 @@ class AdminUserPage extends StatefulWidget {
 
 class _AdminUserPageState extends State<AdminUserPage> {
   late List<User> _users = [];
-  late final List<String> _roles = ['user', 'admin', 'moderator']; // Define the roles
+  late final List<String> _roles = [
+    'user',
+    'admin',
+    'moderator'
+  ]; // Define the roles
   late Map<String, String> _selectedRoles = {};
-  late Map<String, bool> _isUpdatingMap = {}; // Track update status for each user
+  late Map<String, bool> _isUpdatingMap =
+      {}; // Track update status for each user
 
   @override
   void initState() {
@@ -29,11 +36,16 @@ class _AdminUserPageState extends State<AdminUserPage> {
       final users = await UserService.getAllUsers();
       setState(() {
         _users = users;
-        _selectedRoles = { for (var user in users) user.id : user.role! };
-        _isUpdatingMap = { for (var user in users) user.id : false };
+        _selectedRoles = {for (var user in users) user.id: user.role!};
+        _isUpdatingMap = {for (var user in users) user.id: false};
       });
     } catch (e) {
-      print('Error fetching users: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              '${AppLocalizations.of(context).translate('Error fetching users:')} , $e'),
+        ),
+      );
       // Handle error
     }
   }
@@ -56,14 +68,21 @@ class _AdminUserPageState extends State<AdminUserPage> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: FittedBox(
-                        fit:Responsive.isDesktop(context) ?  BoxFit.none:BoxFit.fitWidth,
+                        fit: Responsive.isDesktop(context)
+                            ? BoxFit.none
+                            : BoxFit.fitWidth,
                         child: DataTable(
                           columns: const [
-                            DataColumn(label: Expanded(child: Text('Username'))),
+                            DataColumn(
+                                label: Expanded(child: Text('Username'))),
                             DataColumn(label: Expanded(child: Text('Email'))),
-                            DataColumn(label: Expanded(child: Text('Member Since'))),
+                            DataColumn(
+                                label: Expanded(child: Text('Member Since'))),
                             DataColumn(label: Expanded(child: Text('Role'))),
-                            DataColumn(label: Expanded(child: Text('Actions'))), // New column for actions
+                            DataColumn(
+                                label: Expanded(
+                                    child: Text(
+                                        'Actions'))), // New column for actions
                           ],
                           rows: _users.map((user) {
                             return DataRow(cells: [
@@ -83,7 +102,8 @@ class _AdminUserPageState extends State<AdminUserPage> {
                                       _selectedRoles[user.id] = newValue!;
                                     });
                                   },
-                                  items: _roles.map<DropdownMenuItem<String>>((role) {
+                                  items: _roles
+                                      .map<DropdownMenuItem<String>>((role) {
                                     return DropdownMenuItem<String>(
                                       value: role,
                                       child: Text(role.toUpperCase()),
@@ -93,7 +113,8 @@ class _AdminUserPageState extends State<AdminUserPage> {
                               ),
                               DataCell(
                                 ElevatedButton(
-                                  onPressed: _isUpdatingMap[user.id]! // Check if updating
+                                  onPressed: _isUpdatingMap[
+                                          user.id]! // Check if updating
                                       ? null
                                       : () async {
                                           setState(() {
@@ -101,7 +122,8 @@ class _AdminUserPageState extends State<AdminUserPage> {
                                           });
                                           try {
                                             await UserService.updateUserRole(
-                                                user.id, _selectedRoles[user.id]!);
+                                                user.id,
+                                                _selectedRoles[user.id]!);
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -110,7 +132,8 @@ class _AdminUserPageState extends State<AdminUserPage> {
                                                     Icon(Icons.check,
                                                         color: Colors.green),
                                                     SizedBox(width: 8),
-                                                    Text('Role updated successfully'),
+                                                    Text(
+                                                        'Role updated successfully'),
                                                   ],
                                                 ),
                                               ),
@@ -124,7 +147,8 @@ class _AdminUserPageState extends State<AdminUserPage> {
                                                     Icon(Icons.error,
                                                         color: Colors.red),
                                                     SizedBox(width: 8),
-                                                    Text('Failed to update role'),
+                                                    Text(
+                                                        'Failed to update role'),
                                                   ],
                                                 ),
                                               ),

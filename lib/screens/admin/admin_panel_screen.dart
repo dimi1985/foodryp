@@ -13,14 +13,14 @@ class AdminPanelScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      final isDesktop = Responsive.isDesktop(context);
-     final Size screenSize = MediaQuery.of(context).size;
+    final isDesktop = Responsive.isDesktop(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Panel'),
       ),
       body: GridView.count(
-        crossAxisCount:isDesktop ? 5: 2, // Adjust the number of columns as needed
+        crossAxisCount:
+            isDesktop ? 5 : 2, // Adjust the number of columns as needed
         padding: const EdgeInsets.all(16.0),
         crossAxisSpacing: 16.0,
         mainAxisSpacing: 16.0,
@@ -30,11 +30,10 @@ class AdminPanelScreen extends StatelessWidget {
             icon: Icons.person,
             onTap: () {
               // Navigate to Users screen
-               Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AdminUserPage()),
               );
-
             },
           ),
           CustomAdminCard(
@@ -42,11 +41,11 @@ class AdminPanelScreen extends StatelessWidget {
             icon: Icons.restaurant_menu,
             onTap: () {
               // Navigate to Recipes screen
-               Navigator.push(
+              Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AdminRecipePage()),
+                MaterialPageRoute(
+                    builder: (context) => const AdminRecipePage()),
               );
-
             },
           ),
           CustomAdminCard(
@@ -54,11 +53,11 @@ class AdminPanelScreen extends StatelessWidget {
             icon: Icons.category,
             onTap: () {
               // Navigate to Categories screen
-               Navigator.push(
+              Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AdminCategoryPage()),
+                MaterialPageRoute(
+                    builder: (context) => const AdminCategoryPage()),
               );
-
             },
           ),
           CustomAdminCard(
@@ -66,24 +65,23 @@ class AdminPanelScreen extends StatelessWidget {
             icon: Icons.multiline_chart_sharp,
             onTap: () {
               // Navigate to Teams screen
-               Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AdminTeamsPage()),
               );
-
             },
           ),
-          
+
           CustomAdminCard(
             title: 'Running Events',
             icon: Icons.restaurant_menu,
             onTap: () {
               // Navigate to Running Events screen
-               Navigator.push(
+              Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AdminRunningEventPage()),
+                MaterialPageRoute(
+                    builder: (context) => const AdminRunningEventPage()),
               );
-
             },
           ),
           // Add more CategoryCard widgets for other categories

@@ -1,28 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
+import 'package:foodryp/screens/recipe_deletion_confirmation_screen.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:intl/intl.dart';
 
-class CustomRecipeCard extends StatelessWidget {
+class CustomRecipeCard extends StatefulWidget {
   final String internalUse;
-
   final Recipe recipe;
+  final List<String>? missingIngredients;
 
   const CustomRecipeCard({
     super.key,
     required this.internalUse,
     required this.recipe,
+    this.missingIngredients,
   });
+
+  @override
+  State<CustomRecipeCard> createState() => _CustomRecipeCardState();
+}
+
+class _CustomRecipeCardState extends State<CustomRecipeCard> {
+  bool isOwner = false;
+  List<String>? uniqueIngredients = [];
+  @override
+  void initState() {
+    checkAuthenticationStatus();
+    uniqueIngredients = widget.missingIngredients?.toSet().toList();
+    super.initState();
+  }
+
+  Future<void> checkAuthenticationStatus() async {
+    String getCurrentUserId = await UserService().getCurrentUserId();
+
+    setState(() {
+      isOwner = widget.recipe.userId.contains(getCurrentUserId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
-    final recipeImage = '${Constants.imageURL}/${recipe.recipeImage}';
+    final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Constants.defaultPadding),
@@ -72,13 +98,13 @@ class CustomRecipeCard extends StatelessWidget {
                         onImageSelected: (file, list) {},
                         gender: '',
                         isFor: '',
-                        initialImagePath: recipe.useImage!,
+                        initialImagePath: widget.recipe.useImage!,
                         isForEdit: false,
                         allowSelection: false,
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        recipe.username,
+                        widget.recipe.username,
                         style: TextStyle(
                           fontSize: Responsive.isDesktop(context)
                               ? Constants.desktopFontSize
@@ -86,8 +112,7 @@ class CustomRecipeCard extends StatelessWidget {
                           color: Colors.black,
                         ),
                       ),
-                      const SizedBox(
-                          width: 5), // Adjust the spacing as needed
+                      const SizedBox(width: 5), // Adjust the spacing as needed
                       Text(
                         '•',
                         style: TextStyle(
@@ -98,10 +123,10 @@ class CustomRecipeCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 5),
-    
+
                       Text(
-                        DateFormat('dd MMM yyyy')
-                            .format(recipe.date), // Format the date
+                        Constants.calculateMembershipDuration(
+                            context, widget.recipe.date), // Format the date
                         style: TextStyle(
                           fontSize: Responsive.isDesktop(context)
                               ? Constants.desktopFontSize
@@ -112,9 +137,9 @@ class CustomRecipeCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 5),
-    
+
                   Text(
-                    recipe.difficulty,
+                    widget.recipe.difficulty,
                     style: TextStyle(
                       fontSize: Responsive.isDesktop(context)
                           ? Constants.desktopFontSize
@@ -128,14 +153,14 @@ class CustomRecipeCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            recipe.recipeTitle.toUpperCase(),
+                            widget.recipe.recipeTitle.toUpperCase(),
                             style: GoogleFonts.getFont(
-                              recipe.categoryFont,
+                              widget.recipe.categoryFont,
                               fontSize: Responsive.isDesktop(context)
                                   ? Constants.desktopFontSize
                                   : Constants.mobileFontSize,
                               fontWeight: FontWeight.bold,
-                              color: HexColor(recipe.categoryColor)
+                              color: HexColor(widget.recipe.categoryColor)
                                   .withOpacity(0.7),
                             ),
                           ),
@@ -145,14 +170,56 @@ class CustomRecipeCard extends StatelessWidget {
                           children: [
                             const Icon(Icons.favorite_border),
                             Text(
-                              recipe.likedBy.length.toString(),
+                              widget.recipe.likedBy.length.toString(),
                             ),
+                            if (isOwner &&
+                                widget.internalUse != 'MainScreen' &&
+                                widget.internalUse != 'RecipePage')
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddRecipePage(
+                                        recipe: widget.recipe,
+                                        isForEdit: isOwner,
+                                        user: null,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.edit),
+                              ),
+                            if (isOwner &&
+                                widget.internalUse != 'MainScreen' &&
+                                widget.internalUse != 'RecipePage')
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        RecipeDeletionConfirmationScreen(
+                                      recipe: widget.recipe,
+                                    ),
+                                  ));
+                                },
+                                icon: const Icon(Icons.delete),
+                              )
                           ],
                         )
                       ],
                     ),
                   ),
                   // You can add more widgets here if needed
+                  if (widget.missingIngredients != null &&
+                      widget.missingIngredients!.isNotEmpty)
+                    TextButton(
+                      onPressed: () => _showMissingIngredientsDialog(
+                          context, uniqueIngredients!),
+                      child: Text(
+                        '${AppLocalizations.of(context).translate('Missing Ingredients')}: ${uniqueIngredients?.length}',
+                        style: TextStyle(color: Colors.red.withOpacity(0.7)),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -163,6 +230,37 @@ class CustomRecipeCard extends StatelessWidget {
             )
         ],
       ),
+    );
+  }
+
+  void _showMissingIngredientsDialog(
+      BuildContext context, List<String> missingIngredients) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+              AppLocalizations.of(context).translate('Missing Ingredients')),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView(
+              children: missingIngredients
+                  .map((ingredient) => ListTile(
+                          title: Text(
+                        ingredient,
+                        style: TextStyle(color: Colors.red.withOpacity(0.7)),
+                      )))
+                  .toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

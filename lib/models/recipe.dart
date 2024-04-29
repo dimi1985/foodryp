@@ -1,5 +1,3 @@
-
-
 class Recipe {
   final String? id;
   final String recipeTitle;
@@ -9,7 +7,7 @@ class Recipe {
   final String prepDuration;
   final String cookDuration;
   final String servingNumber;
-  final String difficulty;
+  String difficulty;
   final String username;
   final String? useImage;
   final String userId;
@@ -72,9 +70,7 @@ class Recipe {
       categoryName: json['categoryName'] ?? '',
       likedBy:
           (json['likedBy'] as List<dynamic>?)?.cast<String>().toList() ?? [],
-           meal:
-          (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
-      
+      meal: (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
     );
   }
 }

@@ -1,13 +1,8 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:ui';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/recipe_by_category_page/recipe_by_category_page.dart';
 import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:hexcolor/hexcolor.dart';
-import 'package:http/http.dart' as http;
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_category_card.dart';
 
@@ -17,7 +12,6 @@ class CategorySection extends StatefulWidget {
   @override
   State<CategorySection> createState() => _CategorySectionState();
 }
-
 
 class _CategorySectionState extends State<CategorySection> {
   List<CategoryModel> categories = [];

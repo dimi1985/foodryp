@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
@@ -52,7 +52,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   TextEditingController prepDurationTextController = TextEditingController();
   TextEditingController cookDurationTextController = TextEditingController();
 
-  late int tappedCategoryIndex = 0;
+  late int tappedCategoryIndex = -1;
 
   String _selectedDifficulty = 'Easy';
 
@@ -69,6 +69,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   bool imageIsPicked = false;
   late String currentPage;
+  bool isTapped = false;
 
   User user = User(
     id: '',
@@ -110,6 +111,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
     super.initState();
     _fetchCategories();
     fetchUserProfile();
+
     currentPage = 'Add Recipe';
 
     if (widget.recipe != null) {
@@ -218,13 +220,17 @@ class _AddRecipePageState extends State<AddRecipePage> {
                 );
               },
               user: user,
-              menuItems:isDesktop ? MenuWebItems(
-                user: user,
-                currentPage: currentPage,
-              ):Container(),
+              menuItems: isDesktop
+                  ? MenuWebItems(
+                      user: user,
+                      currentPage: currentPage,
+                    )
+                  : Container(),
             )
           : AppBar(),
-           endDrawer: !isDesktop ?  MenuWebItems(user: user,currentPage: currentPage) : null,
+      endDrawer: !isDesktop
+          ? MenuWebItems(user: user, currentPage: currentPage)
+          : null,
       body: SingleChildScrollView(
         child: Center(
           child: Container(
@@ -258,7 +264,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                               itemCount: categories.length,
                               itemBuilder: (context, index) {
                                 final category = categories[index];
-                                final isTapped = index == tappedCategoryIndex;
+                                isTapped = index == tappedCategoryIndex;
 
                                 return InkWell(
                                   onTap: () {
@@ -344,9 +350,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       initialImagePath:
                           widget.isForEdit ? widget.recipe!.recipeImage : '',
                       allowSelection: true,
-                      containerSize: isDesktop
-                          ? 600
-                          : screenSize.width,
+                      containerSize: isDesktop ? 600 : screenSize.width,
                       onImageSelected: (file, bytes) {
                         // Handle image selection
                         setState(() {
@@ -527,12 +531,17 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                   selectedColor: Colors
                                       .white, // Optional: Set selected color
                                   onSelected: (selected) {
-                                    setState(() {
-                                      widget.isForEdit
-                                          ? widget.recipe!.difficulty
-                                          : _selectedDifficulty =
-                                              (selected ? value : null)!;
-                                    });
+                                    if (selected) {
+                                      setState(() {
+                                        if (widget.isForEdit) {
+                                          widget.recipe!.difficulty =
+                                              value; // Update the model
+                                        } else {
+                                          _selectedDifficulty =
+                                              value; // Update local state
+                                        }
+                                      });
+                                    }
                                   },
                                 ),
                                 const SizedBox(
@@ -547,8 +556,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () {
-                      log('ElevatedButton${user.profileImage}');
-
                       String finalProfileImageURL =
                           ('${Constants.baseUrl}/${widget.recipe?.recipeImage}')
                               .replaceAll('\\', '/');
@@ -565,12 +572,19 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return AlertDialog(
-                            contentPadding: EdgeInsets.zero,
+                          return Dialog(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16.0),
                             ),
-                            content: Container(
+                            elevation: 0,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: HexColor(selectedCategoryColor),
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                               constraints: BoxConstraints(
                                 maxWidth: isDesktop
                                     ? 700
@@ -581,30 +595,34 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     widget.isForEdit && !imageIsPicked
-                                        ? ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                    top: Radius.circular(16.0)),
-                                            child:
-                                                finalProfileImageURL.isNotEmpty
-                                                    ? Image.network(
-                                                        finalProfileImageURL,
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Container(),
+                                        ? Center(
+                                            child: ClipRRect(
+                                              borderRadius: const BorderRadius
+                                                  .vertical(
+                                                  top: Radius.circular(16.0)),
+                                              child: finalProfileImageURL
+                                                      .isNotEmpty
+                                                  ? Image.network(
+                                                      finalProfileImageURL,
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Container(),
+                                            ),
                                           )
-                                        : ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                    top: Radius.circular(16.0)),
-                                            child: kIsWeb
-                                                ? Image.memory(uint8list)
-                                                : Image.file(
-                                                    _imageFile!,
-                                                    fit: BoxFit.cover,
-                                                    width: double.infinity,
-                                                    height: 200.0,
-                                                  ),
+                                        : Center(
+                                            child: ClipRRect(
+                                              borderRadius: const BorderRadius
+                                                  .vertical(
+                                                  top: Radius.circular(16.0)),
+                                              child: kIsWeb
+                                                  ? Image.memory(uint8list)
+                                                  : Image.file(
+                                                      _imageFile!,
+                                                      fit: BoxFit.cover,
+                                                      width: double.infinity,
+                                                      height: 200.0,
+                                                    ),
+                                            ),
                                           ),
                                     Padding(
                                       padding: const EdgeInsets.all(16.0),
@@ -725,6 +743,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
+                                          const SizedBox(height: 8.0),
                                           Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -735,6 +754,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                       fontSize: 16.0));
                                             }).toList(),
                                           ),
+                                          const SizedBox(height: 8.0),
                                           Text(
                                             AppLocalizations.of(context)
                                                 .translate('Difficulty:'),
@@ -742,6 +762,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
+                                          const SizedBox(height: 8.0),
                                           Text(
                                             _selectedDifficulty,
                                             style:
@@ -750,130 +771,170 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                         ],
                                       ),
                                     ),
+                                    Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(
+                                            Constants.defaultPadding),
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            // Show SnackBar indicating recipe creation or update process
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Row(
+                                                  children: [
+                                                    const CircularProgressIndicator(),
+                                                    const SizedBox(width: 16),
+                                                    Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate(widget
+                                                                  .isForEdit
+                                                              ? 'Updating recipe...'
+                                                              : 'Creating recipe...'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+
+                                            // Call the appropriate recipe service method based on whether it's for creation or update
+
+                                            Future<
+                                                bool> recipeOperation = widget
+                                                    .isForEdit
+                                                ? RecipeService().updateRecipe(
+                                                    widget.recipe?.id ?? '',
+                                                    recipeTitleValue,
+                                                    ingredients,
+                                                    instructions,
+                                                    prepDurationValue,
+                                                    cookDurationValue,
+                                                    servingValue,
+                                                    _selectedDifficulty,
+                                                    user.username,
+                                                    user.profileImage,
+                                                    user.id,
+                                                    DateTime.now(),
+                                                    descriptionValue,
+                                                    selectedCategoryId,
+                                                    selectedCategoryColor,
+                                                    selectedCategoryFont,
+                                                    selectedCategoryName,
+                                                    [],
+                                                  )
+                                                : RecipeService().createRecipe(
+                                                    recipeTitleValue,
+                                                    ingredients,
+                                                    instructions,
+                                                    prepDurationValue,
+                                                    cookDurationValue,
+                                                    servingValue,
+                                                    _selectedDifficulty,
+                                                    user.username,
+                                                    user.profileImage,
+                                                    user.id,
+                                                    DateTime.now(),
+                                                    descriptionValue,
+                                                    selectedCategoryId,
+                                                    selectedCategoryColor,
+                                                    selectedCategoryFont,
+                                                    selectedCategoryName,
+                                                    [],
+                                                    []);
+
+                                            // Handle the completion of the recipe operation
+                                            recipeOperation.then((value) {
+                                              // Hide the SnackBar
+                                              ScaffoldMessenger.of(context)
+                                                  .hideCurrentSnackBar();
+
+                                              if (value) {
+                                                // Show success SnackBar
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(AppLocalizations
+                                                            .of(context)
+                                                        .translate(widget
+                                                                .isForEdit
+                                                            ? 'Recipe updated successfully'
+                                                            : 'Recipe created successfully')),
+                                                  ),
+                                                );
+                                                if (imageIsPicked) {
+                                                  if (_imageFile != null) {
+                                                    RecipeService()
+                                                        .uploadRecipeImage(
+                                                            _imageFile!,
+                                                            uint8list);
+                                                  } else {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            '${AppLocalizations.of(context).translate('Failed to ')} ${AppLocalizations.of(context).translate(widget.isForEdit ? 'update' : 'create')} ${AppLocalizations.of(context).translate('recipe')}'),
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+                                                // Upload the recipe image if applicable
+
+                                                // Pop the current screen
+                                                Navigator.of(context).pop();
+                                                Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          MainScreen()),
+                                                  (Route<dynamic> route) =>
+                                                      false,
+                                                );
+                                              } else {
+                                                // Show failure SnackBar
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                        '${AppLocalizations.of(context).translate('Failed to ')} ${AppLocalizations.of(context).translate(widget.isForEdit ? 'update' : 'create')} ${AppLocalizations.of(context).translate('recipe')}'),
+                                                  ),
+                                                );
+                                              }
+                                            }).catchError((error) {
+                                              // Hide the SnackBar
+                                              ScaffoldMessenger.of(context)
+                                                  .hideCurrentSnackBar();
+
+                                              // Show error SnackBar
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      '${AppLocalizations.of(context).translate('Error:')} $error'),
+                                                ),
+                                              );
+                                            });
+                                          },
+                                          child: Text(
+                                              AppLocalizations.of(context)
+                                                  .translate(widget.isForEdit
+                                                      ? 'Update'
+                                                      : 'Save')),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8.0),
                                   ],
                                 ),
                               ),
                             ),
-                            actions: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Show SnackBar indicating recipe creation or update process
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Row(
-                                        children: [
-                                          const CircularProgressIndicator(),
-                                          const SizedBox(width: 16),
-                                          Text(
-                                            AppLocalizations.of(context)
-                                                .translate(widget.isForEdit
-                                                    ? 'Updating recipe...'
-                                                    : 'Creating recipe...'),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-
-                                  // Call the appropriate recipe service method based on whether it's for creation or update
-                                  log('ElevatedButton${user.username}');
-                                  Future<bool> recipeOperation =
-                                      widget.isForEdit
-                                          ? RecipeService().updateRecipe(
-                                              widget.recipe?.id ?? '',
-                                              recipeTitleValue,
-                                              ingredients,
-                                              instructions,
-                                              prepDurationValue,
-                                              cookDurationValue,
-                                              servingValue,
-                                              _selectedDifficulty,
-                                              user.username,
-                                              user.profileImage,
-                                              user.id,
-                                              DateTime.now(),
-                                              descriptionValue,
-                                              selectedCategoryId,
-                                              selectedCategoryColor,
-                                              selectedCategoryFont,
-                                              selectedCategoryName,
-                                              [],
-                                            )
-                                          : RecipeService().createRecipe(
-                                              recipeTitleValue,
-                                              ingredients,
-                                              instructions,
-                                              prepDurationValue,
-                                              cookDurationValue,
-                                              servingValue,
-                                              _selectedDifficulty,
-                                              user.username,
-                                              user.profileImage,
-                                              user.id,
-                                              DateTime.now(),
-                                              descriptionValue,
-                                              selectedCategoryId,
-                                              selectedCategoryColor,
-                                              selectedCategoryFont,
-                                              selectedCategoryName, [], []);
-
-                                  // Handle the completion of the recipe operation
-                                  recipeOperation.then((value) {
-                                    // Hide the SnackBar
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
-
-                                    if (value) {
-                                      // Show success SnackBar
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(AppLocalizations.of(
-                                                  context)
-                                              .translate(widget.isForEdit
-                                                  ? 'Recipe updated successfully'
-                                                  : 'Recipe created successfully')),
-                                        ),
-                                      );
-                                      // Upload the recipe image if applicable
-                                      if (imageIsPicked) {
-                                        RecipeService().uploadRecipeImage(
-                                            _imageFile!, uint8list);
-                                      }
-                                      // Pop the current screen
-                                      Navigator.of(context).pop();
-                                    } else {
-                                      // Show failure SnackBar
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              'Failed to ${widget.isForEdit ? 'update' : 'create'} recipe'),
-                                        ),
-                                      );
-                                    }
-                                  }).catchError((error) {
-                                    // Hide the SnackBar
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
-
-                                    // Show error SnackBar
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Error: $error'),
-                                      ),
-                                    );
-                                  });
-                                },
-                                child:
-                                    Text(widget.isForEdit ? 'Update' : 'Save'),
-                              ),
-                            ],
                           );
                         },
                       );
                     },
-                    child: const Text('Preview Recipe'),
+                    child: Text(AppLocalizations.of(context)
+                        .translate('Preview Recipe')),
                   ),
                 ],
               ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/recipe_service.dart';
@@ -110,6 +111,10 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       setState(() {
         isLoading = false;
       });
+      SnackBar(
+        content: Text(
+            '${AppLocalizations.of(context).translate('Error fetching user profile and recipes:')} , $e'),
+      );
       print('Error fetching user profile and recipes: $e');
     }
   }
@@ -137,7 +142,6 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
         isFetching = false;
       });
     } catch (e) {
-      
       setState(() {
         isFetching = false;
       });

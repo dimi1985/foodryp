@@ -157,18 +157,20 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                     );
               break;
 
-              case 'My Fridge':
+            case 'My Fridge':
               kIsWeb
                   ? Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MyFridgePage(user: widget.user!),
+                          builder: (context) =>
+                              MyFridgePage(user: widget.user!),
                           maintainState: true),
                       (Route<dynamic> route) => false)
                   : Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MyFridgePage(user: widget.user!)),
+                          builder: (context) =>
+                              MyFridgePage(user: widget.user!)),
                     );
               break;
 
@@ -179,11 +181,13 @@ class _MenuWebItemsState extends State<MenuWebItems> {
         child: Text(
           AppLocalizations.of(context).translate(item),
           style: TextStyle(
-            color:item == widget.currentPage ? Colors.orange: Responsive.isMobile(context) ||
-                    Responsive.isTablet(context) ||
-                    themeProvider.currentTheme == ThemeType.dark
-                ? Colors.white
-                : Colors.black,
+            color: item == widget.currentPage
+                ? Colors.orange
+                : Responsive.isMobile(context) ||
+                        Responsive.isTablet(context) ||
+                        themeProvider.currentTheme == ThemeType.dark
+                    ? Colors.white
+                    : Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: isAndroid
                 ? 30

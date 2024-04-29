@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_page/profile_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
@@ -82,7 +86,6 @@ class _CreatorsPageState extends State<CreatorsPage> {
         isAuthenticated: true,
         profileImage: widget.user.profileImage,
         username: widget.user.username,
-       
         user: widget.user,
         menuItems: isDesktop
             ? MenuWebItems(
@@ -108,70 +111,103 @@ class _CreatorsPageState extends State<CreatorsPage> {
           itemBuilder: (context, index) {
             if (index < users.length) {
               final user = users[index];
-              return InkWell(
-                onTap: () {
-                  print('got : ${user.username}');
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ProfilePage(user: user,publicUsername:user.username)),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ImagePickerPreviewContainer(
-                                initialImagePath: user.profileImage,
-                                containerSize: 100,
-                                onImageSelected: (file, bytes) {},
-                                gender: user.gender!,
-                                isFor: '',
-                                isForEdit: false,
-                              ),
-                              Text(
-                                user.username,
-                                style: const TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
+              return Padding(
+                padding: const EdgeInsets.all(Constants.defaultPadding),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfilePage(
+                              user: user, publicUsername: user.username)),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(Constants.defaultPadding),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                ImagePickerPreviewContainer(
+                                  initialImagePath: user.profileImage,
+                                  containerSize: 100,
+                                  onImageSelected: (file, bytes) {},
+                                  gender: user.gender!,
+                                  isFor: '',
+                                  isForEdit: false,
                                 ),
-                              ),
-                              const SizedBox(height: 8.0),
-                              Text(
-                                'Member Since: ${user.memberSince}',
-                                style: const TextStyle(fontSize: 14.0),
-                              ),
-                              const SizedBox(height: 8.0),
-                              Text(
-                                'Recipe Length: ${user.recipes!.length}',
-                                style: const TextStyle(fontSize: 14.0),
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Toggle follow/unfollow action here
-                            },
-                            child: Text(
-                              user.followedBy!.contains(loggedUserID)
-                                  ? 'Unfollow'
-                                  : 'Follow',
+                                Text(
+                                  user.username,
+                                  style: const TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8.0),
+                                Text(
+                                  '${AppLocalizations.of(context).translate('Member Since:')} ${Constants.calculateMembershipDuration(context, user.memberSince!)}',
+                                  style: const TextStyle(fontSize: 14.0),
+                                ),
+                                const SizedBox(height: 8.0),
+                                Text(
+                                  '${AppLocalizations.of(context).translate('Total Recipes:')} ${user.recipes!.length}',
+                                  style: const TextStyle(fontSize: 14.0),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                            const Spacer(),
+                            ElevatedButton(
+                              onPressed: _isLoading
+                                  ? null
+                                  : () {
+                                      // Toggle follow/unfollow action here
+
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+                                      user.followedBy!.contains(loggedUserID)
+                                          ? UserService()
+                                              .unfollowUser(user.id)
+                                              .then((value) {
+                                              if (value) {
+                                                user.followedBy!.remove(
+                                                    loggedUserID); // Update the local model
+                                                setState(() {});
+                                              }
+                                            })
+                                          : UserService()
+                                              .followUser(user.id)
+                                              .then((value) {
+                                              if (value) {
+                                                user.followedBy!.add(
+                                                    loggedUserID); // Update the local model
+                                                setState(() {});
+                                              }
+                                            });
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    },
+                              child: Text(
+                                user.followedBy!.contains(loggedUserID)
+                                    ? AppLocalizations.of(context)
+                                        .translate('Unfollow')
+                                    : AppLocalizations.of(context)
+                                        .translate('Follow'),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

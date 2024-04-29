@@ -75,7 +75,7 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
     return weeklyList.isEmpty
         ? isLoading
             ? const LinearProgressIndicator()
-            : !widget.showAll && widget.publicUserId != currentUserId
+            : widget.showAll
                 ? Container()
                 : Center(
                     child: MaterialButton(

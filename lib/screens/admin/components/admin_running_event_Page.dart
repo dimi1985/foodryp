@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AdminRunningEventPage extends StatefulWidget {
-  const AdminRunningEventPage({Key? key}) : super(key: key);
+  const AdminRunningEventPage({super.key});
 
   @override
   State<AdminRunningEventPage> createState() => _AdminRunningEventPageState();

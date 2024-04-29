@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/data/demo_data.dart';
-import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
-import '../../utils/contants.dart';
 
 class DesktopLeftSide extends StatelessWidget {
   const DesktopLeftSide({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Size screenSize = MediaQuery.of(context).size;
-    return Scaffold(
-      body: Container()
-    );
+    return Scaffold(body: Container());
   }
 
   //Maybe put it later forn now Blank

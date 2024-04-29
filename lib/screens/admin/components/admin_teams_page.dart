@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AdminTeamsPage extends StatefulWidget {
-  const AdminTeamsPage({Key? key}) : super(key: key);
+  const AdminTeamsPage({super.key});
 
   @override
   State<AdminTeamsPage> createState() => _AdminTeamsPageState();

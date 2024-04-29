@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
@@ -139,9 +140,20 @@ class _RecipeCardProfileState extends State<RecipeCardProfile> {
                     child: SizedBox(
                       height: 300,
                       width: 300,
-                      child: CustomRecipeCard(
-                        internalUse: '',
-                        recipe: recipe,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  RecipeDetailPage(recipe: recipe),
+                            ),
+                          );
+                        },
+                        child: CustomRecipeCard(
+                          internalUse: '',
+                          recipe: recipe,
+                        ),
                       ),
                     ),
                   );

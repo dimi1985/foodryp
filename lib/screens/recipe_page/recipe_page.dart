@@ -25,13 +25,13 @@ class _RecipePageState extends State<RecipePage> {
   bool _isLoading = false;
   int _currentPage = 1;
   final int _pageSize = 10;
-    late String currentPage;
+  late String currentPage;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
-        currentPage = 'Recipes';
+    currentPage = 'Recipes';
     _fetchRecipes(); // Fetch initial set of recipes
   }
 
@@ -54,15 +54,14 @@ class _RecipePageState extends State<RecipePage> {
     });
     try {
       final fetchedRecipes = await RecipeService().getAllRecipesByPage(
-         _currentPage,
-         _pageSize,
+        _currentPage,
+        _pageSize,
       );
       setState(() {
         recipes = fetchedRecipes;
         _isLoading = false;
       });
     } catch (e) {
-    
       setState(() {
         _isLoading = false;
       });
@@ -76,8 +75,8 @@ class _RecipePageState extends State<RecipePage> {
       });
       try {
         final fetchedRecipes = await RecipeService().getAllRecipesByPage(
-           _currentPage + 1, // Fetch next page
-           _pageSize,
+          _currentPage + 1, // Fetch next page
+          _pageSize,
         );
         setState(() {
           recipes.addAll(fetchedRecipes);
@@ -95,27 +94,36 @@ class _RecipePageState extends State<RecipePage> {
 
   @override
   Widget build(BuildContext context) {
-      final bool isDesktop = Responsive.isDesktop(context);
+    final bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
-      appBar:kIsWeb ? CustomAppBar(
-          isDesktop: true,
-          isAuthenticated: true,
-          profileImage: widget.user!.profileImage,
-          username: widget.user!.username,
-          onTapProfile: () {
-            // Handle profile onTap action
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ProfilePage(
-                        user: widget.user!,
-                      )),
-            );
-          },
-          user: widget.user!,
-          menuItems:isDesktop ?  MenuWebItems(user: widget.user!, currentPage: currentPage,):Container(),
-        ):AppBar(),
-         endDrawer: !isDesktop ?  MenuWebItems(user: widget.user!,currentPage: currentPage) : null,
+      appBar: kIsWeb
+          ? CustomAppBar(
+              isDesktop: true,
+              isAuthenticated: true,
+              profileImage: widget.user!.profileImage,
+              username: widget.user!.username,
+              onTapProfile: () {
+                // Handle profile onTap action
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                            user: widget.user!,
+                          )),
+                );
+              },
+              user: widget.user!,
+              menuItems: isDesktop
+                  ? MenuWebItems(
+                      user: widget.user!,
+                      currentPage: currentPage,
+                    )
+                  : Container(),
+            )
+          : AppBar(),
+      endDrawer: !isDesktop
+          ? MenuWebItems(user: widget.user!, currentPage: currentPage)
+          : null,
       body: _buildRecipeList(),
     );
   }
@@ -138,15 +146,19 @@ class _RecipePageState extends State<RecipePage> {
                     height: 300,
                     width: 300,
                     child: InkWell(
-                         onTap: () {
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RecipeDetailPage(recipe: recipe),
+                            builder: (context) =>
+                                RecipeDetailPage(recipe: recipe),
                           ),
                         );
                       },
-                      child: CustomRecipeCard(internalUse: '', recipe: recipe))),
+                      child: CustomRecipeCard(
+                          internalUse: 'RecipePage', recipe: recipe),
+                    ),
+                  ),
                 );
               } else {
                 return _buildLoader();

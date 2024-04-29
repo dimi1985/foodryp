@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -8,14 +7,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class RecipeService  {
+class RecipeService {
   late SharedPreferences _prefs; // SharedPreferences instance
   Future<void> _initPrefs() async {
     _prefs = await SharedPreferences.getInstance();
   }
-
-
-
 
   Future<List<Recipe>> getAllRecipes() async {
     final response = await http.get(
@@ -27,51 +23,50 @@ class RecipeService  {
 
       final recipes =
           decodedData.map((recipeJson) => Recipe.fromJson(recipeJson)).toList();
-     
+
       return recipes;
     } else {
       // Handle API errors gracefully (e.g., throw an exception)
       throw Exception('Failed to load recipes');
     }
   }
-  
 
   Future<List<Recipe>> getFixedRecipes(int desiredLength) async {
-  final response = await http.get(
-    Uri.parse('${Constants.baseUrl}/api/recipes/getFixedRecipes?length=$desiredLength'),
-  );
+    final response = await http.get(
+      Uri.parse(
+          '${Constants.baseUrl}/api/recipes/getFixedRecipes?length=$desiredLength'),
+    );
 
-  if (response.statusCode == 200) {
-    final decodedData = jsonDecode(response.body) as List<dynamic>;
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body) as List<dynamic>;
 
-    final recipes = decodedData.map((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+      final recipes =
+          decodedData.map((recipeJson) => Recipe.fromJson(recipeJson)).toList();
 
-    return recipes;
-  } else {
-    // Handle API errors gracefully (e.g., throw an exception)
-    throw Exception('Failed to load recipes');
+      return recipes;
+    } else {
+      // Handle API errors gracefully (e.g., throw an exception)
+      throw Exception('Failed to load recipes');
+    }
   }
-}
-
 
   Future<List<Recipe>> getRecipesByPage(int pageNumber, int pageSize) async {
-  final response = await http.get(
-    Uri.parse('${Constants.baseUrl}/api/recipes/getRecipesByPage?page=$pageNumber&pageSize=$pageSize'),
-  );
+    final response = await http.get(
+      Uri.parse(
+          '${Constants.baseUrl}/api/recipes/getRecipesByPage?page=$pageNumber&pageSize=$pageSize'),
+    );
 
-  if (response.statusCode == 200) {
-    final decodedData = jsonDecode(response.body) as List<dynamic>;
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body) as List<dynamic>;
 
-    final recipes = decodedData
-        .map((recipeJson) => Recipe.fromJson(recipeJson))
-        .toList();
-    return recipes;
-  } else {
-    // Handle API errors gracefully (e.g., throw an exception)
-    throw Exception('Failed to load recipes');
+      final recipes =
+          decodedData.map((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+      return recipes;
+    } else {
+      // Handle API errors gracefully (e.g., throw an exception)
+      throw Exception('Failed to load recipes');
+    }
   }
-}
-
 
   Future<bool> createRecipe(
     String recipeTitle,
@@ -89,11 +84,10 @@ class RecipeService  {
     String categoryId,
     String categoryColor,
     String categoryFont,
-     String selectedCategoryName,
-     List<String> likedBy,
-     List<WeeklyMenu> meal,
+    String selectedCategoryName,
+    List<String> likedBy,
+    List<WeeklyMenu> meal,
   ) async {
-    
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/saveRecipe'),
@@ -105,17 +99,17 @@ class RecipeService  {
           'prepDuration': prepDuration,
           'cookDuration': cookDuration,
           'difficulty': difficulty,
-           'servingNumber': servingNumber,
+          'servingNumber': servingNumber,
           'username': username,
           'useImage': useImage,
           'userId': userId,
           'date': date.toIso8601String(),
           'description': description,
-           'categoryId': categoryId,
-            'categoryColor': categoryColor,
-             'categoryFont': categoryFont,
-              'categoryName': selectedCategoryName,
-               'likedBy': [],
+          'categoryId': categoryId,
+          'categoryColor': categoryColor,
+          'categoryFont': categoryFont,
+          'categoryName': selectedCategoryName,
+          'likedBy': [],
         }),
       );
       if (response.statusCode == 201) {
@@ -123,7 +117,7 @@ class RecipeService  {
         final responseData = jsonDecode(response.body);
         String recipeId = responseData['recipeId'];
         // categoryId = id;
-        
+
         await _saveRecipeIDLocally(recipeId);
         return true;
       }
@@ -151,32 +145,31 @@ class RecipeService  {
     String categoryId,
     String categoryColor,
     String categoryFont,
-     String selectedCategoryName,
-     List<String> likedBy,
+    String selectedCategoryName,
+    List<String> likedBy,
   ) async {
-  
     try {
       final response = await http.put(
         Uri.parse('${Constants.baseUrl}/api/updateRecipe/$recipeId'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-       'recipeTitle': recipeTitle,
+          'recipeTitle': recipeTitle,
           'ingredients': ingredients,
           'instructions': instructions,
           'prepDuration': prepDuration,
           'cookDuration': cookDuration,
           'difficulty': difficulty,
-           'servingNumber': servingNumber,
+          'servingNumber': servingNumber,
           'username': username,
           'useImage': userImage,
           'userId': userId,
           'date': date.toIso8601String(),
           'description': description,
-           'categoryId': categoryId,
-            'categoryColor': categoryColor,
-             'categoryFont': categoryFont,
-              'categoryName': selectedCategoryName,
-               'likedBy': likedBy,
+          'categoryId': categoryId,
+          'categoryColor': categoryColor,
+          'categoryFont': categoryFont,
+          'categoryName': selectedCategoryName,
+          'likedBy': likedBy,
         }),
       );
       if (response.statusCode == 200) {
@@ -190,14 +183,13 @@ class RecipeService  {
     }
   }
 
-
   Future<void> uploadRecipeImage(File image, List<int>? bytes) async {
     await _initPrefs();
     final recipeId = _prefs.getString('recipeId');
     try {
       String url = '${Constants.baseUrl}/api/uploadRecipeImage';
       var request = http.MultipartRequest('POST', Uri.parse(url));
-      
+
       if (image != null) {
         String filename = 'recipe-$recipeId-${DateTime.now()}.jpg';
 
@@ -246,71 +238,69 @@ class RecipeService  {
     }
   }
 
+  Future<List<Recipe>> getAllRecipesByPage(int page, int pageSize) async {
+    final response = await http.get(
+      Uri.parse(
+          '${Constants.baseUrl}/api/getAllRecipesByPage?page=$page&pageSize=$pageSize'),
+    );
 
-Future<List<Recipe>> getAllRecipesByPage(int page, int pageSize) async {
+    if (response.statusCode == 200) {
+      final List<dynamic> decodedData = jsonDecode(response.body);
 
+      final List<Recipe> recipes = decodedData.map((json) {
+        return Recipe.fromJson(json);
+      }).toList();
 
-  final response = await http.get(
-    Uri.parse('${Constants.baseUrl}/api/getAllRecipesByPage?page=$page&pageSize=$pageSize'),
-  );
-
-  if (response.statusCode == 200) {
-    final List<dynamic> decodedData = jsonDecode(response.body);
-
-    final List<Recipe> recipes = decodedData.map((json) {
-      return Recipe.fromJson(json);
-    }).toList();
-
-    return recipes;
-  } else {
-    throw Exception('Failed to load user recipes');
+      return recipes;
+    } else {
+      throw Exception('Failed to load user recipes');
+    }
   }
-}
 
+  Future<List<Recipe>> getUserRecipesByPage(int page, int pageSize) async {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
 
-Future<List<Recipe>> getUserRecipesByPage(int page, int pageSize) async {
-  await _initPrefs();
-  final userId = _prefs.getString('userId');
+    final response = await http.get(
+      Uri.parse(
+          '${Constants.baseUrl}/api/getUserRecipesByPage/$userId?page=$page&pageSize=$pageSize'),
+    );
 
-  final response = await http.get(
-    Uri.parse('${Constants.baseUrl}/api/getUserRecipesByPage/$userId?page=$page&pageSize=$pageSize'),
-  );
+    if (response.statusCode == 200) {
+      final List<dynamic> decodedData = jsonDecode(response.body);
 
-  if (response.statusCode == 200) {
-    final List<dynamic> decodedData = jsonDecode(response.body);
+      final List<Recipe> recipes = decodedData.map((json) {
+        return Recipe.fromJson(json);
+      }).toList();
 
-    final List<Recipe> recipes = decodedData.map((json) {
-      return Recipe.fromJson(json);
-    }).toList();
-
-    return recipes;
-  } else {
-    throw Exception('Failed to load user recipes');
+      return recipes;
+    } else {
+      throw Exception('Failed to load user recipes');
+    }
   }
-}
 
-Future<List<Recipe>> getUserPublicRecipesByPage(String username, int page, int pageSize) async {
-  final response = await http.get(
-    Uri.parse('${Constants.baseUrl}/api/getUserPublicRecipes/$username?page=$page&pageSize=$pageSize'),
-  );
+  Future<List<Recipe>> getUserPublicRecipesByPage(
+      String username, int page, int pageSize) async {
+    final response = await http.get(
+      Uri.parse(
+          '${Constants.baseUrl}/api/getUserPublicRecipes/$username?page=$page&pageSize=$pageSize'),
+    );
 
-  if (response.statusCode == 200) {
-    final List<dynamic> decodedData = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      final List<dynamic> decodedData = jsonDecode(response.body);
 
-    final List<Recipe> recipes = decodedData.map((json) {
-      return Recipe.fromJson(json);
-    }).toList();
+      final List<Recipe> recipes = decodedData.map((json) {
+        return Recipe.fromJson(json);
+      }).toList();
 
-    return recipes;
-  } else {
-    throw Exception('Failed to load public user recipes');
+      return recipes;
+    } else {
+      throw Exception('Failed to load public user recipes');
+    }
   }
-}
 
-
-
-Future<void> likeRecipe(String recipeId) async {
-   await _initPrefs();
+  Future<void> likeRecipe(String recipeId) async {
+    await _initPrefs();
     final userId = _prefs.getString('userId');
     final response = await http.post(
       Uri.parse('${Constants.baseUrl}/api/recipe/likeRecipe'),
@@ -324,7 +314,7 @@ Future<void> likeRecipe(String recipeId) async {
   }
 
   Future<void> dislikeRecipe(String recipeId) async {
-     await _initPrefs();
+    await _initPrefs();
     final userId = _prefs.getString('userId');
     final response = await http.post(
       Uri.parse('${Constants.baseUrl}/api/recipe/dislikeRecipe'),
@@ -337,46 +327,48 @@ Future<void> likeRecipe(String recipeId) async {
     }
   }
 
+  Future<bool> deleteRecipe(String recipeId) async {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
 
-Future<void> deleteRecipe(String recipeId) async {
-  await _initPrefs();
-  final userId = _prefs.getString('userId');
-  
-  final response = await http.delete(
-    Uri.parse('${Constants.baseUrl}/api/deleteRecipe/$recipeId'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'userId': userId,}),
-  );
-
-  if (response.statusCode != 200) {
-
-    throw Exception('Failed to delete recipe');
-  } 
-}
-
- Future<List<Recipe>> getRecipesByCategory(String categoryName, int page, int pageSize) async {
-  try {
-    final response = await http.get(
-      Uri.parse('${Constants.baseUrl}/api/getRecipesByCategory/$categoryName?page=$page&pageSize=$pageSize'),
+    final response = await http.delete(
+      Uri.parse('${Constants.baseUrl}/api/deleteRecipe/$recipeId'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'userId': userId,
+      }),
     );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> decodedData = jsonDecode(response.body);
-      
-      final List<Recipe> recipes = decodedData.map((json) {
-        return Recipe.fromJson(json);
-      }).toList();
-
-      return recipes;
+    if (response.statusCode != 200) {
+      return true;
     } else {
-      throw Exception('Failed to load recipes by category');
+      return false;
     }
-  } catch (e) {
-    throw Exception('Failed to load recipes by category: $e');
   }
-}
 
+  Future<List<Recipe>> getRecipesByCategory(
+      String categoryName, int page, int pageSize) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '${Constants.baseUrl}/api/getRecipesByCategory/$categoryName?page=$page&pageSize=$pageSize'),
+      );
 
+      if (response.statusCode == 200) {
+        final List<dynamic> decodedData = jsonDecode(response.body);
+
+        final List<Recipe> recipes = decodedData.map((json) {
+          return Recipe.fromJson(json);
+        }).toList();
+
+        return recipes;
+      } else {
+        throw Exception('Failed to load recipes by category');
+      }
+    } catch (e) {
+      throw Exception('Failed to load recipes by category: $e');
+    }
+  }
 
   Future<void> _saveRecipeIDLocally(String recipeId) async {
     await _initPrefs();
@@ -387,6 +379,4 @@ Future<void> deleteRecipe(String recipeId) async {
     await _initPrefs();
     await _prefs.remove('recipeId');
   }
-
-  
 }

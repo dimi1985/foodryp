@@ -14,7 +14,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AdminCategoryPage extends StatefulWidget {
-  const AdminCategoryPage({Key? key}) : super(key: key);
+  const AdminCategoryPage({super.key});
 
   @override
   State<AdminCategoryPage> createState() => _AdminCategoryPageState();
@@ -203,7 +203,9 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                     uint8list = Uint8List.fromList(bytes);
                   });
                 },
-                gender: '', isFor: 'Other', isForEdit: false,
+                gender: '',
+                isFor: 'Other',
+                isForEdit: false,
               ),
             ),
             const SizedBox(height: 16),

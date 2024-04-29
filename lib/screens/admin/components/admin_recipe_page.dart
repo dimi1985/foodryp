@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AdminRecipePage extends StatefulWidget {
-  const AdminRecipePage({Key? key}) : super(key: key);
+  const AdminRecipePage({super.key});
 
   @override
   State<AdminRecipePage> createState() => _AdminRecipePageState();

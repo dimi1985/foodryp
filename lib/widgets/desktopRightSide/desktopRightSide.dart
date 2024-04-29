@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:foodryp/data/demo_data.dart';
-import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/utils/responsive.dart';
 
 class DesktopRightSide extends StatelessWidget {
   const DesktopRightSide({super.key});
@@ -18,7 +15,7 @@ class DesktopRightSide extends StatelessWidget {
   // Padding(
   //       padding: const EdgeInsets.all(8.0),
   //       child: Column(
-          
+
   //         children: [
   //           // Friend List Title
   //           Container(

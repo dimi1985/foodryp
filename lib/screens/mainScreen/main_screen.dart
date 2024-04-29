@@ -86,25 +86,34 @@ class _MainScreenState extends State<MainScreen> {
     final bool isDesktop = Responsive.isDesktop(context);
     return SafeArea(
       child: Scaffold(
-        appBar:kIsWeb ? CustomAppBar(
-          isDesktop: true,
-          isAuthenticated: true,
-          profileImage: user.profileImage,
-          username: user.username,
-          onTapProfile: () {
-            // Handle profile onTap action
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ProfilePage(
+        appBar: kIsWeb
+            ? CustomAppBar(
+                isDesktop: true,
+                isAuthenticated: true,
+                profileImage: user.profileImage,
+                username: user.username,
+                onTapProfile: () {
+                  // Handle profile onTap action
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProfilePage(
+                              user: user,
+                            )),
+                  );
+                },
+                user: user,
+                menuItems: isDesktop
+                    ? MenuWebItems(
                         user: user,
-                      )),
-            );
-          },
-          user: user,
-          menuItems:isDesktop ?  MenuWebItems(user: user, currentPage: currentPage,):Container(),
-        ):AppBar(),
-        endDrawer: !isDesktop ?  MenuWebItems(user: user,currentPage: currentPage) : null,
+                        currentPage: currentPage,
+                      )
+                    : Container(),
+              )
+            : AppBar(),
+        endDrawer: !isDesktop
+            ? MenuWebItems(user: user, currentPage: currentPage)
+            : null,
         body: Row(
           children: [
             if (isDesktop)

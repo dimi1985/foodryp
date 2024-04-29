@@ -1,13 +1,8 @@
-import 'dart:developer';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/widgets/custom_creator_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,7 +41,7 @@ class _CreatorsState extends State<Creators> {
   Future<void> _fetchAllUsers() async {
     final userList = await UserService.getAllUsers();
     String getCurrentUserId = await UserService().getCurrentUserId();
-    currentUserId = getCurrentUserId; 
+    currentUserId = getCurrentUserId;
     if (!isAuthenticated) {
       setState(() {
         users = userList.take(5).toList(); // Limit the users to the first 5

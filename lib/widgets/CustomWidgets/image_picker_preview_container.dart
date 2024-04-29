@@ -1,6 +1,4 @@
 // ignore_for_file: library_private_types_in_public_api
-
-import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -26,7 +24,8 @@ class ImagePickerPreviewContainer extends StatefulWidget {
     this.initialImagePath,
     this.allowSelection = true,
     required this.gender,
-    required this.isFor, required this.isForEdit,
+    required this.isFor,
+    required this.isForEdit,
   });
 
   @override
@@ -82,7 +81,7 @@ class _ImagePickerPreviewContainerState
         if (widget.allowSelection && widget.onImageSelected != null) {
           _pickImage(ImageSource.gallery);
         } else {
-          _showImagePreview(context, _imageFile);
+          return;
         }
       },
       child: Container(
@@ -98,8 +97,8 @@ class _ImagePickerPreviewContainerState
                 child: kIsWeb
                     ? imageIsPicked
                         ? Image.memory(uint8list)
-                        : widget.initialImagePath == null || widget.initialImagePath!.isEmpty
-
+                        : widget.initialImagePath == null ||
+                                widget.initialImagePath!.isEmpty
                             ? widget.isFor.contains('Other')
                                 ? Center(
                                     child: Icon(
@@ -137,41 +136,6 @@ class _ImagePickerPreviewContainerState
                 ),
               ),
       ),
-    );
-  }
-
-  void _showImagePreview(BuildContext context, File? imageFile) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Hero(
-            tag: 'imageHero',
-            child: kIsWeb
-                ? imageIsPicked ? Image.memory(
-                    uint8list,
-                    fit: BoxFit.cover,
-                  ) :finalProfileImageURL == Constants.imageURL ? Image.asset(
-                                widget.gender.contains('female')
-                                    ? 'assets/default_avatar_female.jpg'
-                                    : 'assets/default_avatar_male.jpg',
-                              ): Image.network(
-                                finalProfileImageURL,
-                                fit: BoxFit.cover,
-                              )
-                : Image.file(
-                    _imageFile!,
-                    fit: BoxFit.cover,
-                  ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

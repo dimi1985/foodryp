@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/mainScreen/components/logo_widget.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -38,9 +39,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           const LogoWidget(),
           const Text('Foodryp'),
-          const Spacer(),
           if (isDesktop)
             Expanded(
+              flex: Responsive.isDesktop(context) ? 3 : 2,
               child: SizedBox(
                 width: screenSize.width,
                 height: 100,

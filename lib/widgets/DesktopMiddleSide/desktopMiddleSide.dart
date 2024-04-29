@@ -1,11 +1,10 @@
 // ignore_for_file: use_key_in_widget_constructors
 
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/category_page/category_page.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/category_section.dart';
@@ -18,7 +17,7 @@ class DesktopMiddleSide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
- bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     Size size = MediaQuery.of(context).size;
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -38,7 +37,7 @@ class DesktopMiddleSide extends StatelessWidget {
                               ? 10
                               : 50),
                   HeadingTitleRow(
-                    title: 'Recipes',
+                    title: AppLocalizations.of(context).translate('Recipes'),
                     onPressed: () {
                       // Navigate to the corresponding page
                       Navigator.push(
@@ -49,10 +48,11 @@ class DesktopMiddleSide extends StatelessWidget {
                     },
                     showSeeALl: true,
                   ),
-                  const RecipeSection(),
-                  if ( Responsive.isDesktop(context) || isAndroid) const SizedBox(height: 25),
+                  const RecipeSection(isFor: 'MainScreen'),
+                  if (Responsive.isDesktop(context) || isAndroid)
+                    const SizedBox(height: 25),
                   HeadingTitleRow(
-                    title: 'Categories',
+                    title: AppLocalizations.of(context).translate('Categories'),
                     onPressed: () {
                       // Navigate to the corresponding page
                       Navigator.push(
@@ -66,7 +66,8 @@ class DesktopMiddleSide extends StatelessWidget {
                   const CategorySection(),
                   const SizedBox(height: 15.0),
                   HeadingTitleRow(
-                    title: 'Weekly Menus',
+                    title:
+                        AppLocalizations.of(context).translate('Weekly Menus'),
                     onPressed: () {
                       // Navigate to the corresponding page
                       Navigator.push(
@@ -81,7 +82,6 @@ class DesktopMiddleSide extends StatelessWidget {
                     showAll: true,
                     publicUsername: '',
                     publicUserId: '',
-                   
                   ),
                   const SizedBox(height: 15.0),
                 ],

@@ -9,6 +9,7 @@ import 'package:foodryp/screens/profile_page/components/recipe_card_profile.dart
 import 'package:foodryp/screens/profile_page/components/top_profile.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
+import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/creators_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
@@ -18,10 +19,11 @@ import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
 
 class ProfilePage extends StatefulWidget {
   User user;
-   String? publicUsername;
+  String? publicUsername;
   ProfilePage({
     super.key,
-    required this.user, this.publicUsername,
+    required this.user,
+    this.publicUsername,
   });
 
   @override
@@ -57,8 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-
-
+    final bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
       appBar: kIsWeb
           ? CustomAppBar(
@@ -66,12 +67,13 @@ class _ProfilePageState extends State<ProfilePage> {
               isAuthenticated: true,
               profileImage: '',
               username: '',
-             
               user: widget.user,
-              menuItems: MenuWebItems(
-                user: widget.user,
-                currentPage: currentPage,
-              ),
+              menuItems: isDesktop
+                  ? MenuWebItems(
+                      user: widget.user,
+                      currentPage: currentPage,
+                    )
+                  : Container(),
             )
           : AppBar(),
       body: ListView(

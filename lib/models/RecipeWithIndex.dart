@@ -1,4 +1,4 @@
-// Define a class to hold both the recipe and its original index
+// ignore_for_file: file_names
 import 'package:foodryp/models/recipe.dart';
 
 class RecipeWithIndex {

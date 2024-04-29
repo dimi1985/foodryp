@@ -12,7 +12,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   // Initialize the language provider and load the language
-   // Ensure that the necessary bindings are initialized
+  // Ensure that the necessary bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? languageCode = prefs.getString('languageCode');
@@ -26,9 +26,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(
           create: (_) => LanguageProvider(),
-          
-        ), 
-         ChangeNotifierProvider(create: (_) => UsersProvider()),
+        ),
+        ChangeNotifierProvider(create: (_) => UsersProvider()),
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),
@@ -67,7 +66,6 @@ class _FoodrypState extends State<Foodryp> {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Foodryp',
-            
             theme: themeProvider.themeData,
             localizationsDelegates: const [
               AppLocalizations.delegate,

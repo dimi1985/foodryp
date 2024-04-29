@@ -1,17 +1,14 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
-import 'package:hexcolor/hexcolor.dart';
-import 'package:http/http.dart' as http;
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 
 class RecipeSection extends StatefulWidget {
-  const RecipeSection({Key? key}) : super(key: key);
+  final isFor;
+  const RecipeSection({Key? key, required this.isFor}) : super(key: key);
 
   @override
   State<RecipeSection> createState() => _RecipeSectionState();
@@ -27,14 +24,12 @@ class _RecipeSectionState extends State<RecipeSection> {
   }
 
   Future<void> fetchixedRecipes() async {
-  const int desiredLength = 4; 
-  final fetchedRecipes = await RecipeService().getFixedRecipes(desiredLength);
-  setState(() {
-    recipes = fetchedRecipes;
-  });
-}
-
-
+    const int desiredLength = 4;
+    final fetchedRecipes = await RecipeService().getFixedRecipes(desiredLength);
+    setState(() {
+      recipes = fetchedRecipes;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +41,7 @@ class _RecipeSectionState extends State<RecipeSection> {
           height: 260,
           width: screenSize.width,
           child: ScrollConfiguration(
-             behavior: ScrollConfiguration.of(context).copyWith(
+            behavior: ScrollConfiguration.of(context).copyWith(
               dragDevices: {
                 PointerDeviceKind.touch,
                 PointerDeviceKind.mouse,
@@ -68,15 +63,14 @@ class _RecipeSectionState extends State<RecipeSection> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RecipeDetailPage(recipe: recipe),
+                            builder: (context) =>
+                                RecipeDetailPage(recipe: recipe),
                           ),
                         );
                       },
                       child: CustomRecipeCard(
                         recipe: recipe,
-                        internalUse: 'recipes',
-                        
-                        
+                        internalUse: widget.isFor,
                       ),
                     ),
                   ),

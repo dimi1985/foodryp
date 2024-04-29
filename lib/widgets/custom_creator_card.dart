@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_page/profile_page.dart';
@@ -89,12 +91,6 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    String buttonText = '';
-                    setState(() {
-                      widget.isFollowing
-                          ? buttonText = 'Following'
-                          : 'UnFollowing';
-                    });
                     if (widget.user.followedBy!
                         .contains(widget.currentUserId)) {
                       // Call the unfollowUser method from the UserService
