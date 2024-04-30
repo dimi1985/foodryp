@@ -30,7 +30,7 @@ class _TopProfileState extends State<TopProfile> {
   @override
   void initState() {
     getFolowedUserAddForSearch(userIdFollowedByRequest);
-     fetchFollowingUsers();
+    fetchFollowingUsers();
     super.initState();
   }
 
@@ -40,7 +40,7 @@ class _TopProfileState extends State<TopProfile> {
     }
   }
 
-    Future<void> fetchFollowingUsers() async {
+  Future<void> fetchFollowingUsers() async {
     try {
       final List<User> users = await userService.getFollowingUsers();
       setState(() {
@@ -189,77 +189,89 @@ class _TopProfileState extends State<TopProfile> {
           width: 400,
           child: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-              return Container(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Display users following you
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: users.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final User userToFollowBack = users[index];
-                        final bool isFollowing = followingUsers.any((user) => user.id == userToFollowBack.id);
-                        return ListTile(
-                          leading: userToFollowBack.gender!.contains('female')
-                              ? ImagePickerPreviewContainer(
-                                  containerSize: 100.0,
-                                  initialImagePath:
-                                      userToFollowBack.profileImage,
-                                  onImageSelected:
-                                      (File imageFile, List<int> bytes) {},
-                                  allowSelection: false,
-                                  gender: userToFollowBack.gender!,
-                                  isFor: '',
-                                  isForEdit: false,
-                                )
-                              : userToFollowBack.gender!.contains('male')
-                                  ? ImagePickerPreviewContainer(
-                                      containerSize: 100.0,
-                                      initialImagePath:
-                                          userToFollowBack.profileImage,
-                                      onImageSelected:
-                                          (File imageFile, List<int> bytes) {},
-                                      allowSelection: false,
-                                      gender: userToFollowBack.gender!,
-                                      isFor: '',
-                                      isForEdit: false,
-                                    )
-                                  : Container(),
-                          title: Text(userToFollowBack.username),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              // Logic to follow the user back
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              userService
-                                  .followBack(userToFollowBack.id)
-                                  .then((success) {
-                                if (success) {
-                                  // Refresh the UI if necessary
-                                  setState(() {
-                                    _isLoading = false;
-                                    ;
-                                  });
-                                }
-                              });
-                            },
-                             child: _isLoading ? const CircularProgressIndicator() : Text(isFollowing ? 'Following' : 'Follow Back'),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              );
+              if (followingUsers.isEmpty) {
+                return Center(
+                  child: Text(
+                    AppLocalizations.of(context)
+                        .translate('No users are following you yet.'),
+                  ),
+                );
+              } else {
+                return Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Display users following you
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: users.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final User userToFollowBack = users[index];
+                          final bool isFollowing = followingUsers
+                              .any((user) => user.id == userToFollowBack.id);
+                          return ListTile(
+                            leading: userToFollowBack.gender!.contains('female')
+                                ? ImagePickerPreviewContainer(
+                                    containerSize: 100.0,
+                                    initialImagePath:
+                                        userToFollowBack.profileImage,
+                                    onImageSelected:
+                                        (File imageFile, List<int> bytes) {},
+                                    allowSelection: false,
+                                    gender: userToFollowBack.gender!,
+                                    isFor: '',
+                                    isForEdit: false,
+                                  )
+                                : userToFollowBack.gender!.contains('male')
+                                    ? ImagePickerPreviewContainer(
+                                        containerSize: 100.0,
+                                        initialImagePath:
+                                            userToFollowBack.profileImage,
+                                        onImageSelected: (File imageFile,
+                                            List<int> bytes) {},
+                                        allowSelection: false,
+                                        gender: userToFollowBack.gender!,
+                                        isFor: '',
+                                        isForEdit: false,
+                                      )
+                                    : Container(),
+                            title: Text(userToFollowBack.username),
+                            trailing: ElevatedButton(
+                              onPressed: () {
+                                // Logic to follow the user back
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                userService
+                                    .followBack(userToFollowBack.id)
+                                    .then((success) {
+                                  if (success) {
+                                    // Refresh the UI if necessary
+                                    setState(() {
+                                      _isLoading = false;
+                                      ;
+                                    });
+                                  }
+                                });
+                              },
+                              child: _isLoading
+                                  ? const CircularProgressIndicator()
+                                  : Text(isFollowing
+                                      ? 'Following'
+                                      : 'Follow Back'),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
             },
           ),
         );
       },
     );
   }
-  
-
 }

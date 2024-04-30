@@ -102,6 +102,14 @@
     "Missing Ingredients": "Λείπουν Συστατικά",
     "Search Settings": "Ρυθμίσεις αναζήτησης",
     "Search on Submit": "Αναζήτηση στην Υποβολή",
-    "Search on Every Keystroke": "Αναζήτηση σε κάθε πάτημα πλήκτρων"
+    "Search on Every Keystroke": "Αναζήτηση σε κάθε πάτημα πλήκτρων",
+    "Category": "Κατηγορία",
+    "Serving": "Αριθμός Σερβιρίσματος",
+    "Preparation Duration": "Διάρκεια προετοιμασίας",
+    "Cooking Duration": "Διάρκεια μαγειρέματος",
+    "Ingredients": "Συστατικά",
+    "Instructions:": "Οδηγίες:",
+    "Difficulty:": "Δυσκολία:",
+    "No users are following you yet.": "Κανείς χρήστης δεν σας ακολουθεί ακόμα."
   }
   

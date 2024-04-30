@@ -101,7 +101,15 @@
     "Missing Ingredients": "Missing Ingredients",
     "Search Settings": "Search Settings",
     "Search on Submit": "Search on Submit",
-    "Search on Every Keystroke": "Search on Every Keystroke"
+    "Search on Every Keystroke": "Search on Every Keystroke",
+    "Category": "Category",
+    "Serving": "Serving",
+    "Preparation Duration": "Preparation Duration",
+    "Cooking Duration": "Cooking Duration",
+    "Ingredients": "Ingredients",
+    "Instructions:": "Instructions:",
+    "Difficulty:": "Difficulty:",
+    "No users are following you yet.": "No users are following you yet."
     
   }
   

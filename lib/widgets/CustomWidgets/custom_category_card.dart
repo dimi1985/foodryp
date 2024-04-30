@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -16,6 +18,14 @@ class CustomCategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final categoryImage = '${Constants.imageURL}/${category.categoryImage}';
+    // Skip rendering the card if the category name is "Uncategorized"
+    print('Category Name: ${category.name}'); // Add this line for debugging
+
+    // Skip rendering the card if the category name is "Uncategorized"
+    if (category.name == 'Uncategorized') {
+      return SizedBox.shrink(); // Return an empty SizedBox
+    }
+
     return SizedBox(
       height: 150,
       width: 150,

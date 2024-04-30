@@ -28,19 +28,21 @@ class CustomRecipeCard extends StatefulWidget {
 
 class _CustomRecipeCardState extends State<CustomRecipeCard> {
   bool isOwner = false;
+  bool isAuthenticated = false;
   List<String>? uniqueIngredients = [];
   @override
   void initState() {
-    checkAuthenticationStatus();
+    checkAuthenticationAndOwnershipStatus();
     uniqueIngredients = widget.missingIngredients?.toSet().toList();
     super.initState();
   }
 
-  Future<void> checkAuthenticationStatus() async {
+  Future<void> checkAuthenticationAndOwnershipStatus() async {
     String getCurrentUserId = await UserService().getCurrentUserId();
-
     setState(() {
-      isOwner = widget.recipe.userId.contains(getCurrentUserId);
+      isAuthenticated = getCurrentUserId.isNotEmpty;
+      isOwner =
+          isAuthenticated && widget.recipe.userId.contains(getCurrentUserId);
     });
   }
 
@@ -125,8 +127,8 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       const SizedBox(width: 5),
 
                       Text(
-                        Constants.calculateMembershipDuration(
-                            context, widget.recipe.dateCreated), // Format the date
+                        Constants.calculateMembershipDuration(context,
+                            widget.recipe.dateCreated), // Format the date
                         style: TextStyle(
                           fontSize: Responsive.isDesktop(context)
                               ? Constants.desktopFontSize
@@ -172,7 +174,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                             Text(
                               widget.recipe.likedBy.length.toString(),
                             ),
-                            if (isOwner &&
+                            if (isOwner && isAuthenticated &&
                                 widget.internalUse != 'MainScreen' &&
                                 widget.internalUse != 'RecipePage')
                               IconButton(
@@ -190,7 +192,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                                 },
                                 icon: const Icon(Icons.edit),
                               ),
-                            if (isOwner &&
+                            if (isOwner && isAuthenticated &&
                                 widget.internalUse != 'MainScreen' &&
                                 widget.internalUse != 'RecipePage')
                               IconButton(

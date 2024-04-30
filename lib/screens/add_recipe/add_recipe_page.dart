@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
@@ -240,7 +241,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                               itemBuilder: (context, index) {
                                 final category = categories[index];
                                 isTapped = index == tappedCategoryIndex;
-
+                                if (category.name == 'Uncategorized') {
+                                  return const SizedBox.shrink();
+                                }
                                 return InkWell(
                                   onTap: () {
                                     setState(() {
@@ -249,6 +252,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                       selectedCategoryId = category.id!;
                                       selectedCategoryFont = category.font;
                                       selectedCategoryName = category.name;
+                                   
                                     });
                                   },
                                   child: Padding(
@@ -547,6 +551,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
+                             log('selectedCategoryName in showDialog:  $selectedCategoryName');
                           return Dialog(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16.0),
@@ -622,13 +627,14 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                           Text(
                                             AppLocalizations.of(context)
                                                 .translate('Category'),
+                                                
                                             style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           const SizedBox(height: 8.0),
                                           Text(
-                                            widget.isForEdit
+                                            widget.isForEdit && !isTapped
                                                 ? widget.recipe?.categoryName ??
                                                     ''
                                                 : selectedCategoryName,
