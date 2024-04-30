@@ -370,6 +370,27 @@ class RecipeService {
     }
   }
 
+   Future<List<Recipe>> getRecipesBySearch(String searchQuery, int page, int pageSize) async {
+    // Encodes the search query to handle special characters in URL
+    final encodedQuery = Uri.encodeComponent(searchQuery);
+    final url = Uri.parse('${Constants.baseUrl}/api/searchRecipesByName?query=$encodedQuery&page=$page&pageSize=$pageSize');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        // Decode the JSON response and extract 'recipes' data
+        List<dynamic> data = jsonDecode(response.body)['recipes'];
+        // Map each JSON object to a Recipe model
+        return data.map((recipeData) => Recipe.fromJson(recipeData)).toList();
+      } else {
+        throw Exception('Failed to load recipes');
+      }
+    } catch (error) {
+      print('Error fetching recipes: $error');
+      throw Exception('Error fetching recipes: $error');
+    }
+  }
+
   Future<void> _saveRecipeIDLocally(String recipeId) async {
     await _initPrefs();
     await _prefs.setString('recipeId', recipeId);

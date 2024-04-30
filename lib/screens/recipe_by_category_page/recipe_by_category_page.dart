@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -8,7 +10,8 @@ import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 class RecipeByCategoryPage extends StatefulWidget {
   final CategoryModel category;
 
-  const RecipeByCategoryPage({Key? key, required this.category}) : super(key: key);
+  const RecipeByCategoryPage({Key? key, required this.category})
+      : super(key: key);
 
   @override
   _RecipeByCategoryPageState createState() => _RecipeByCategoryPageState();
@@ -19,13 +22,15 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
   List<Recipe> recipes = [];
   bool _isLoading = false;
   int _page = 1; // Initial page number
-  int _pageSize = 10; // Number of recipes per page
+  final int _pageSize = 10; // Number of recipes per page
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
-    _fetchRecipesByCategory();
+    if (recipes.isEmpty) {
+      _fetchRecipesByCategory();
+    }
   }
 
   @override
@@ -35,7 +40,8 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
       _fetchMoreRecipes();
     }
   }
@@ -97,7 +103,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
       body: Center(
         child: SizedBox(
           width: 600,
-          child: ListView.builder(
+          child: ListView.separated(
             controller: _scrollController,
             itemCount: recipes.length + (_isLoading ? 1 : 0),
             itemBuilder: (context, index) {
@@ -111,13 +117,13 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RecipeDetailPage(recipe: recipe),
+                          builder: (context) =>
+                              RecipeDetailPage(recipe: recipe),
                         ),
                       );
                     },
                     child: CustomRecipeCard(
                       recipe: recipe,
-                      
                       internalUse: '',
                     ),
                   ),
@@ -125,6 +131,11 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
               } else {
                 return _buildLoader();
               }
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(
+                height: 15,
+              );
             },
           ),
         ),

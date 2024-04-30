@@ -15,24 +15,24 @@ class CustomCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categoryImage = '${Constants.imageURL}/${category.categoryImage}';
+    // final categoryImage = '${Constants.imageURL}/${category.categoryImage}';
     return SizedBox(
       height: 150,
       width: 150,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
-              height: 120,
-              width: 120,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: Image.network(
-                  categoryImage,
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.none,
-                ),
-              )),
+          // SizedBox(
+          //     height: 120,
+          //     width: 120,
+          //     child: ClipRRect(
+          //       borderRadius: BorderRadius.circular(2),
+          //       child: Image.network(
+          //         categoryImage,
+          //         fit: BoxFit.cover,
+          //         filterQuality: FilterQuality.none,
+          //       ),
+          //     )),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

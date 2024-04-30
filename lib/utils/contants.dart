@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 
 class Constants {
@@ -18,6 +19,8 @@ class Constants {
   static const tabletHeadingTitleSize = 22.0;
   static const desktopHeadingTitleSize = 24.0;
   static const topThreeTitleSize = 30.0;
+
+  static  User defaultUser = User(id: '', username: '', email: '', profileImage: '', memberSince: DateTime.now(), role: '', recipes: [], following: [], followedBy: [], likedRecipes: [], followedByRequest: []);
 
   static const imageURL =
       kIsWeb ? 'http://localhost:3000' : 'http://192.168.12.229:3000';

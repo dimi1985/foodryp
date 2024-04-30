@@ -8,7 +8,6 @@ import 'package:foodryp/screens/creators_page/creators_page.dart';
 import 'package:foodryp/screens/profile_page/components/recipe_card_profile.dart';
 import 'package:foodryp/screens/profile_page/components/top_profile.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
-import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/creators_section.dart';
@@ -25,6 +24,7 @@ class ProfilePage extends StatefulWidget {
     required this.user,
     this.publicUsername,
   });
+
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -51,6 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
       userProfile =
           await userService.getPublicUserProfile(widget.user.username);
     }
+
 
     setState(() {
       widget.user = userProfile!;
@@ -109,25 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 600,
             child: RecipeCardProfile(publicUsername: widget.user.username),
           ),
-          const SizedBox(height: 15.0),
-          HeadingTitleRow(
-            title: 'Following',
-            onPressed: () {
-              // Navigate to the corresponding page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => CreatorsPage(
-                          user: widget.user,
-                        )),
-              );
-            },
-            showSeeALl: true,
-          ),
-          const Creators(
-            showAllUsers: false,
-          ),
-          const SizedBox(height: 15.0),
+         
         ],
       ),
     );

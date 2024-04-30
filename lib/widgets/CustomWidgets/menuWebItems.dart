@@ -84,13 +84,13 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                   ? Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MainScreen(user: widget.user!),
+                          builder: (context) => MainScreen(user: widget.user),
                           maintainState: true),
                       (Route<dynamic> route) => false)
                   : Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MainScreen(user: widget.user!)),
+                          builder: (context) => MainScreen(user: widget.user)),
                     );
               break;
 
@@ -109,7 +109,7 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                           builder: (context) => AddRecipePage(
                                 recipe: null,
                                 isForEdit: false,
-                                user: widget.user!,
+                                user: widget.user,
                               ),
                           maintainState: true),
                       (Route<dynamic> route) => false)
@@ -119,7 +119,7 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                         builder: (context) => AddRecipePage(
                           recipe: null,
                           isForEdit: false,
-                          user: widget.user!,
+                          user: widget.user,
                         ),
                       ),
                     );
@@ -130,13 +130,13 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                   ? Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => RecipePage(user: widget.user!),
+                          builder: (context) => RecipePage(user: widget.user),
                           maintainState: true),
                       (Route<dynamic> route) => false)
                   : Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => RecipePage(user: widget.user!)),
+                          builder: (context) => RecipePage(user: widget.user)),
                     );
               break;
 
@@ -146,14 +146,14 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              CreatorsPage(user: widget.user!),
+                              CreatorsPage(user: widget.user ?? Constants.defaultUser),
                           maintainState: true),
                       (Route<dynamic> route) => false)
                   : Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              CreatorsPage(user: widget.user!)),
+                              CreatorsPage(user: widget.user ?? Constants.defaultUser)),
                     );
               break;
 
@@ -163,14 +163,14 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              MyFridgePage(user: widget.user!),
+                              MyFridgePage(user: widget.user ?? Constants.defaultUser),
                           maintainState: true),
                       (Route<dynamic> route) => false)
                   : Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              MyFridgePage(user: widget.user!)),
+                              MyFridgePage(user: widget.user ?? Constants.defaultUser)),
                     );
               break;
 

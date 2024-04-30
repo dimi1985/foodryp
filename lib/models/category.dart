@@ -3,7 +3,7 @@ class CategoryModel {
   final String name;
   final String font;
   final String color;
-  final String? categoryImage; 
+  // final String? categoryImage; 
   final List<String>? recipes; 
 
   CategoryModel({
@@ -11,7 +11,7 @@ class CategoryModel {
     required this.name,
     required this.font,
     required this.color,
-    this.categoryImage,
+    // this.categoryImage,
     this.recipes,
   });
 
@@ -20,7 +20,7 @@ class CategoryModel {
       name: json['name'],
       font: json['font'],
       color: json['color'],
-      categoryImage: json['categoryImage'],
+      // categoryImage: json['categoryImage'],
       recipes: json['recipes']?.cast<String>(), // Check for null and cast
     );
 
@@ -29,7 +29,7 @@ Map<String, dynamic> toJson() => {
       'name': name,
       'font': font,
       'color': color,
-      'categoryImage': categoryImage,
+      // 'categoryImage': categoryImage,
       'recipes': recipes, 
     };
 

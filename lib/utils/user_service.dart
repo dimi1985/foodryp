@@ -26,7 +26,8 @@ class UserService {
       List<String> following,
       List<String> followedBy,
       List<String> likedRecipes,
-      List<String> mealId) async {
+      List<String> mealId,
+      List<String> followedByRequest,) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/register'),
@@ -43,6 +44,7 @@ class UserService {
           'following': following,
           'followedBy': followedBy,
           'likedRecipes': likedRecipes,
+          'followedByRequest': followedByRequest,
         }),
       );
       if (response.statusCode == 201) {
@@ -62,7 +64,7 @@ class UserService {
             recipes: [],
             following: [],
             followedBy: [],
-            likedRecipes: []);
+            likedRecipes: [], followedByRequest: []);
 
         return true;
       }
@@ -340,6 +342,63 @@ class UserService {
     return true;
   }
 
+
+Future<List<User>> searchUsersByFollowedByRequest(List<String> userIds) async {
+  await _initPrefs(); // Initialize SharedPreferences
+    final currentUserId = _prefs.getString('userId');
+  try {
+    const url = '${Constants.baseUrl}/api/searchUsersByFollowedByRequest';
+    final response = await http.post(
+      Uri.parse(url),
+      body: jsonEncode({'userId': currentUserId, 'userIds': userIds}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> userDataList = jsonDecode(response.body);
+      final List<User> users = userDataList.map((userData) => User.fromJson(userData)).toList();
+      return users;
+    } else {
+      print('Failed to search users by followedByRequest: ${response.statusCode}');
+      return [];
+    }
+  } catch (error) {
+    print('Error searching users by followedByRequest: $error');
+    return [];
+  }
+}
+
+
+  Future<bool> followBack(String userToFollowBackId) async {
+     await _initPrefs(); // Initialize SharedPreferences
+    final currentUserId = _prefs.getString('userId');
+  try {
+    const url = '${Constants.baseUrl}/api/followBack';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'userId': currentUserId,
+        'userToFollowBack': userToFollowBackId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Handle success
+      print('Followed back successfully');
+      return true;
+    } else {
+      // Handle other errors
+      print('Failed to follow back: ${response.statusCode}');
+      return false;
+    }
+  } catch (error) {
+    // Handle exception
+    print('Error following back: $error');
+    return false;
+  }
+}
+
+
   Future<void> _saveUserIDLocally(String userId) async {
     await _initPrefs(); // Initialize SharedPreferences
     await _prefs.setString('userId', userId); // Save userID locally
@@ -431,6 +490,38 @@ class UserService {
     } catch (e) {
       print('Error fetching fridge items: $e');
       return null;
+    }
+  }
+
+  Future<bool> updateFridgeItem(String oldItemName, String newItemName, String newItemCategory) async {
+     await _initPrefs();
+    final userId = _prefs.getString('userId');
+  
+     final url = Uri.parse('${Constants.baseUrl}/api/updateFridgeItem');
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'userId': userId,
+          'oldItemName': oldItemName,
+          'newItem': {
+            'name': newItemName,
+            'category': newItemCategory
+          }
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Fridge item updated successfully.');
+        return true;
+      } else {
+        print('Failed to update fridge item: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error updating fridge item: $e');
+      return false;
     }
   }
 

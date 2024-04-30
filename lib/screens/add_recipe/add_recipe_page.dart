@@ -71,38 +71,13 @@ class _AddRecipePageState extends State<AddRecipePage> {
   late String currentPage;
   bool isTapped = false;
 
-  User user = User(
-    id: '',
-    username: '',
-    email: '',
-    profileImage: '',
-    gender: '',
-    memberSince: null,
-    role: '',
-    recipes: [],
-    following: [],
-    followedBy: [],
-    likedRecipes: [],
-  );
+  User user = Constants.defaultUser;
 
   Future<void> fetchUserProfile() async {
     final userService = UserService();
     final userProfile = await userService.getUserProfile();
     setState(() {
-      user = userProfile ??
-          User(
-            id: '',
-            username: '',
-            email: '',
-            profileImage: '',
-            gender: '',
-            memberSince: null,
-            role: '',
-            recipes: [],
-            following: [],
-            followedBy: [],
-            likedRecipes: [],
-          );
+      user = userProfile ?? Constants.defaultUser;
     });
   }
 

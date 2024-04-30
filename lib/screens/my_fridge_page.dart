@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -621,8 +622,8 @@ class _MyFridgePageState extends State<MyFridgePage>
                   ElevatedButton(
                     onPressed: () {
                       if (isForEdit) {
-                        updateFridgeItem(
-                            category, existingItem, controller.text.trim());
+                        updateFridgeItem(context, category, existingItem,
+                            controller.text.trim());
                       } else {
                         addItemToList(category, controller.text.trim());
                         _onAddFridgeItem(category, controller.text.trim());
@@ -639,13 +640,7 @@ class _MyFridgePageState extends State<MyFridgePage>
                     const SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: () {
-                        deleteFridgeItem(existingItem);
-                        // setState(() {
-                        //   // Remove the item from the list
-                        //   fridgeItems!.removeWhere(
-                        //       (item) => item['name'] == item['name']);
-                        // });
-                        updateListUI();
+                        deleteFridgeItem(existingItem, category);
 
                         Navigator.pop(context);
                       },
@@ -662,18 +657,62 @@ class _MyFridgePageState extends State<MyFridgePage>
     );
   }
 
-  void updateFridgeItem(Category category, String oldItem, String newItem) {
-    // Logic to update an item in the fridge list based on category
+  void updateFridgeItem(
+    BuildContext context,Category category, String oldItem, String newItem) {
+  // Update the item in the local list
+  List<String> itemList = getCategoryItems(category);
+  int index = itemList.indexOf(oldItem);
+  if (index != -1) {
+    itemList[index] = newItem;
+    updateListUI();
   }
 
-  void deleteFridgeItem(String item) {
+  // Get category name as string
+  String categoryStr = categoryToString(category);
+
+  // Call the server update method
+  UserService().updateFridgeItem( oldItem, newItem, categoryStr).then((success) {
+    if (success) {
+      print('Fridge item updated successfully.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Fridge item updated successfully!'))
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update fridge item.'))
+      );
+    }
+  });
+}
+
+
+  void deleteFridgeItem(String item, Category category) {
     // Logic to remove an item from the fridge list based on category
     UserService().deleteFridgeItem(item).then((value) {
       if (value) {
         print('Fridge item deleted successfully.');
+        // Remove item from the correct list based on category
+        switch (category) {
+          case Category.vegetables:
+            vegetablesList.remove(item);
+            break;
+          case Category.milkAndDairy:
+            milkAndDairyList.remove(item);
+            break;
+          case Category.meatAndFish:
+            meatAndFishList.remove(item);
+            break;
+        }
+        updateListUI();
       } else {
         print('Error deleting fridge item');
       }
+    }).catchError((error) {
+      print('Error deleting fridge item: $error');
     });
   }
+  
+  String categoryToString(Category category) {
+  return category.toString().split('.').last;
+}
 }

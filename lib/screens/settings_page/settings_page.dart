@@ -11,6 +11,7 @@ import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/language.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/changeFieldDialog.dart';
@@ -73,7 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
-
+    final searchSettingsProvider = Provider.of<SearchSettingsProvider>(context);
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) {
@@ -371,6 +372,46 @@ class _SettingsPageState extends State<SettingsPage> {
 
             _sectionTitle(AppLocalizations.of(context)
                 .translate('Units and Measurements')),
+
+            _sectionTitle(
+                AppLocalizations.of(context).translate(AppLocalizations.of(context)
+                .translate('Search Settings'))),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  
+                  title:  Text(AppLocalizations.of(context)
+                .translate('Search on Submit')),
+                  leading: Radio(
+                    value: false,
+                    groupValue: searchSettingsProvider.searchOnEveryKeystroke,
+                    onChanged: (value) {
+                      searchSettingsProvider.searchOnEveryKeystroke = value!;
+                    },
+                  ),
+                  onTap: () {
+                    searchSettingsProvider.searchOnEveryKeystroke = false;
+                  },
+                ),
+                ListTile(
+                  
+                  title:  Text(AppLocalizations.of(context)
+                .translate('Search on Every Keystroke')),
+                  leading: Radio(
+                    value: true,
+                    groupValue: searchSettingsProvider.searchOnEveryKeystroke,
+                    onChanged: (value) {
+                      searchSettingsProvider.searchOnEveryKeystroke = value!;
+                    },
+                  ),
+                  onTap: () {
+                    searchSettingsProvider.searchOnEveryKeystroke = true;
+                  },
+                ),
+              ],
+            )
             // Add units and measurements settings tiles here
           ],
         ),
@@ -454,8 +495,8 @@ class _SettingsPageState extends State<SettingsPage> {
       SnackBar(
         content: Row(
           children: [
-            CircularProgressIndicator(), // Add a circular progress indicator
-            SizedBox(width: 16),
+            const CircularProgressIndicator(), // Add a circular progress indicator
+            const SizedBox(width: 16),
 
             Text(AppLocalizations.of(context)
                 .translate('Uploading file...')), // Text indicating file upload

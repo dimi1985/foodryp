@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/connectivity_provider.dart';
 import 'package:foodryp/utils/language_provider.dart';
+import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +30,8 @@ void main() async {
           create: (_) => LanguageProvider(),
         ),
         ChangeNotifierProvider(create: (_) => UsersProvider()),
+        ChangeNotifierProvider(create: (_) => SearchSettingsProvider()),
+        ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),

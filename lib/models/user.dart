@@ -7,10 +7,10 @@ class User {
   final DateTime? memberSince;
   final String? role;
   final List<String>? recipes;
-   final List<String>? following;
-   final List<String>? followedBy;
-   final List<String>? likedRecipes;
-   
+  final List<String>? following;
+  final List<String>? followedBy;
+  final List<String>? likedRecipes;
+  final List<String>? followedByRequest;
 
   User({
     required this.id,
@@ -21,9 +21,10 @@ class User {
     required this.memberSince,
     required this.role,
     required this.recipes,
-      required this.following,
-      required this.followedBy,
-      required this.likedRecipes,
+    required this.following,
+    required this.followedBy,
+    required this.likedRecipes,
+    required this.followedByRequest,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -39,8 +40,9 @@ class User {
       role: json['role'],
       recipes: json['recipes']?.cast<String>(),
       following: json['following']?.cast<String>(),
-       followedBy: json['followedBy']?.cast<String>(),
-         likedRecipes: json['likedRecipes']?.cast<String>(),
+      followedBy: json['followedBy']?.cast<String>(),
+      likedRecipes: json['likedRecipes']?.cast<String>(),
+      followedByRequest: json['followedByRequest']?.cast<String>(),
     );
   }
 
@@ -54,7 +56,8 @@ class User {
         'role': role,
         'recipes': recipes,
         'following': following,
-         'followedBy': followedBy,
-          'likedRecipes': likedRecipes,
+        'followedBy': followedBy,
+        'likedRecipes': likedRecipes,
+        'followedByRequest': followedByRequest,
       };
 }

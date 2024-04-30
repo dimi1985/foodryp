@@ -145,6 +145,7 @@ class _CreatorsPageState extends State<CreatorsPage> {
                                   gender: user.gender!,
                                   isFor: '',
                                   isForEdit: false,
+                                  allowSelection: false,
                                 ),
                                 Text(
                                   user.username,

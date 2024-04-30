@@ -35,7 +35,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       recipes: [],
       following: [],
       followedBy: [],
-      likedRecipes: []); // Initialize with default value
+      likedRecipes: [], followedByRequest: []); // Initialize with default value
   List<Recipe> userRecipes = [];
   bool isLoading = false;
   final ScrollController _scrollController = ScrollController();

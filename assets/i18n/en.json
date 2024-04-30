@@ -98,7 +98,10 @@
     "Meat and Fish": "Meat and Fish",
     "Error fetching users:": "Error fetching users:",
     "Error fetching user profile and recipes:": "Error fetching user profile and recipes:",
-    "Missing Ingredients": "Missing Ingredients"
+    "Missing Ingredients": "Missing Ingredients",
+    "Search Settings": "Search Settings",
+    "Search on Submit": "Search on Submit",
+    "Search on Every Keystroke": "Search on Every Keystroke"
     
   }
   

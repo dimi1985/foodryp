@@ -126,7 +126,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
 
                       Text(
                         Constants.calculateMembershipDuration(
-                            context, widget.recipe.date), // Format the date
+                            context, widget.recipe.dateCreated), // Format the date
                         style: TextStyle(
                           fontSize: Responsive.isDesktop(context)
                               ? Constants.desktopFontSize

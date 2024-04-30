@@ -11,7 +11,7 @@ class Recipe {
   final String username;
   final String? useImage;
   final String userId;
-  final DateTime date;
+  final DateTime dateCreated;
   final String description;
   final String categoryId;
   final String categoryColor;
@@ -33,7 +33,7 @@ class Recipe {
     required this.username,
     required this.useImage,
     required this.userId,
-    required this.date,
+    required this.dateCreated,
     required this.description,
     required this.categoryId,
     required this.categoryColor,
@@ -42,6 +42,7 @@ class Recipe {
     required this.likedBy,
     required this.meal,
   });
+
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
@@ -59,10 +60,10 @@ class Recipe {
       servingNumber: json['servingNumber'] ?? '',
       difficulty: json['difficulty'] ?? '',
       username: json['username'] ?? '',
-      useImage: json['useImage'] ?? '',
+      useImage: json['useImage']?? '', 
       userId: json['userId']?.toString() ?? '',
-      date:
-          json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
+      dateCreated:
+          json['dateCreated'] != null ? DateTime.parse(json['dateCreated']) : DateTime.now(),
       description: json['description'] ?? '',
       categoryId: json['categoryId']?.toString() ?? '',
       categoryColor: json['categoryColor'] ?? '',

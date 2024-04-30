@@ -99,6 +99,9 @@
     "Meat and Fish": "Κρέας και ψάρι",
     "Error fetching users:": "Σφάλμα κατά την ανάκτηση χρηστών:",
     "Error fetching user profile and recipes:": "Σφάλμα κατά την ανάκτηση του προφίλ χρήστη και των συνταγών:",
-    "Missing Ingredients": "Λείπουν Συστατικά"
+    "Missing Ingredients": "Λείπουν Συστατικά",
+    "Search Settings": "Ρυθμίσεις αναζήτησης",
+    "Search on Submit": "Αναζήτηση στην Υποβολή",
+    "Search on Every Keystroke": "Αναζήτηση σε κάθε πάτημα πλήκτρων"
   }
   

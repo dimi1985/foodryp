@@ -46,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
     recipes: [],
     following: [],
     followedBy: [],
-    likedRecipes: [],
+    likedRecipes: [], followedByRequest: [],
   );
 
   @override
@@ -65,19 +65,7 @@ class _MainScreenState extends State<MainScreen> {
       if (userId.isNotEmpty) {
         isAuthenticated = true;
       }
-      user = userProfile ??
-          User(
-              id: '',
-              username: '',
-              email: '',
-              profileImage: '',
-              gender: '',
-              memberSince: null,
-              role: '',
-              recipes: [],
-              following: [],
-              followedBy: [],
-              likedRecipes: []);
+      user = userProfile ?? Constants.defaultUser;
     });
   }
 
