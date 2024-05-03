@@ -17,70 +17,63 @@ class CustomCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final categoryImage = '${Constants.imageURL}/${category.categoryImage}';
-    // Skip rendering the card if the category name is "Uncategorized"
-    print('Category Name: ${category.name}'); // Add this line for debugging
-
-    // Skip rendering the card if the category name is "Uncategorized"
-    if (category.name == 'Uncategorized') {
-      return SizedBox.shrink(); // Return an empty SizedBox
-    }
-
     return SizedBox(
       height: 150,
       width: 150,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // SizedBox(
-          //     height: 120,
-          //     width: 120,
-          //     child: ClipRRect(
-          //       borderRadius: BorderRadius.circular(2),
-          //       child: Image.network(
-          //         categoryImage,
-          //         fit: BoxFit.cover,
-          //         filterQuality: FilterQuality.none,
-          //       ),
-          //     )),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    category.name,
-                    style: GoogleFonts.getFont(
-                      category.font,
-                      fontSize: Responsive.isDesktop(context)
-                          ? Constants.desktopFontSize
-                          : Constants.mobileFontSize,
-                      fontWeight: FontWeight.bold,
-                      color: HexColor(category.color).withOpacity(0.7),
+      child: Card(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // SizedBox(
+            //     height: 120,
+            //     width: 120,
+            //     child: ClipRRect(
+            //       borderRadius: BorderRadius.circular(2),
+            //       child: Image.network(
+            //         categoryImage,
+            //         fit: BoxFit.cover,
+            //         filterQuality: FilterQuality.none,
+            //       ),
+            //     )),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      category.name,
+                      style: GoogleFonts.getFont(
+                        category.font,
+                        fontSize: Responsive.isDesktop(context)
+                            ? Constants.desktopFontSize
+                            : Constants.mobileFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: HexColor(category.color).withOpacity(0.7),
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    ('(${category.recipes!.length.toString()})'),
-                    style: GoogleFonts.getFont(
-                      category.font,
-                      fontSize: Responsive.isDesktop(context)
-                          ? Constants.desktopFontSize
-                          : Constants.mobileFontSize,
-                      fontWeight: FontWeight.bold,
-                      color: HexColor(category.color).withOpacity(0.7),
+                    const SizedBox(
+                      width: 10,
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                    Text(
+                      ('(${category.recipes!.length.toString()})'),
+                      style: GoogleFonts.getFont(
+                        category.font,
+                        fontSize: Responsive.isDesktop(context)
+                            ? Constants.desktopFontSize
+                            : Constants.mobileFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: HexColor(category.color).withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

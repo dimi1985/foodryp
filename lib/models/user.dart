@@ -7,10 +7,13 @@ class User {
   final DateTime? memberSince;
   final String? role;
   final List<String>? recipes;
-  final List<String>? following;
-  final List<String>? followedBy;
   final List<String>? likedRecipes;
-  final List<String>? followedByRequest;
+  final List<String> followers;
+  final List<String> following;
+   List<String> followRequestsSent;
+   List<String> followRequestsReceived;
+   List<String> followRequestsCanceled;
+
 
   User({
     required this.id,
@@ -21,11 +24,15 @@ class User {
     required this.memberSince,
     required this.role,
     required this.recipes,
-    required this.following,
-    required this.followedBy,
     required this.likedRecipes,
-    required this.followedByRequest,
+    required this.followers,
+    required this.following,
+    required this.followRequestsSent,
+    required this.followRequestsReceived,
+    required this.followRequestsCanceled,
+
   });
+
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -39,12 +46,16 @@ class User {
           : null, // Parse string to DateTime object
       role: json['role'],
       recipes: json['recipes']?.cast<String>(),
-      following: json['following']?.cast<String>(),
-      followedBy: json['followedBy']?.cast<String>(),
       likedRecipes: json['likedRecipes']?.cast<String>(),
-      followedByRequest: json['followedByRequest']?.cast<String>(),
+      followers: json['followers']?.cast<String>(),
+      following: json['following']?.cast<String>(),
+      followRequestsSent: json['followRequestsSent']?.cast<String>(),
+      followRequestsReceived: json['followRequestsReceived']?.cast<String>(),
+      followRequestsCanceled: json['followRequestsCanceled']?.cast<String>(),
     );
   }
+
+  set buttonText(String buttonText) {}
 
   Map<String, dynamic> toJson() => {
         '_id': id,
@@ -55,9 +66,11 @@ class User {
         'memberSince': memberSince,
         'role': role,
         'recipes': recipes,
-        'following': following,
-        'followedBy': followedBy,
         'likedRecipes': likedRecipes,
-        'followedByRequest': followedByRequest,
+        'followers': followers,
+        'following': following,
+        'followRequestsSent': followRequestsSent,
+        'followRequestsReceived': followRequestsReceived,
+        'followRequestsCanceled': followRequestsCanceled,
       };
 }

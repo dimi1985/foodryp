@@ -49,6 +49,7 @@
     "Steps": "Βήματα",
     "Step": "Βήμα",
     "Following": "Ακολουθείται",
+    "Follow Back": "Ακολουθήστε πίσω",
     "Unfollow": "Κατάργηση παρακολούθησης",
     "Follow": "Ακολουθήστε",
     "Message": "Μήνυμα",
@@ -110,6 +111,11 @@
     "Ingredients": "Συστατικά",
     "Instructions:": "Οδηγίες:",
     "Difficulty:": "Δυσκολία:",
-    "No users are following you yet.": "Κανείς χρήστης δεν σας ακολουθεί ακόμα."
+    "No users are following you yet.": "Κανείς χρήστης δεν σας ακολουθεί ακόμα.",
+    "Social": "Κοινωνικά",
+    "Comments": "Σχόλια",
+    "Posted by:": "Αναρτήθηκε από:",
+    "Write a comment...": "Γράψε ένα σχόλιο...",
+    "Remove": "Aφαίρεση"
   }
   

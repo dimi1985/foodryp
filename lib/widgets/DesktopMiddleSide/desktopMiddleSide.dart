@@ -30,6 +30,22 @@ class DesktopMiddleSide extends StatelessWidget {
                     height: 400,
                     child: TopThreeRecipeCardSection(),
                   ),
+                  if (Responsive.isDesktop(context) || isAndroid)
+                    const SizedBox(height: 25),
+                  HeadingTitleRow(
+                    title: AppLocalizations.of(context).translate('Categories'),
+                    onPressed: () {
+                      // Navigate to the corresponding page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CategoryPage()),
+                      );
+                    },
+                    showSeeALl: true,
+                  ),
+                  const CategorySection(),
+                  const SizedBox(height: 15.0),
                   SizedBox(
                       height: Responsive.isDesktop(context)
                           ? 100
@@ -49,21 +65,6 @@ class DesktopMiddleSide extends StatelessWidget {
                     showSeeALl: true,
                   ),
                   const RecipeSection(isFor: 'MainScreen'),
-                  if (Responsive.isDesktop(context) || isAndroid)
-                    const SizedBox(height: 25),
-                  HeadingTitleRow(
-                    title: AppLocalizations.of(context).translate('Categories'),
-                    onPressed: () {
-                      // Navigate to the corresponding page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CategoryPage()),
-                      );
-                    },
-                    showSeeALl: true,
-                  ),
-                  const CategorySection(),
                   const SizedBox(height: 15.0),
                   HeadingTitleRow(
                     title:

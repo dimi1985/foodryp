@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:http/http.dart' as http;
@@ -128,23 +126,20 @@ class CategoryService {
   }
 
   Future<bool> deleteCategory(String categoryId) async {
-    log(categoryId);
-  try {
-    final response = await http.delete(
-      Uri.parse('${Constants.baseUrl}/api/deleteCategory/$categoryId'),
-      headers: {'Content-Type': 'application/json'},
-    );
-    if (response.statusCode == 200) {
-     
-      return true;
+    try {
+      final response = await http.delete(
+        Uri.parse('${Constants.baseUrl}/api/deleteCategory/$categoryId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error deleting category: $e');
+      return false;
     }
-    return false;
-  } catch (e) {
-    print('Error deleting category: $e');
-    return false;
   }
-}
-
 
   Future<void> _saveCategoryIDLocally(String categoryId) async {
     await _initPrefs();

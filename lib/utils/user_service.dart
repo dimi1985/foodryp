@@ -18,16 +18,17 @@ class UserService {
   }
 
   Future<bool> registerUser(
-      String username,
-      String email,
-      String password,
-      String gender,
-      List<String> recipes,
-      List<String> following,
-      List<String> followedBy,
-      List<String> likedRecipes,
-      List<String> mealId,
-      List<String> followedByRequest,) async {
+    String username,
+    String email,
+    String password,
+    String gender,
+    List<String> recipes,
+    List<String> following,
+    List<String> followedBy,
+    List<String> likedRecipes,
+    List<String> mealId,
+    List<String> followedByRequest,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/register'),
@@ -53,18 +54,7 @@ class UserService {
         final userID = responseData['userId'];
 
         await _saveUserIDLocally(userID);
-        _user = User(
-            id: userID,
-            username: username,
-            email: email,
-            profileImage: '',
-            gender: gender,
-            memberSince: null,
-            role: '',
-            recipes: [],
-            following: [],
-            followedBy: [],
-            likedRecipes: [], followedByRequest: []);
+        _user = Constants.defaultUser;
 
         return true;
       }
@@ -266,138 +256,130 @@ class UserService {
     }
   }
 
-  Future<List<User>> getFollowingUsers() async {
-    await _initPrefs(); // Initialize SharedPreferences
-    final currentUserId = _prefs.getString('userId');
-    final url = '${Constants.baseUrl}/api/getFollowingUsers/$currentUserId';
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final List<dynamic> userDataList = jsonDecode(response.body);
-      final List<User> followedUsers =
-          userDataList.map((userData) => User.fromJson(userData)).toList();
-      return followedUsers;
-    } else {
-      throw Exception('Failed to load followed users');
-    }
-  }
-
-  Future<bool> followUser(String userToFollow) async {
-    await _initPrefs(); // Initialize SharedPreferences
-    final userId = _prefs.getString('userId');
-    try {
-      const url = '${Constants.baseUrl}/api/followUser';
-      final response = await http.post(
-        Uri.parse(url),
-        body: {'userToFollow': userToFollow, 'userId': userId},
-      );
-
-      if (response.statusCode == 200) {
-        // Handle success
-        print('User followed successfully');
-        return true;
-      } else if (response.statusCode == 404) {
-        // Handle user not found error
-        print('User not found');
-        return false;
-      } else {
-        // Handle other errors
-        print('Failed to follow user: ${response.statusCode}');
-        return false;
-      }
-    } catch (e) {
-      // Handle exception
-      print('Error following user: $e');
-    }
-    return true;
-  }
-
-  Future<bool> unfollowUser(String userToUnfollow) async {
-    await _initPrefs(); // Initialize SharedPreferences
-    final userId = _prefs.getString('userId');
-    try {
-      const url = '${Constants.baseUrl}/api/unfollowUser';
-      final response = await http.post(
-        Uri.parse(url),
-        body: {'userToUnfollow': userToUnfollow, 'userId': userId},
-      );
-
-      if (response.statusCode == 200) {
-        // Handle success
-        print('User unfollowed successfully');
-        return true;
-      } else if (response.statusCode == 404) {
-        // Handle user not found error
-        print('User not found');
-        return false;
-      } else {
-        // Handle other errors
-        print('Failed to unfollow user: ${response.statusCode}');
-        return false;
-      }
-    } catch (e) {
-      // Handle exception
-      print('Error unfollowing user: $e');
-    }
-    return true;
-  }
 
 
-Future<List<User>> searchUsersByFollowedByRequest(List<String> userIds) async {
-  await _initPrefs(); // Initialize SharedPreferences
-    final currentUserId = _prefs.getString('userId');
+Future<void> followUser(String userToFollowId) async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
   try {
-    const url = '${Constants.baseUrl}/api/searchUsersByFollowedByRequest';
     final response = await http.post(
-      Uri.parse(url),
-      body: jsonEncode({'userId': currentUserId, 'userIds': userIds}),
-      headers: {'Content-Type': 'application/json'},
+      Uri.parse('${Constants.baseUrl}/api/sendFollowRequest'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'userToFollowId': userToFollowId,
+      }),
     );
-
     if (response.statusCode == 200) {
-      final List<dynamic> userDataList = jsonDecode(response.body);
-      final List<User> users = userDataList.map((userData) => User.fromJson(userData)).toList();
-      return users;
+      // Successfully followed user
+      // You can update the UI or perform any other necessary actions
+          print('Following Use Sent!!');
     } else {
-      print('Failed to search users by followedByRequest: ${response.statusCode}');
-      return [];
+      // Handle non-200 status code
+      // You can show an error message to the user
+       print('Following Not Sent!!');
     }
-  } catch (error) {
-    print('Error searching users by followedByRequest: $error');
-    return [];
+  } catch (e) {
+    print('Error following user: $e');
+    // Handle error
+    // You can show an error message to the user
   }
 }
 
-
-  Future<bool> followBack(String userToFollowBackId) async {
-     await _initPrefs(); // Initialize SharedPreferences
-    final currentUserId = _prefs.getString('userId');
+Future<bool> rejectFollowRequest(String userToRejectId) async {
+   await _initPrefs();
+  final userId = _prefs.getString('userId');
   try {
-    const url = '${Constants.baseUrl}/api/followBack';
     final response = await http.post(
-      Uri.parse(url),
+      Uri.parse('${Constants.baseUrl}/api/rejectFollowRequest'),
       body: {
-        'userId': currentUserId,
-        'userToFollowBack': userToFollowBackId,
+        'userId': userId, // The ID of the current user
+        'userToRejectId': userToRejectId, // The ID of the user whose follow request is being rejected
       },
     );
-
     if (response.statusCode == 200) {
-      // Handle success
-      print('Followed back successfully');
+      // Request rejected successfully
+      // You can update the UI or perform any other necessary actions
       return true;
     } else {
-      // Handle other errors
-      print('Failed to follow back: ${response.statusCode}');
+      // Handle non-200 status code
+      // You can show an error message to the user
       return false;
     }
-  } catch (error) {
-    // Handle exception
-    print('Error following back: $error');
-    return false;
+  } catch (e) {
+    print('Error rejecting follow request: $e');
+    // Handle error
+    // You can show a
+    //n error message to the user
+    return true;
   }
 }
 
+
+
+
+   Future<bool> unFollow(String userToUnfollowId) async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/api/unfollowUser'),
+        body: {
+        'userId': userId, // The ID of the current user
+        'userToUnfollowId': userToUnfollowId, // The ID of the user whose follow request is being rejected
+      },
+        // Add any necessary headers, such as authorization token
+      );
+      if (response.statusCode == 200) {
+        // Successfully followed user back
+        // You can update the UI or perform any other necessary actions
+        return true;
+      } else {
+        // Handle non-200 status code
+        // You can show an error message to the user
+        return false;
+      }
+    } catch (e) {
+      print('Error following user back: $e');
+      // Handle error
+      // You can show an error message to the user
+      return false;
+    }
+    
+  }
+
+
+Future<bool> followBack(String userToFollowBackId) async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/api/followUserBack'),
+        body: {
+        'userId': userId, // The ID of the current user
+        'userToFollowBackId': userToFollowBackId, 
+      },
+        // Add any necessary headers, such as authorization token
+      );
+      if (response.statusCode == 200) {
+        // Successfully followed user back
+        // You can update the UI or perform any other necessary actions
+        return true;
+      } else {
+        // Handle non-200 status code
+        // You can show an error message to the user
+        return false;
+      }
+    } catch (e) {
+      print('Error following user back: $e');
+      // Handle error
+      // You can show an error message to the user
+      return false;
+    }
+    
+  }
 
   Future<void> _saveUserIDLocally(String userId) async {
     await _initPrefs(); // Initialize SharedPreferences
@@ -493,11 +475,12 @@ Future<List<User>> searchUsersByFollowedByRequest(List<String> userIds) async {
     }
   }
 
-  Future<bool> updateFridgeItem(String oldItemName, String newItemName, String newItemCategory) async {
-     await _initPrefs();
+  Future<bool> updateFridgeItem(
+      String oldItemName, String newItemName, String newItemCategory) async {
+    await _initPrefs();
     final userId = _prefs.getString('userId');
-  
-     final url = Uri.parse('${Constants.baseUrl}/api/updateFridgeItem');
+
+    final url = Uri.parse('${Constants.baseUrl}/api/updateFridgeItem');
     try {
       final response = await http.put(
         url,
@@ -505,10 +488,7 @@ Future<List<User>> searchUsersByFollowedByRequest(List<String> userIds) async {
         body: jsonEncode({
           'userId': userId,
           'oldItemName': oldItemName,
-          'newItem': {
-            'name': newItemName,
-            'category': newItemCategory
-          }
+          'newItem': {'name': newItemName, 'category': newItemCategory}
         }),
       );
 

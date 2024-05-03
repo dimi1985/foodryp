@@ -25,17 +25,8 @@ class AddWeeklyMenuPage extends StatefulWidget {
 }
 
 class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
-  late User userProfile = User(
-      id: '',
-      username: '',
-      email: '',
-      profileImage: '',
-      memberSince: null,
-      role: '',
-      recipes: [],
-      following: [],
-      followedBy: [],
-      likedRecipes: [], followedByRequest: []); // Initialize with default value
+  late User userProfile =
+      Constants.defaultUser; // Initialize with default value
   List<Recipe> userRecipes = [];
   bool isLoading = false;
   final ScrollController _scrollController = ScrollController();

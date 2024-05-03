@@ -20,8 +20,24 @@ class Constants {
   static const desktopHeadingTitleSize = 24.0;
   static const topThreeTitleSize = 30.0;
 
-  static  User defaultUser = User(id: '', username: '', email: '', profileImage: '', memberSince: DateTime.now(), role: '', recipes: [], following: [], followedBy: [], likedRecipes: [], followedByRequest: []);
-
+  static User defaultUser = User(
+    id: '',
+    username: '',
+    email: '',
+    profileImage: '',
+    memberSince: DateTime.now(),
+    role: '',
+    recipes: [],
+    likedRecipes: [],
+    followers: [],
+    following: [],
+    followRequestsSent: [],
+    followRequestsReceived: [],
+    followRequestsCanceled: [],
+  );
+  static String emptyField = '';
+  static bool defaultBoolValue = false;
+  static List<User> defaultEmptyList = [];
   static const imageURL =
       kIsWeb ? 'http://localhost:3000' : 'http://192.168.12.229:3000';
 
@@ -29,9 +45,9 @@ class Constants {
       kIsWeb ? 'http://localhost:3000' : 'http://192.168.12.229:3000';
 
   static String calculateMembershipDuration(
-      BuildContext context, DateTime memberSince) {
+      BuildContext context, DateTime? memberSince) {
     final now = DateTime.now();
-    final difference = now.difference(memberSince);
+    final difference = now.difference(memberSince!);
 
     if (difference.inDays >= 365) {
       final years = (difference.inDays / 365).floor();

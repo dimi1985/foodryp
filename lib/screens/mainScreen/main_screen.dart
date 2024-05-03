@@ -35,19 +35,7 @@ class _MainScreenState extends State<MainScreen> {
   UsersProvider usersProvider = UsersProvider();
   late String currentPage;
 
-  User user = User(
-    id: '',
-    username: '',
-    email: '',
-    profileImage: '',
-    gender: '',
-    memberSince: null,
-    role: '',
-    recipes: [],
-    following: [],
-    followedBy: [],
-    likedRecipes: [], followedByRequest: [],
-  );
+  User user = Constants.defaultUser;
 
   @override
   void initState() {

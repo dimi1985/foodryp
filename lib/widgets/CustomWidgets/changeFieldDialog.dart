@@ -9,14 +9,14 @@ class ChangeFieldDialog extends StatefulWidget {
   final bool isForPassword;
 
   const ChangeFieldDialog({
-    Key? key,
+    super.key,
     required this.context,
     required this.title,
     required this.hintText,
     required this.newHintText,
     required this.onSave,
     required this.isForPassword,
-  }) : super(key: key);
+  });
 
   @override
   _ChangeFieldDialogState createState() => _ChangeFieldDialogState();
@@ -77,9 +77,7 @@ class _ChangeFieldDialogState extends State<ChangeFieldDialog> {
                 ),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
                   ),
                   onPressed: () {
                     setState(() {

@@ -46,7 +46,7 @@ class _MenuWebItemsState extends State<MenuWebItems> {
   Widget build(BuildContext context) {
     final List<String> menuItems = [
       'Home',
-      'Creators',
+      if (isAuthenticated) 'Creators',
       'Recipes',
       if (isAuthenticated) 'My Fridge',
       if (!isAuthenticated) 'Sign Up/Sign In',
@@ -145,15 +145,15 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                   ? Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              CreatorsPage(user: widget.user ?? Constants.defaultUser),
+                          builder: (context) => CreatorsPage(
+                              user: widget.user ?? Constants.defaultUser),
                           maintainState: true),
                       (Route<dynamic> route) => false)
                   : Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              CreatorsPage(user: widget.user ?? Constants.defaultUser)),
+                          builder: (context) => CreatorsPage(
+                              user: widget.user ?? Constants.defaultUser)),
                     );
               break;
 
@@ -162,15 +162,15 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                   ? Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              MyFridgePage(user: widget.user ?? Constants.defaultUser),
+                          builder: (context) => MyFridgePage(
+                              user: widget.user ?? Constants.defaultUser),
                           maintainState: true),
                       (Route<dynamic> route) => false)
                   : Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              MyFridgePage(user: widget.user ?? Constants.defaultUser)),
+                          builder: (context) => MyFridgePage(
+                              user: widget.user ?? Constants.defaultUser)),
                     );
               break;
 

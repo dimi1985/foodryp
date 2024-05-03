@@ -13,24 +13,6 @@ class RecipeService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<List<Recipe>> getAllRecipes() async {
-    final response = await http.get(
-      Uri.parse('${Constants.baseUrl}/api/recipes'),
-    );
-
-    if (response.statusCode == 200) {
-      final decodedData = jsonDecode(response.body) as List<dynamic>;
-
-      final recipes =
-          decodedData.map((recipeJson) => Recipe.fromJson(recipeJson)).toList();
-
-      return recipes;
-    } else {
-      // Handle API errors gracefully (e.g., throw an exception)
-      throw Exception('Failed to load recipes');
-    }
-  }
-
   Future<List<Recipe>> getFixedRecipes(int desiredLength) async {
     final response = await http.get(
       Uri.parse(
@@ -46,7 +28,7 @@ class RecipeService {
       return recipes;
     } else {
       // Handle API errors gracefully (e.g., throw an exception)
-      throw Exception('Failed to load recipes');
+      return [];
     }
   }
 
@@ -64,7 +46,8 @@ class RecipeService {
       return recipes;
     } else {
       // Handle API errors gracefully (e.g., throw an exception)
-      throw Exception('Failed to load recipes');
+
+      return [];
     }
   }
 
@@ -253,7 +236,7 @@ class RecipeService {
 
       return recipes;
     } else {
-      throw Exception('Failed to load user recipes');
+      return [];
     }
   }
 
@@ -275,7 +258,7 @@ class RecipeService {
 
       return recipes;
     } else {
-      throw Exception('Failed to load user recipes');
+      return [];
     }
   }
 
@@ -295,7 +278,7 @@ class RecipeService {
 
       return recipes;
     } else {
-      throw Exception('Failed to load public user recipes');
+      return [];
     }
   }
 
@@ -363,17 +346,19 @@ class RecipeService {
 
         return recipes;
       } else {
-        throw Exception('Failed to load recipes by category');
+        return [];
       }
     } catch (e) {
-      throw Exception('Failed to load recipes by category: $e');
+      return [];
     }
   }
 
-   Future<List<Recipe>> getRecipesBySearch(String searchQuery, int page, int pageSize) async {
+  Future<List<Recipe>> getRecipesBySearch(
+      String searchQuery, int page, int pageSize) async {
     // Encodes the search query to handle special characters in URL
     final encodedQuery = Uri.encodeComponent(searchQuery);
-    final url = Uri.parse('${Constants.baseUrl}/api/searchRecipesByName?query=$encodedQuery&page=$page&pageSize=$pageSize');
+    final url = Uri.parse(
+        '${Constants.baseUrl}/api/searchRecipesByName?query=$encodedQuery&page=$page&pageSize=$pageSize');
 
     try {
       final response = await http.get(url);
@@ -383,11 +368,11 @@ class RecipeService {
         // Map each JSON object to a Recipe model
         return data.map((recipeData) => Recipe.fromJson(recipeData)).toList();
       } else {
-        throw Exception('Failed to load recipes');
+        return [];
       }
     } catch (error) {
       print('Error fetching recipes: $error');
-      throw Exception('Error fetching recipes: $error');
+      return [];
     }
   }
 

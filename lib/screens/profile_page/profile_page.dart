@@ -1,16 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/creators_page/creators_page.dart';
 import 'package:foodryp/screens/profile_page/components/recipe_card_profile.dart';
 import 'package:foodryp/screens/profile_page/components/top_profile.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/creators_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
@@ -24,7 +20,6 @@ class ProfilePage extends StatefulWidget {
     required this.user,
     this.publicUsername,
   });
-
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -51,7 +46,6 @@ class _ProfilePageState extends State<ProfilePage> {
       userProfile =
           await userService.getPublicUserProfile(widget.user.username);
     }
-
 
     setState(() {
       widget.user = userProfile!;
@@ -110,7 +104,6 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 600,
             child: RecipeCardProfile(publicUsername: widget.user.username),
           ),
-         
         ],
       ),
     );

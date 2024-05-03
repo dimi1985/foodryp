@@ -50,6 +50,7 @@
     "Unfollow": "Unfollow",
     "Follow": "Follow",
     "Following": "Following",
+    "Follow Back": "Follow Back",
     "Message": "Message",
     "Recipe Title": "Recipe Title",
     "Description": "Description",
@@ -109,7 +110,12 @@
     "Ingredients": "Ingredients",
     "Instructions:": "Instructions:",
     "Difficulty:": "Difficulty:",
-    "No users are following you yet.": "No users are following you yet."
+    "No users are following you yet.": "No users are following you yet.",
+    "Comments": "Comments",
+    "Posted by:": "Posted by:",
+    "Write a comment...": "Write a comment...",
+    "Remove": "Remove"
+    
     
   }
   
