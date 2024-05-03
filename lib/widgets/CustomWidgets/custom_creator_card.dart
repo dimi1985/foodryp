@@ -1,8 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 
 class CustomCreatorCard extends StatefulWidget {
   final User user;
@@ -42,94 +42,118 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(widget.user.username),
-      subtitle: Text(
-        widget.user.followRequestsCanceled.contains(widget.currentLoggedUserId)
-            ? 'User is following you, you can follow back at any time'
-            : widget.user.email,
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: ListTile(
+        leading: ImagePickerPreviewContainer(
+          initialImagePath: widget.user.profileImage,
+          containerSize: 30,
+          onImageSelected: (image, bytes) {},
+          gender: widget.user.gender ?? Constants.emptyField,
+          isFor: Constants.emptyField,
+          isForEdit: Constants.defaultBoolValue,
+          allowSelection: false,
+        ),
+        title: Text(widget.user.username,
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(
+          widget.user.followRequestsCanceled
+                  .contains(widget.currentLoggedUserId)
+              ? 'User is following you, you can follow back at any time'
+              : widget.user.email,
+          style: TextStyle(color: Colors.grey.shade600),
+        ),
+        trailing:SizedBox(
+          height: 75,
+          width: widget.user.followRequestsSent.contains(widget.currentLoggedUserId) ? 250 : 100,
+          child: widget.user.followRequestsSent.contains(widget.currentLoggedUserId)
+              ? Row(
+                  children: [
+                    if (!requestRejected)
+                      Flexible(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              buttonText = 'Following Back';
+                              requestAccepted = true;
+                            });
+                            UserService().rejectFollowRequest(widget.user.id).then((success) {
+                              if (success) {
+                                // Handle success, maybe refresh state or show a message
+                              }
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor, // Use the primary theme color
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                          ),
+                          child: Text(buttonText,style: const TextStyle(color: Constants.secondaryColor),),
+                        ),
+                      ),
+                    const SizedBox(width: 10),
+                    if (!requestAccepted)
+                      Flexible(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              buttonText = 'No Thanks';
+                              requestRejected = true;
+                            });
+                            UserService().rejectFollowRequest(widget.user.id);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red, // Color for rejection
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                          ),
+                          child: const Text('No Thanks',style: TextStyle(color: Constants.secondaryColor)),
+                        ),
+                      ),
+                  ],
+                )
+              : ElevatedButton(
+          onPressed: () => buttonPressAction(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor:
+                Theme.of(context).primaryColor, // Use the primary theme color
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+          child: Text(buttonText,style: const TextStyle(color: Constants.secondaryColor),),
+        ),
       ),
-      trailing: SizedBox(
-        height: 75,
-        width:
-            widget.user.followRequestsSent.contains(widget.currentLoggedUserId)
-                ? 250
-                : 100,
-        child: widget.user.followRequestsSent
-                .contains(widget.currentLoggedUserId)
-            ? Row(
-                children: [
-                  if (!requestRejected)
-                    Flexible(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            buttonText = 'Following Back';
-                            requestAccepted = true;
-                          });
-                          // Logic for following back
-                          UserService()
-                              .rejectFollowRequest(widget.user.id)
-                              .then((success) {
-                            if (success) {}
-                          });
-                        },
-                        child: Text(buttonText),
-                      ),
-                    ),
-                  const SizedBox(width: 10),
-                  if (!requestAccepted)
-                    Flexible(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            buttonText = 'No Thanks';
-                            requestRejected = true;
-                          });
-                          // Logic for rejecting follow request
-                          UserService().rejectFollowRequest(widget.user.id);
-                        },
-                        child: const Text('No Thanks'),
-                      ),
-                    ),
-                ],
-              )
-            : ElevatedButton(
-                onPressed: () {
-                  if (widget.user.followers
-                      .contains(widget.currentLoggedUserId)) {
-                    // Implement logic for following user
-                    setState(() {
-                      buttonText = 'UnFollowing';
-                    });
-                    UserService().unFollow(widget.user.id);
-                  } else if (widget.user.followRequestsCanceled
-                      .contains(widget.currentLoggedUserId)) {
-                    setState(() {
-                      buttonText = 'Following Back';
-                    });
-                    UserService().followBack(widget.user.id);
-                  } else if (!widget.user.following.contains(widget.user.id) &&
-                      !widget.user.followRequestsSent
-                          .contains(widget.user.id) &&
-                      !widget.user.followRequestsReceived
-                          .contains(widget.user.id) &&
-                      !widget.user.followRequestsCanceled
-                          .contains(widget.user.id)) {
-                    UserService().followUser(widget.user.id);
+    ));
+  }
 
-                    setState(() {
-                      buttonText = widget.user.following
-                              .contains(widget.currentLoggedUserId)
-                          ? 'Following'
-                          : 'Sent Request';
-                    });
-                    // Implement logic for accepting follow request
-                  }
-                },
-                child: Text(buttonText),
-              ),
-      ),
-    );
+  void buttonPressAction() {
+    // Include your existing logic to handle button press here.
+    // This part should handle different states like following, unfollowing, etc.
+    if (widget.user.followers.contains(widget.currentLoggedUserId)) {
+      // Implement logic for following user
+      setState(() {
+        buttonText = 'UnFollowing';
+      });
+      UserService().unFollow(widget.user.id);
+    } else if (widget.user.followRequestsCanceled
+        .contains(widget.currentLoggedUserId)) {
+      setState(() {
+        buttonText = 'Following Back';
+      });
+      UserService().followBack(widget.user.id);
+    } else if (!widget.user.following.contains(widget.user.id) &&
+        !widget.user.followRequestsSent.contains(widget.user.id) &&
+        !widget.user.followRequestsReceived.contains(widget.user.id) &&
+        !widget.user.followRequestsCanceled.contains(widget.user.id)) {
+      UserService().followUser(widget.user.id);
+
+      setState(() {
+        buttonText = widget.user.following.contains(widget.currentLoggedUserId)
+            ? 'Following'
+            : 'Sent Request';
+      });
+      // Implement logic for accepting follow request
+    }
   }
 }

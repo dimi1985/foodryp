@@ -34,7 +34,6 @@ class _MainScreenState extends State<MainScreen> {
   bool valueSet = false;
   UsersProvider usersProvider = UsersProvider();
   late String currentPage;
-
   User user = Constants.defaultUser;
 
   @override
@@ -62,31 +61,29 @@ class _MainScreenState extends State<MainScreen> {
     final bool isDesktop = Responsive.isDesktop(context);
     return SafeArea(
       child: Scaffold(
-        appBar: kIsWeb
-            ? CustomAppBar(
-                isDesktop: true,
-                isAuthenticated: true,
-                profileImage: user.profileImage,
-                username: user.username,
-                onTapProfile: () {
-                  // Handle profile onTap action
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ProfilePage(
-                              user: user,
-                            )),
-                  );
-                },
-                user: user,
-                menuItems: isDesktop
-                    ? MenuWebItems(
+        appBar: CustomAppBar(
+          isDesktop: true,
+          isAuthenticated: true,
+          profileImage: user.profileImage,
+          username: user.username,
+          onTapProfile: () {
+            // Handle profile onTap action
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
                         user: user,
-                        currentPage: currentPage,
-                      )
-                    : Container(),
-              )
-            : AppBar(),
+                      )),
+            );
+          },
+          user: user,
+          menuItems: isDesktop
+              ? MenuWebItems(
+                  user: user,
+                  currentPage: currentPage,
+                )
+              : Container(),
+        ),
         endDrawer: !isDesktop
             ? MenuWebItems(user: user, currentPage: currentPage)
             : null,

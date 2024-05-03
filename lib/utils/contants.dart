@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/celebration_day.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 
@@ -38,6 +39,7 @@ class Constants {
   static String emptyField = '';
   static bool defaultBoolValue = false;
   static List<User> defaultEmptyList = [];
+  static List<CelebrationDay> defaultCelebEmptyList = [];
   static const imageURL =
       kIsWeb ? 'http://localhost:3000' : 'http://192.168.12.229:3000';
 

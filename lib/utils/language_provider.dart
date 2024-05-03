@@ -12,7 +12,6 @@ class LanguageProvider with ChangeNotifier {
     _currentLanguageCode = languageCode;
     // Notify listeners to update the UI language
     notifyListeners();
-    log('provider got here');
     // Save the selected language code to shared preferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('languageCode', languageCode);
@@ -22,7 +21,6 @@ class LanguageProvider with ChangeNotifier {
     // Load the selected language code from shared preferences
     final prefs = await SharedPreferences.getInstance();
     final savedLanguageCode = prefs.getString('languageCode');
-    log('load launguage got here with launguage code :  $savedLanguageCode');
     if (savedLanguageCode != null) {
       _currentLanguageCode = savedLanguageCode;
       notifyListeners();

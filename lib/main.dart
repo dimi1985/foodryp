@@ -1,7 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
+import 'package:foodryp/database/database_helper.dart';
 import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/connectivity_provider.dart';
 import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
@@ -16,6 +18,8 @@ void main() async {
   // Initialize the language provider and load the language
   // Ensure that the necessary bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
+   var db = getDatabase(); // This will fetch the appropriate database instance
+  await db.init();        // Initialize the database
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? languageCode = prefs.getString('languageCode');
   String? countryCode = prefs.getString('countryCode');
@@ -32,6 +36,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => UsersProvider()),
         ChangeNotifierProvider(create: (_) => SearchSettingsProvider()),
         ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
+           ChangeNotifierProvider(create: (_) => CelebrationSettingsProvider()),
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),

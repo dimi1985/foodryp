@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodryp/main.dart';
@@ -8,12 +9,14 @@ import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/screens/settings_page/components/delete_account_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/language.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:foodryp/widgets/CustomWidgets/celebration_input.dart';
 import 'package:foodryp/widgets/CustomWidgets/changeFieldDialog.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/language_settings_tile.dart';
@@ -75,6 +78,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
     final searchSettingsProvider = Provider.of<SearchSettingsProvider>(context);
+     final settingsProvider = Provider.of<CelebrationSettingsProvider>(context);
+
+    int currentSelection = settingsProvider.daysBeforeNotification;
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) {
@@ -411,7 +417,46 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
               ],
-            )
+            ),
+             _sectionTitle(
+                AppLocalizations.of(context).translate(AppLocalizations.of(context)
+                .translate('Celebration Day Input'))),
+              const SizedBox(
+                height: 400,
+           
+                child: CelebrationInput()),
+
+ _sectionTitle(
+                AppLocalizations.of(context).translate(AppLocalizations.of(context)
+                .translate('Celebration Day Notification'))),
+                Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Days Before Notification',
+              style: TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+                  height: 400,
+              child: ListView.builder(
+                      itemCount: 31,
+                      itemBuilder: (context, index) {
+                        final days = index + 1;
+                        return RadioListTile<int>(
+              title: Text('$days days'),
+              value: days,
+              groupValue: currentSelection,
+              onChanged: (value) {
+                settingsProvider.setDaysBeforeNotification(value!);
+                log(value.toString());
+              },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        )
             // Add units and measurements settings tiles here
           ],
         ),

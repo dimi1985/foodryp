@@ -43,7 +43,7 @@ class _CreatorsPageState extends State<CreatorsPage> {
       setState(() {
         currentLoggedUserId = getCurrentUserId;
         _users = users.where((user) => user.id != widget.user.id).toList();
-      
+
         _isLoading = false;
       });
     } catch (e) {
@@ -86,15 +86,29 @@ class _CreatorsPageState extends State<CreatorsPage> {
           : null,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _users.length,
-              itemBuilder: (context, index) {
-                final user = _users[index];
-                return CustomCreatorCard(
-                  user: user,
-                  currentLoggedUserId: currentLoggedUserId,
-                );
-              },
+          : Padding(
+              padding: const EdgeInsets.all(Constants.defaultPadding),
+              child: ListView.builder(
+                itemCount: _users.length,
+                itemBuilder: (context, index) {
+                  final user = _users[index];
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfilePage(
+                                  user: user,
+                                )),
+                      );
+                    },
+                    child: CustomCreatorCard(
+                      user: user,
+                      currentLoggedUserId: currentLoggedUserId,
+                    ),
+                  );
+                },
+              ),
             ),
     );
   }

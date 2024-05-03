@@ -1,0 +1,10 @@
+// filename: database_interface.dart
+import 'package:foodryp/models/celebration_day.dart';
+
+abstract class DatabaseInterface {
+  Future<void> init();
+  Future<int> insertCelebration(CelebrationDay celebration);
+  Future<List<CelebrationDay>> queryAllCelebrations();
+  Future<int> updateCelebration(CelebrationDay celebration);
+  Future<int> deleteCelebration(int id);
+}
