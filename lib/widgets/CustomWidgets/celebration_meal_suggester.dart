@@ -70,9 +70,13 @@ class _CelebrationMealSuggesterState extends State<CelebrationMealSuggester> {
             style: const TextStyle(color: Colors.blue, fontSize: 14.0),
           ),
           const SizedBox(height: 20),
-          Text(
-            '${upcomingCelebration.description} is on ${DateFormat('d MMMM').format(upcomingCelebration.dueDate)} so in $daysUntilCelebration days!',
-            style: const TextStyle(color: Colors.blue, fontSize: 14.0),
+          Expanded(
+            child: Text(
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              '${upcomingCelebration.description} is on ${DateFormat('d MMMM').format(upcomingCelebration.dueDate)} so in $daysUntilCelebration days!',
+              style: const TextStyle(color: Colors.blue, fontSize: 14.0),
+            ),
           ),
         ],
       );

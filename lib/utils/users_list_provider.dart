@@ -1,10 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/utils/user_service.dart';
 
-class UsersProvider extends ChangeNotifier {
+class UsersListProvider extends ChangeNotifier {
   late List<User> _users = [];
 
   List<User> get users => _users;
@@ -13,7 +11,7 @@ class UsersProvider extends ChangeNotifier {
 
     if(valueSet){
  try {
-      log('fetching all users:');
+     
       final userList = await UserService.getAllUsers();
       _users = userList;
       notifyListeners();

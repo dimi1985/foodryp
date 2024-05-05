@@ -1,10 +1,13 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, must_be_immutable
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/profile_page/components/recipe_card_profile.dart';
+import 'package:foodryp/screens/profile_page/components/recipe_card_profile_section.dart';
 import 'package:foodryp/screens/profile_page/components/top_profile.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
+import 'package:foodryp/screens/settings_page/settings_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
@@ -27,6 +30,8 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late String currentPage;
+  final userService = UserService();
+  User? userProfile;
   @override
   void initState() {
     super.initState();
@@ -35,9 +40,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> fetchUserProfile() async {
-    final userService = UserService();
-    User? userProfile;
-
     if (widget.user.username.isEmpty) {
       // Fetch user profile if it's the logged-in user's profile
       userProfile = await userService.getUserProfile();
@@ -48,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     setState(() {
-      widget.user = userProfile!;
+      widget.user = userProfile ?? Constants.defaultUser;
     });
   }
 
@@ -70,13 +72,24 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   : Container(),
             )
-          : AppBar(),
+            
+          : AppBar(
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    _goToSettingsPage(userProfile);
+                  },
+                  icon: const Icon(Icons.settings),
+                ),
+              ],
+            ),
       body: ListView(
+        shrinkWrap: true,
         children: [
           TopProfile(user: widget.user),
           const SizedBox(height: 10.0),
           HeadingTitleRow(
-            title: 'Weekly Menus',
+            title: AppLocalizations.of(context).translate('Weekly Menus'),
             onPressed: () {},
             showSeeALl: false,
           ),
@@ -87,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
               publicUserId: widget.user.id),
           const SizedBox(height: 25.0),
           HeadingTitleRow(
-              title: 'Recipes',
+              title: AppLocalizations.of(context).translate('Recipes'),
               onPressed: () {
                 // Navigate to the corresponding page
                 Navigator.push(
@@ -101,11 +114,21 @@ class _ProfilePageState extends State<ProfilePage> {
               showSeeALl: false),
           const SizedBox(height: 10.0),
           SizedBox(
-            height: 600,
-            child: RecipeCardProfile(publicUsername: widget.user.username),
-          ),
+              height: MediaQuery.of(context).size.height,
+              child: RecipeCardProfileSection(
+                  publicUsername: widget.user.username)),
         ],
       ),
+    );
+  }
+
+  void _goToSettingsPage(User? userProfile) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => SettingsPage(
+                user: userProfile ?? Constants.defaultUser,
+              )),
     );
   }
 }

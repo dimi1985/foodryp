@@ -1,14 +1,18 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'package:flutter/foundation.dart';
+import 'package:universal_io/io.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/database/database_helper.dart';
+import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/connectivity_provider.dart';
 import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
-import 'package:foodryp/utils/user_provider.dart';
+import 'package:foodryp/utils/user_profile_provider.dart';
+import 'package:foodryp/utils/users_list_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/mainScreen/main_screen.dart';
@@ -33,10 +37,11 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => LanguageProvider(),
         ),
-        ChangeNotifierProvider(create: (_) => UsersProvider()),
+        ChangeNotifierProvider(create: (_) => UsersListProvider()),
         ChangeNotifierProvider(create: (_) => SearchSettingsProvider()),
         ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
            ChangeNotifierProvider(create: (_) => CelebrationSettingsProvider()),
+               ChangeNotifierProvider(create: (_) => UserProfileProvider()),
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),
@@ -64,9 +69,7 @@ class _FoodrypState extends State<Foodryp> {
 
   @override
   Widget build(BuildContext context) {
-    // Retrieve providers
-
-    // final languageProvider = Provider.of<LanguageProvider>(context);
+    
 
     return ChangeNotifierProvider(
       create: (BuildContext context) => ThemeProvider(),
@@ -87,7 +90,7 @@ class _FoodrypState extends State<Foodryp> {
               Locale('el', 'GR'),
             ],
             locale: _locale,
-            home: MainScreen(),
+            home: determineMobileLayout(),
           );
         },
       ),
@@ -102,4 +105,16 @@ class _FoodrypState extends State<Foodryp> {
       _locale = locale;
     });
   }
+  
+  
+  Widget determineMobileLayout() {
+    // Check if the platform is Android
+    if (kIsWeb) {
+      return const MainScreen() ;
+    } else {
+      // Optionally handle other platforms, such as iOS
+      return const BottomNavScreen();  // Default to web layout for other platforms
+    }
+  }
+
 }

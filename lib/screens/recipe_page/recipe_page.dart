@@ -138,6 +138,8 @@ class _RecipePageState extends State<RecipePage> {
     final searchSettingsProvider = Provider.of<SearchSettingsProvider>(context);
     bool searchOnEveryKeystroke = searchSettingsProvider.searchOnEveryKeystroke;
 
+
+
     return Scaffold(
       appBar: kIsWeb
           ? CustomAppBar(

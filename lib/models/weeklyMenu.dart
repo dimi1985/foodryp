@@ -8,6 +8,8 @@ class WeeklyMenu {
   final String userId;
   final String username;
   final String userProfileImage;
+    final DateTime dateCreated;
+
 
   WeeklyMenu({
     required this.id,
@@ -16,6 +18,7 @@ class WeeklyMenu {
     required this.userId,
     required this.username,
     required this.userProfileImage,
+     required this.dateCreated,
   });
 
   factory WeeklyMenu.fromJson(Map<String, dynamic> json) {
@@ -31,6 +34,8 @@ class WeeklyMenu {
       userId: json['userId'],
       username: json['username'],
       userProfileImage: json['userProfileImage'],
+       dateCreated:
+          json['dateCreated'] != null ? DateTime.parse(json['dateCreated']) : DateTime.now(),
     );
   }
 }

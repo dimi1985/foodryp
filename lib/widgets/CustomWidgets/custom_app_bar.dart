@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/mainScreen/components/logo_widget.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -36,18 +35,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: 80,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const LogoWidget(),
           const Text('Foodryp'),
           if (isDesktop)
             Expanded(
-              flex: Responsive.isDesktop(context) ? 3 : 2,
+              flex: isDesktop ? 3 :1,
               child: SizedBox(
                 width: screenSize.width,
-                height: 100,
+                height: isDesktop ? 100:50,
                 child: menuItems,
               ),
             ),
+    
           if (isAuthenticated)
             Padding(
               padding: const EdgeInsets.only(right: 25),
@@ -59,7 +60,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ? Container()
                       : ImagePickerPreviewContainer(
                           initialImagePath: user.profileImage,
-                          containerSize: 30,
+                          containerSize:isDesktop ?  30 : 20,
                           onImageSelected: (iamge, bytes) {},
                           gender: user.gender ?? '',
                           isFor: '',

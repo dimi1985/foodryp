@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/screens/add_weekly_menu_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:intl/intl.dart';
 
 class CustomWeeklyMenuCard extends StatefulWidget {
   final WeeklyMenu meal;
@@ -27,119 +29,99 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    return Padding(
-      padding: const EdgeInsets.all(Constants.defaultPadding),
+    double cardWidth = MediaQuery.of(context).size.width < 600
+        ? MediaQuery.of(context).size.width
+        : 300;
+    return Center(
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
+        surfaceTintColor: Colors.white,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
         child: SizedBox(
-          width: 300,
+          width: cardWidth,
           height: 300,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(Constants.defaultPadding),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Top section: Image and recipe details
-                Expanded(
-                  child: ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: widget.meal.dayOfWeek.length,
-                    itemBuilder: (context, index) {
-                      final dayOfWeek = widget.meal.dayOfWeek[index];
-                      final recipeImage =
-                          ('${Constants.baseUrl}/${dayOfWeek.recipeImage}')
-                              .replaceAll('\\', '/');
-                      return SizedBox(
-                        width: widget.currentPage == 'WeeklyMenuPage' ? 75 : 43,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(2),
-                          child: Image.network(
-                            recipeImage,
-                            fit: BoxFit.cover,
-                            filterQuality: FilterQuality.none,
-                          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: widget.meal.dayOfWeek.length,
+                  itemBuilder: (context, index) {
+                    final imageUrl =
+                        '${Constants.baseUrl}/${widget.meal.dayOfWeek[index].recipeImage}'
+                            .replaceAll('\\', '/');
+                    return Container(
+                      width: cardWidth /
+                          widget.meal.dayOfWeek
+                              .length, // Dynamic width based on number of images
+                      margin: const EdgeInsets.symmetric(horizontal: 1),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(imageUrl),
                         ),
-                      );
-                    },
-                  ),
+                        borderRadius: index == 0
+                            ? const BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                bottomLeft: Radius.circular(0))
+                            : index == widget.meal.dayOfWeek.length - 1
+                                ? const BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(0))
+                                : BorderRadius.zero,
+                      ),
+                    );
+                  },
                 ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(Constants.defaultPadding),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(Constants.defaultPadding),
-                        bottomRight: Radius.circular(Constants.defaultPadding),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(Constants.defaultPadding),
+                child: Row(
+                  children: [
+                    ImagePickerPreviewContainer(
+                      containerSize: 10,
+                      onImageSelected: (file, list) {},
+                      gender: '',
+                      isFor: '',
+                      initialImagePath: widget.meal.userProfileImage,
+                      isForEdit: false,
+                      allowSelection: false,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      widget.meal.username,
+                      style: TextStyle(
+                        fontSize: Responsive.isDesktop(context)
+                            ? Constants.desktopFontSize
+                            : Constants.mobileFontSize,
+                        color: Colors.black,
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            ImagePickerPreviewContainer(
-                              containerSize: 10,
-                              onImageSelected: (file, list) {},
-                              gender: '',
-                              isFor: '',
-                              initialImagePath: widget.meal.userProfileImage,
-                              isForEdit: false,
-                              allowSelection: false,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              widget.meal.username,
-                              style: TextStyle(
-                                fontSize: Responsive.isDesktop(context)
-                                    ? Constants.desktopFontSize
-                                    : Constants.mobileFontSize,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(
-                                width: 5), // Adjust the spacing as needed
-                            Text(
-                              '•',
-                              style: TextStyle(
-                                fontSize: Responsive.isDesktop(context)
-                                    ? Constants.desktopFontSize
-                                    : Constants.mobileFontSize,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-
-                            // Text(
-                            //   DateFormat('dd MMM yyyy')
-                            //       .format(recipe.date), // Format the date
-                            //   style: TextStyle(
-                            //     fontSize: Responsive.isDesktop(context)
-                            //         ? Constants.desktopFontSize
-                            //         : Constants.mobileFontSize,
-                            //     color: Colors.black,
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  widget.meal.title.toUpperCase(),
-                                ),
-                              ),
-                              const Spacer(),
-                              !widget.isForAll &&
+                    const SizedBox(width: 5), // Adjust the spacing as needed
+                    Text(
+                      '•',
+                      style: TextStyle(
+                        fontSize: Responsive.isDesktop(context)
+                            ? Constants.desktopFontSize
+                            : Constants.mobileFontSize,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                
+                    Text(
+                      DateFormat('dd MMM yyyy')
+                          .format(widget.meal.dateCreated), // Format the date
+                      style: TextStyle(
+                        fontSize: Responsive.isDesktop(context)
+                            ? Constants.desktopFontSize
+                            : Constants.mobileFontSize,
+                        color: Colors.black,
+                      ),
+                    ),
+                    !widget.isForAll &&
                                       widget.publicUserId ==
                                           widget.currentUserId
                                   ? IconButton(
@@ -156,16 +138,27 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                                       },
                                       icon: const Icon(Icons.edit))
                                   : Container()
-                            ],
-                          ),
-                        ),
-                        // You can add more widgets here if needed
-                      ],
-                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(widget.meal.title,
+                            style: Theme.of(context).textTheme.headline6),
+                      ),
+                        
+                              
+                    
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

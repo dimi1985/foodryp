@@ -74,4 +74,30 @@ class Recipe {
       meal: (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
     );
   }
+
+  Map<String, Object?> toJson() {
+  return {
+    '_id': id,
+    'recipeTitle': recipeTitle,
+    'recipeImage': recipeImage,
+    'ingredients': ingredients,
+    'instructions': instructions,
+    'prepDuration': prepDuration,
+    'cookDuration': cookDuration,
+    'servingNumber': servingNumber,
+    'difficulty': difficulty,
+    'username': username,
+    'useImage': useImage,
+    'userId': userId,
+    'dateCreated': dateCreated.toIso8601String(),
+    'description': description,
+    'categoryId': categoryId,
+    'categoryColor': categoryColor,
+    'categoryFont': categoryFont,
+    'categoryName': categoryName,
+    'likedBy': likedBy,
+    'meal': meal,
+  };
+}
+
 }

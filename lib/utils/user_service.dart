@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/user.dart';
@@ -91,6 +92,7 @@ class UserService {
     await _initPrefs();
     final userId =
         _prefs.getString('userId'); // Use 'userId' instead of 'userID'
+        log('This Methos is called from BottomNavigation and profile page');
 
     try {
       final response = await http.get(

@@ -1,4 +1,8 @@
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/recipe_deletion_confirmation_screen.dart';
@@ -34,6 +38,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
   void initState() {
     checkAuthenticationAndOwnershipStatus();
     uniqueIngredients = widget.missingIngredients?.toSet().toList();
+    log(widget.internalUse);
     super.initState();
   }
 
@@ -50,38 +55,53 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    bool isDesktop = Responsive.isDesktop(context);
     final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Constants.defaultPadding),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(isAndroid ? 0.2 : 0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3), // changes position of shadow
-          ),
-        ],
-      ),
+    return Card(
+      surfaceTintColor: Colors.white70,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Expanded(
-            flex: 2,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(Constants.defaultPadding),
-                topRight: Radius.circular(Constants.defaultPadding),
-              ),
-              child: Image.network(
-                recipeImage,
-                fit: BoxFit.cover,
-              ),
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(Constants.defaultPadding),
+                    topRight: Radius.circular(Constants.defaultPadding),
+                  ),
+                  child: Image.network(
+                    recipeImage,
+                    fit: BoxFit.cover,
+                    width: screenSize.width,
+                  ),
+                ),
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: HexColor(widget.recipe.categoryColor)
+                          .withOpacity(0.7),
+                    ),
+                    child: Text(
+                      overflow: TextOverflow.ellipsis,
+                      widget.recipe.categoryName.toUpperCase(),
+                      style: GoogleFonts.getFont(
+                        widget.recipe.categoryFont,
+                        fontSize: Responsive.isDesktop(context)
+                            ? Constants.desktopFontSize
+                            : Constants.mobileFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          Expanded(
-            flex: isAndroid ? 3 : 2,
-            child: Container(
+          Container(
               padding: const EdgeInsets.all(Constants.defaultPadding),
               decoration: const BoxDecoration(
                 color: Colors.white,
@@ -92,11 +112,14 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       ImagePickerPreviewContainer(
-                        containerSize: 10,
+                        containerSize: 20,
                         onImageSelected: (file, list) {},
                         gender: '',
                         isFor: '',
@@ -108,9 +131,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       Text(
                         widget.recipe.username,
                         style: TextStyle(
-                          fontSize: Responsive.isDesktop(context)
-                              ? Constants.desktopFontSize
-                              : Constants.mobileFontSize,
+                          fontSize: Responsive.isDesktop(context) ? 16 : 12,
                           color: Colors.black,
                         ),
                       ),
@@ -138,131 +159,76 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 5),
-
-                  Text(
-                    widget.recipe.difficulty,
-                    style: TextStyle(
-                      fontSize: Responsive.isDesktop(context)
-                          ? Constants.desktopFontSize
-                          : Constants.mobileFontSize,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            widget.recipe.recipeTitle.toUpperCase(),
-                            style: GoogleFonts.getFont(
-                              widget.recipe.categoryFont,
-                              fontSize: Responsive.isDesktop(context)
-                                  ? Constants.desktopFontSize
-                                  : Constants.mobileFontSize,
-                              fontWeight: FontWeight.bold,
-                              color: HexColor(widget.recipe.categoryColor)
-                                  .withOpacity(0.7),
-                            ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          overflow: TextOverflow.ellipsis,
+                          widget.recipe.recipeTitle.toUpperCase(),
+                          style: GoogleFonts.getFont(
+                            widget.recipe.categoryFont,
+                            fontSize: Responsive.isDesktop(context)
+                                ? Constants.desktopFontSize
+                                : Constants.mobileFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: HexColor(widget.recipe.categoryColor)
+                                .withOpacity(0.7),
                           ),
                         ),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            const Icon(Icons.favorite_border),
-                            Text(
-                              widget.recipe.likedBy.length.toString(),
-                            ),
-                            if (isOwner && isAuthenticated &&
-                                widget.internalUse != 'MainScreen' &&
-                                widget.internalUse != 'RecipePage')
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AddRecipePage(
-                                        recipe: widget.recipe,
-                                        isForEdit: isOwner,
-                                        user: null,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(Icons.edit),
-                              ),
-                            if (isOwner && isAuthenticated &&
-                                widget.internalUse != 'MainScreen' &&
-                                widget.internalUse != 'RecipePage')
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        RecipeDeletionConfirmationScreen(
-                                      recipe: widget.recipe,
-                                    ),
-                                  ));
-                                },
-                                icon: const Icon(Icons.delete),
-                              )
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  // You can add more widgets here if needed
-                  if (widget.missingIngredients != null &&
-                      widget.missingIngredients!.isNotEmpty)
-                    TextButton(
-                      onPressed: () => _showMissingIngredientsDialog(
-                          context, uniqueIngredients!),
-                      child: Text(
-                        '${AppLocalizations.of(context).translate('Missing Ingredients')}: ${uniqueIngredients?.length}',
-                        style: TextStyle(color: Colors.red.withOpacity(0.7)),
                       ),
-                    ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      if (isOwner &&
+                          isAuthenticated &&
+                          widget.internalUse != 'MainScreen' &&
+                          widget.internalUse != 'RecipePage' &&
+                          widget.internalUse != 'AddWeeklyMenuPage')
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddRecipePage(
+                                  recipe: widget.recipe,
+                                  isForEdit: isOwner,
+                                  user: null,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.edit),
+                        ),
+                      if (isOwner &&
+                          isAuthenticated &&
+                          widget.internalUse != 'MainScreen' &&
+                          widget.internalUse != 'RecipePage')
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  RecipeDeletionConfirmationScreen(
+                                recipe: widget.recipe,
+                              ),
+                            ));
+                          },
+                          icon: const Icon(Icons.delete),
+                        ),
+                      const Icon(Icons.favorite_border),
+                      Text(
+                        widget.recipe.likedBy.length.toString(),
+                      ),
+                    ],
+                  )
                 ],
-              ),
-            ),
-          ),
-          if (isAndroid)
-            const SizedBox(
-              height: 20,
-            )
+              ))
         ],
       ),
-    );
-  }
-
-  void _showMissingIngredientsDialog(
-      BuildContext context, List<String> missingIngredients) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-              AppLocalizations.of(context).translate('Missing Ingredients')),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView(
-              children: missingIngredients
-                  .map((ingredient) => ListTile(
-                          title: Text(
-                        ingredient,
-                        style: TextStyle(color: Colors.red.withOpacity(0.7)),
-                      )))
-                  .toList(),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

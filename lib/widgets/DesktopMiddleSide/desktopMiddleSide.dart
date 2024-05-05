@@ -25,6 +25,8 @@ class DesktopMiddleSide extends StatelessWidget {
           child: Scaffold(
             body: SingleChildScrollView(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const SizedBox(
                     height: 400,
@@ -79,10 +81,17 @@ class DesktopMiddleSide extends StatelessWidget {
                     },
                     showSeeALl: true,
                   ),
-                  const WeeklyMenuSection(
-                    showAll: true,
-                    publicUsername: '',
-                    publicUserId: '',
+                  
+                const  Padding(
+                    padding:  EdgeInsets.all(16),
+                    child:  Align(
+                      alignment: Alignment.topLeft,
+                      child:  WeeklyMenuSection(
+                        showAll: true,
+                        publicUsername: '',
+                        publicUserId: '',
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 15.0),
                 ],

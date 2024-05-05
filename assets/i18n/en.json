@@ -114,8 +114,21 @@
     "Comments": "Comments",
     "Posted by:": "Posted by:",
     "Write a comment...": "Write a comment...",
-    "Remove": "Remove"
-    
-    
+    "Remove": "Remove",
+    "You have reached the maximum number of selected recipes.": "You have reached the maximum number of selected recipes.",
+    "Add Weekly Menu": "Add Weekly Menu",
+    "Here you can check and put the meals of the day": "Here you can check and put the meals of the day",
+    "Enter Title": "Enter Title",
+    "Title": "Title",
+    "Update Menu": "Update Menu",
+    "Add Menu": "Add Menu",
+    "Monday": "Monday",
+    "Tuesday": "Tuesday",
+    "Wednesday": "Wednesday",
+    "Thursday": "Thursday",
+    "Friday": "Friday",
+    "Saturday": "Saturday",
+    "Sunday": "Sunday",
+    "Day": "Day"   
   }
   

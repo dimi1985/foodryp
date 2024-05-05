@@ -5,14 +5,14 @@ import 'package:sembast_web/sembast_web.dart';
 import 'package:foodryp/models/celebration_day.dart';
 
 class DatabaseSembast implements DatabaseInterface {
-  static const String dbName = 'celebration_database.db';
+  static const String dbName = 'foodryp_database.db';
   Database? _database;
   final store = intMapStoreFactory.store('celebrations');
 
   @override
   Future<void> init() async {
     if (_database != null) return;
-    const dbPath = 'celebration_database.db'; // Use a different path for web
+    const dbPath = 'foodryp_database.db'; // Use a different path for web
     _database = await databaseFactoryWeb.openDatabase(dbPath);
   }
 

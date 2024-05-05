@@ -116,6 +116,21 @@
     "Comments": "Σχόλια",
     "Posted by:": "Αναρτήθηκε από:",
     "Write a comment...": "Γράψε ένα σχόλιο...",
-    "Remove": "Aφαίρεση"
+    "Remove": "Aφαίρεση",
+    "You have reached the maximum number of selected recipes.": "Έχετε φτάσει τον μέγιστο αριθμό επιλεγμένων συνταγών.",
+    "Add Weekly Menu": "Προσθήκη εβδομαδιαίου μενού",
+    "Here you can check and put the meals of the day": "Εδώ μπορείτε να ελέγξετε και να βάλετε τα γεύματα της ημέρας",
+    "Enter Title": "Εισαγάγετε τον τίτλο",
+    "Title": "Τίτλο",
+    "Update Menu": "Ενημέρωση μενού",
+    "Add Menu": "Προσθήκη μενού",
+    "Monday": "Δευτέρα",
+    "Tuesday": "Τρίτη",
+    "Wednesday": "Wednesday",
+    "Thursday": "Τετάρτη",
+    "Friday": "Παρασκευή",
+    "Saturday": "Σάββατο",
+    "Sunday": "Κυριακή",
+    "Day": "Ημέρα"   
   }
   

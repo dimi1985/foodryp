@@ -75,10 +75,11 @@ class _ImagePickerPreviewContainerState
 
   @override
   Widget build(BuildContext context) {
-    bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    Size screenSize = MediaQuery.of(context).size;
+    bool isAndroid = Constants.checiIfAndroid(context);
     return InkWell(
       onTap: () {
-        if (widget.allowSelection && widget.onImageSelected != null) {
+        if (widget.allowSelection) {
           _pickImage(ImageSource.gallery);
         } else {
           return;
@@ -96,7 +97,12 @@ class _ImagePickerPreviewContainerState
                 borderRadius: BorderRadius.circular(8.0),
                 child: kIsWeb
                     ? imageIsPicked
-                        ? Image.memory(uint8list)
+                        ? Image.memory(
+                            uint8list,
+                            height: screenSize.height,
+                            width: screenSize.width,
+                            fit: BoxFit.cover,
+                          )
                         : widget.initialImagePath == null ||
                                 widget.initialImagePath!.isEmpty
                             ? widget.isFor.contains('Other')
@@ -118,15 +124,28 @@ class _ImagePickerPreviewContainerState
                               )
                     : isAndroid
                         ? imageIsPicked
-                            ? Image.network(
-                                finalProfileImageURL,
+                            ? Image.file(
+                                _imageFile!,
+                                height: screenSize.height,
+                                width: screenSize.width,
                                 fit: BoxFit.cover,
                               )
-                            : Image.asset(
-                                widget.gender.contains('female')
-                                    ? 'assets/default_avatar_female.jpg'
-                                    : 'assets/default_avatar_male.jpg',
-                              )
+                            : widget.initialImagePath == null ||
+                                    widget.initialImagePath!.isEmpty
+                                ? widget.isFor.contains('Other')
+                                    ? Center(
+                                        child: Icon(
+                                          Icons.add_photo_alternate,
+                                          size: widget.containerSize / 4,
+                                          color: Colors.grey,
+                                        ),
+                                      )
+                                    : Image.asset(
+                                        widget.gender.contains('female')
+                                            ? 'assets/default_avatar_female.jpg'
+                                            : 'assets/default_avatar_male.jpg',
+                                      )
+                                : Container()
                         : Container())
             : Center(
                 child: Icon(

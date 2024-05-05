@@ -40,11 +40,17 @@ class Constants {
   static bool defaultBoolValue = false;
   static List<User> defaultEmptyList = [];
   static List<CelebrationDay> defaultCelebEmptyList = [];
+   static TextStyle globalTextStyle = const TextStyle(color: Colors.black);
   static const imageURL =
       kIsWeb ? 'http://localhost:3000' : 'http://192.168.12.229:3000';
 
   static const baseUrl =
       kIsWeb ? 'http://localhost:3000' : 'http://192.168.12.229:3000';
+
+  static    bool checiIfAndroid(BuildContext context){
+        bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
+        return isAndroid;
+      }
 
   static String calculateMembershipDuration(
       BuildContext context, DateTime? memberSince) {

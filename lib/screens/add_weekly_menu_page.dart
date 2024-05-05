@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -141,9 +142,11 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    log(MediaQuery.of(context).size.height.toString());
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Weekly Menu'),
+        
+        title:  Text(AppLocalizations.of(context).translate('Add Weekly Menu')),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -177,12 +180,18 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Hi ${userProfile.username} Here you can check and put the meals of the day',
+                      
+                      '${userProfile.username} ${AppLocalizations.of(context).translate('Here you can check and put the meals of the day')}',
                     ),
-                    CustomTextField(
-                        controller: titleController,
-                        hintText: 'Enter Title',
-                        labelText: 'Title'),
+                    Padding(
+                      padding: const EdgeInsets.all(Constants.defaultPadding),
+                      child: CustomTextField(
+                        
+                          
+                          controller: titleController,
+                          hintText: AppLocalizations.of(context).translate('Enter Title'),
+                          labelText: AppLocalizations.of(context).translate('Title')),
+                    ),
                     TextButton(
                       onPressed: isLoading
                           ? null
@@ -201,7 +210,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                           userProfile.profileImage)
                                       .then((value) {
                                       if (value) {
-                                        print('Meal Updated');
+                                        //PUT SNAK
                                         setState(() {
                                           isLoading = false;
                                         });
@@ -215,15 +224,15 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                           userProfile.profileImage)
                                       .then((value) {
                                       if (value) {
-                                        print('Meal Saved');
+                                        //PUT SNAKS
                                         setState(() {
                                           isLoading = false;
                                         });
                                       }
                                     });
                             },
-                      child:
-                          Text(widget.isForEdit ? 'Update Menu' : 'Add Menu'),
+                      child: Text(AppLocalizations.of(context).translate(
+                          widget.isForEdit ? 'Update Menu' : 'Add Menu')),
                     )
                   ],
                 ),
@@ -252,90 +261,205 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                           itemBuilder: (context, index) {
                             if (index < userRecipes.length) {
                               final recipe = userRecipes[index];
+                              final recipeImage =
+                                  '${Constants.imageURL}/${recipe.recipeImage}'
+                                      .replaceAll('\r', '/');
                               return Padding(
                                 padding: const EdgeInsets.all(
                                     Constants.defaultPadding),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Opacity(
-                                      opacity:
-                                          recipeCheckedState[recipe] ?? false
-                                              ? 0.5
-                                              : 1.0,
-                                      child: ColorFiltered(
-                                        colorFilter:
+                                    Expanded(
+                                      child: Opacity(
+                                        opacity:
                                             recipeCheckedState[recipe] ?? false
-                                                ? const ColorFilter.mode(
-                                                    Colors.grey,
-                                                    BlendMode.saturation,
-                                                  )
-                                                : const ColorFilter.mode(
-                                                    Colors.transparent,
-                                                    BlendMode.saturation,
+                                                ? 0.5
+                                                : 1.0,
+                                        child: ColorFiltered(
+                                          colorFilter:
+                                              recipeCheckedState[recipe] ??
+                                                      false
+                                                  ? const ColorFilter.mode(
+                                                      Colors.grey,
+                                                      BlendMode.saturation,
+                                                    )
+                                                  : const ColorFilter.mode(
+                                                      Colors.transparent,
+                                                      BlendMode.saturation,
+                                                    ),
+                                          child: Column(
+                                            children: [
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(32),
+                                                  child: Stack(
+                                                    children: [
+                                                      Container(
+                                                        height: 200,
+                                                        width: 300,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors.grey
+                                                                  .withOpacity(
+                                                                      0.5),
+                                                              spreadRadius: 2,
+                                                              blurRadius: 5,
+                                                              offset:
+                                                                  const Offset(
+                                                                      0, 3),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: SizedBox(
+                                                          height: 200,
+                                                          width: 200,
+                                                          child: Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              // Left side - Day and recipe details
+                                                              Expanded(
+                                                                flex: 5,
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          20),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      // Recipe details
+                                                                      Text(
+                                                                        recipe
+                                                                            .recipeTitle,
+                                                                        style: GoogleFonts
+                                                                            .getFont(
+                                                                          recipe
+                                                                              .categoryFont,
+                                                                          color:
+                                                                              HexColor(recipe.categoryColor).withOpacity(0.7),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                          height:
+                                                                              10),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Checkbox(
+                                                                          value:
+                                                                              recipeCheckedState[recipe] ?? false,
+                                                                          onChanged:
+                                                                              (isChecked) {
+                                                                            setState(() {
+                                                                              if (isChecked != null) {
+                                                                                if (!isChecked!) {
+                                                                                  removedIndex = selectedRecipes.indexWhere((r) => r.id == recipe.id);
+
+                                                                                  selectedRecipes.removeWhere((r) => r.id == recipe.id);
+                                                                                  unSelectedRecipes.add(recipe);
+                                                                                } else {
+                                                                                  if (selectedRecipes.length < 7) {
+                                                                                    // Check if there was a previously removed item
+                                                                                    if (removedIndex != -1) {
+                                                                                      // Insert the new recipe at the previously removed index
+                                                                                      selectedRecipes.insert(removedIndex, recipe);
+
+                                                                                      // Reset removedIndex to indicate that it has been used
+                                                                                      removedIndex = -1;
+                                                                                    } else {
+                                                                                      // If no item was previously removed, just add the recipe to the end
+                                                                                      selectedRecipes.add(recipe);
+                                                                                    }
+
+                                                                                    unSelectedRecipes.removeWhere((r) => r.id == recipe.id);
+                                                                                  } else {
+                                                                                    // If the maximum limit of selected recipes is reached, keep the checkbox unchecked
+                                                                                    isChecked = false;
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(
+                                                                                        content: Text(
+                                                                                          AppLocalizations.of(context).translate('You have reached the maximum number of selected recipes.'),
+                                                                                        ),
+                                                                                      ),
+                                                                                    );
+                                                                                  }
+                                                                                }
+                                                                                // Update the checkbox states
+                                                                                recipeCheckedState[recipe] = isChecked!;
+                                                                              }
+                                                                            });
+                                                                          },
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              // Right side - Recipe image
+                                                              Expanded(
+                                                                flex: 5,
+                                                                child:
+                                                                    Container(
+                                                                  decoration:
+                                                                      const BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .only(
+                                                                      topRight:
+                                                                          Radius.circular(
+                                                                              20),
+                                                                      bottomRight:
+                                                                          Radius.circular(
+                                                                              20),
+                                                                    ),
+                                                                  ),
+                                                                  child:
+                                                                      ClipRRect(
+                                                                    borderRadius:
+                                                                        const BorderRadius
+                                                                            .only(
+                                                                      topRight:
+                                                                          Radius.circular(
+                                                                              20),
+                                                                      bottomRight:
+                                                                          Radius.circular(
+                                                                              20),
+                                                                    ),
+                                                                    child: Image
+                                                                        .network(
+                                                                      recipeImage,
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      width: double
+                                                                          .infinity,
+                                                                      height: double
+                                                                          .infinity,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                        child: SizedBox(
-                                          height: 300,
-                                          width: 300,
-                                          child: CustomRecipeCard(
-                                            internalUse: '',
-                                            recipe: recipe,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Checkbox(
-                                        value:
-                                            recipeCheckedState[recipe] ?? false,
-                                        onChanged: (isChecked) {
-                                          setState(() {
-                                            if (isChecked != null) {
-                                              if (!isChecked!) {
-                                                removedIndex = selectedRecipes
-                                                    .indexWhere((r) =>
-                                                        r.id == recipe.id);
-
-                                                selectedRecipes.removeWhere(
-                                                    (r) => r.id == recipe.id);
-                                                unSelectedRecipes.add(recipe);
-                                              } else {
-                                                if (selectedRecipes.length <
-                                                    7) {
-                                                  // Check if there was a previously removed item
-                                                  if (removedIndex != -1) {
-                                                    // Insert the new recipe at the previously removed index
-                                                    selectedRecipes.insert(
-                                                        removedIndex, recipe);
-
-                                                    // Reset removedIndex to indicate that it has been used
-                                                    removedIndex = -1;
-                                                  } else {
-                                                    // If no item was previously removed, just add the recipe to the end
-                                                    selectedRecipes.add(recipe);
-                                                  }
-
-                                                  unSelectedRecipes.removeWhere(
-                                                      (r) => r.id == recipe.id);
-                                                } else {
-                                                  // If the maximum limit of selected recipes is reached, keep the checkbox unchecked
-                                                  isChecked = false;
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text(
-                                                        'You have reached the maximum number of selected recipes.',
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              }
-                                              // Update the checkbox state
-                                              recipeCheckedState[recipe] =
-                                                  isChecked!;
-                                            }
-                                          });
-                                        },
                                       ),
                                     ),
                                   ],
@@ -395,8 +519,9 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            
                             Text(
-                              'Day ${index + 1}', // Adjust day text as needed
+                              '${AppLocalizations.of(context).translate('Day')} ${index + 1}', // Adjust day text as needed
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black.withOpacity(0.7),
@@ -468,38 +593,45 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
 
     switch (index) {
       case 0:
+     
+     
+      
+      
+     
+      
+      
         return Text(
-          'Monday',
+           AppLocalizations.of(context).translate('Monday'),
           style: textStyle,
         );
       case 1:
         return Text(
-          'Tuesday',
+           AppLocalizations.of(context).translate('Tuesday'),
           style: textStyle,
         );
       case 2:
         return Text(
-          'Wednesday',
+          AppLocalizations.of(context).translate('Wednesday'),
           style: textStyle,
         );
       case 3:
         return Text(
-          'Thursday',
+          AppLocalizations.of(context).translate('Thursday'),
           style: textStyle,
         );
       case 4:
         return Text(
-          'Friday',
+           AppLocalizations.of(context).translate('Friday'),
           style: textStyle,
         );
       case 5:
         return Text(
-          'Saturday',
+          AppLocalizations.of(context).translate('Saturday'),
           style: textStyle,
         );
       case 6:
         return Text(
-          'Sunday',
+          AppLocalizations.of(context).translate('Sunday'),
           style: textStyle,
         );
       default:

@@ -56,6 +56,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = Responsive.isDesktop(context);
     final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
+       final isAndroid =  Constants.checiIfAndroid(context);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -153,7 +154,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                         ),
                       ),
                       // Back button positioned on top-left
-                      if (Theme.of(context).platform == TargetPlatform.android)
+                      if (isAndroid)
                         Positioned(
                           top: 16.0, // Adjust padding from top
                           left: 16.0, // Adjust padding from left

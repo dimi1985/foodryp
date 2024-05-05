@@ -7,6 +7,7 @@ import 'package:foodryp/screens/creators_page/creators_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/screens/my_fridge_page.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
+import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -18,8 +19,7 @@ class MenuWebItems extends StatefulWidget {
   final User? user;
   final String currentPage; // Add this parameter
 
-  const MenuWebItems({Key? key, required this.user, required this.currentPage})
-      : super(key: key);
+  const MenuWebItems({super.key, required this.user, required this.currentPage});
 
   @override
   State<MenuWebItems> createState() => _MenuWebItemsState();
@@ -48,6 +48,7 @@ class _MenuWebItemsState extends State<MenuWebItems> {
       'Home',
       if (isAuthenticated) 'Creators',
       'Recipes',
+      'Weekly Menu Page',
       if (isAuthenticated) 'My Fridge',
       if (!isAuthenticated) 'Sign Up/Sign In',
       if (isAuthenticated) 'Add Recipe',
@@ -137,6 +138,21 @@ class _MenuWebItemsState extends State<MenuWebItems> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => RecipePage(user: widget.user)),
+                    );
+              break;
+
+              case 'Weekly Menu Page':
+              kIsWeb
+                  ? Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => WeeklyMenuPage(user: widget.user),
+                          maintainState: true),
+                      (Route<dynamic> route) => false)
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MainScreen(user: widget.user)),
                     );
               break;
 

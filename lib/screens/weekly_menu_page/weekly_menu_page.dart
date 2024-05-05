@@ -1,15 +1,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
+import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_weekly_menu_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 
 class WeeklyMenuPage extends StatefulWidget {
-  const WeeklyMenuPage({super.key});
+  final User? user;
+  const WeeklyMenuPage({super.key,this.user});
 
   @override
   State<WeeklyMenuPage> createState() => _WeeklyMenuPageState();
@@ -27,7 +31,7 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
-    currentPage = 'WeeklyMenuPage';
+    currentPage = 'Weekly Menu Page';
     _fetchWeeklyMenu(); // Fetch initial set of recipes
   }
 
@@ -92,17 +96,48 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
   Widget build(BuildContext context) {
     final bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
-      body: _buildWeeklyMenuList(),
+      appBar: kIsWeb
+          ? CustomAppBar(
+              isDesktop: true,
+              isAuthenticated: true,
+              profileImage: widget.user?.profileImage ?? '',
+              username: widget.user?.username ?? '',
+              onTapProfile: () {
+                // Handle profile onTap action
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                            user: widget.user ?? Constants.defaultUser,
+                          )),
+                );
+              },
+              user: widget.user ?? Constants.defaultUser,
+              menuItems: isDesktop
+                  ? MenuWebItems(
+                      user: widget.user,
+                      currentPage: currentPage,
+                    )
+                  : Container(),
+            )
+          : AppBar(),
+      endDrawer: !isDesktop
+          ? MenuWebItems(user: widget.user, currentPage: currentPage)
+          : null,
+      body: _buildWeeklyMenuList(isDesktop),
     );
   }
 
-  Widget _buildWeeklyMenuList() {
+  Widget _buildWeeklyMenuList(bool isDesktop) {
+    //Responsive.isDesktop(context) ? MediaQuery.of(context).size.width / 2 : MediaQuery.of(context).size.width,
     return Padding(
       padding: const EdgeInsets.all(Constants.defaultPadding),
       child: Center(
         child: SizedBox(
-          width: 600,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
           child: ListView.builder(
+            shrinkWrap: true,
             controller: _scrollController,
             itemCount: meals.length + (_isLoading ? 1 : 0),
             itemBuilder: (context, index) {
@@ -110,15 +145,11 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
                 final meal = meals[index];
                 return Padding(
                   padding: const EdgeInsets.all(Constants.defaultPadding),
-                  child: SizedBox(
-                    height: 300,
-                    width: 300,
-                    child: InkWell(
-                      onTap: () {},
-                      child: CustomWeeklyMenuCard(
-                        meal: meal,
-                        currentPage:currentPage, isForAll: true, publicUserId: '', currentUserId: '',
-                      ),
+                  child: InkWell(
+                    onTap: () {},
+                    child: CustomWeeklyMenuCard(
+                      meal: meal,
+                      currentPage:currentPage, isForAll: true, publicUserId: '', currentUserId: '',
                     ),
                   ),
                 );

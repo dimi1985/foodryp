@@ -29,6 +29,7 @@ class _CreatorsPageState extends State<CreatorsPage> {
   @override
   void initState() {
     super.initState();
+    log('Creator Page come Bottom NAvgiagation: ${widget.user.email}');
     _fetchUsers();
   }
 
@@ -42,6 +43,7 @@ class _CreatorsPageState extends State<CreatorsPage> {
 
       setState(() {
         currentLoggedUserId = getCurrentUserId;
+
         _users = users.where((user) => user.id != widget.user.id).toList();
 
         _isLoading = false;
@@ -80,7 +82,7 @@ class _CreatorsPageState extends State<CreatorsPage> {
                     )
                   : Container(),
             )
-          : AppBar(),
+          : AppBar(title: Text(widget.user.email),),
       endDrawer: !isDesktop
           ? MenuWebItems(user: widget.user, currentPage: currentPage)
           : null,
