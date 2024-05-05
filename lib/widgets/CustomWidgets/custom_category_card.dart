@@ -46,10 +46,9 @@ class CustomCategoryCard extends StatelessWidget {
                     Text(
                       category.name,
                       style: GoogleFonts.getFont(
+                        
                         category.font,
-                        fontSize: Responsive.isDesktop(context)
-                            ? Constants.desktopFontSize
-                            : Constants.mobileFontSize,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: HexColor(category.color).withOpacity(0.7),
                       ),

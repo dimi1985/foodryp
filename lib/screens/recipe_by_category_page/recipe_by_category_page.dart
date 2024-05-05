@@ -118,7 +118,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              RecipeDetailPage(recipe: recipe),
+                              RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
                         ),
                       );
                     },

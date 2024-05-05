@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum ThemeType { light, dark }
 
 class ThemeProvider with ChangeNotifier {
-  ThemeData _themeData = ThemeData.light();
+  ThemeData _themeData = _buildThemeData(ThemeType.light);
   ThemeType _currentTheme = ThemeType.light;
 
   ThemeProvider() {
@@ -17,9 +17,21 @@ class ThemeProvider with ChangeNotifier {
 
   void toggleTheme() {
     _currentTheme = _currentTheme == ThemeType.light ? ThemeType.dark : ThemeType.light;
-    _themeData = _currentTheme == ThemeType.light ? ThemeData.light() : ThemeData.dark();
+    _themeData = _buildThemeData(_currentTheme);
     _saveThemePreference(_currentTheme);
     notifyListeners();
+  }
+
+  static ThemeData _buildThemeData(ThemeType themeType) {
+    return themeType == ThemeType.light
+        ? ThemeData.light().copyWith(
+            textTheme: ThemeData.light().textTheme.apply(
+              fontFamily: 'Comfortaa',
+            ))
+        : ThemeData.dark().copyWith(
+            textTheme: ThemeData.dark().textTheme.apply(
+              fontFamily: 'Comfortaa',
+            ));
   }
 
   Future<void> _loadThemePreference() async {
@@ -27,7 +39,7 @@ class ThemeProvider with ChangeNotifier {
     final String? themeString = prefs.getString('theme');
     if (themeString != null) {
       _currentTheme = ThemeType.values.firstWhere((e) => e.toString() == themeString);
-      _themeData = _currentTheme == ThemeType.light ? ThemeData.light() : ThemeData.dark();
+      _themeData = _buildThemeData(_currentTheme);
       notifyListeners();
     }
   }

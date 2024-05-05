@@ -102,52 +102,54 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
             ),
           ),
           Container(
-              padding: const EdgeInsets.all(Constants.defaultPadding),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(Constants.defaultPadding),
-                  bottomRight: Radius.circular(Constants.defaultPadding),
-                ),
+            padding: const EdgeInsets.all(Constants.defaultPadding),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(Constants.defaultPadding),
+                bottomRight: Radius.circular(Constants.defaultPadding),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ImagePickerPreviewContainer(
-                        containerSize: 20,
-                        onImageSelected: (file, list) {},
-                        gender: '',
-                        isFor: '',
-                        initialImagePath: widget.recipe.useImage!,
-                        isForEdit: false,
-                        allowSelection: false,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ImagePickerPreviewContainer(
+                      containerSize: 20,
+                      onImageSelected: (file, list) {},
+                      gender: '',
+                      isFor: '',
+                      initialImagePath: widget.recipe.useImage!,
+                      isForEdit: false,
+                      allowSelection: false,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      widget.recipe.username,
+                      style: TextStyle(
+                        fontSize: Responsive.isDesktop(context) ? 16 : 12,
+                        color: Colors.black,
                       ),
-                      const SizedBox(width: 10),
-                      Text(
-                        widget.recipe.username,
-                        style: TextStyle(
-                          fontSize: Responsive.isDesktop(context) ? 16 : 12,
-                          color: Colors.black,
-                        ),
+                    ),
+                    const SizedBox(width: 5), // Adjust the spacing as needed
+                    Text(
+                      '•',
+                      style: TextStyle(
+                        fontSize: Responsive.isDesktop(context)
+                            ? Constants.desktopFontSize
+                            : Constants.mobileFontSize,
+                        color: Colors.black,
                       ),
-                      const SizedBox(width: 5), // Adjust the spacing as needed
-                      Text(
-                        '•',
-                        style: TextStyle(
-                          fontSize: Responsive.isDesktop(context)
-                              ? Constants.desktopFontSize
-                              : Constants.mobileFontSize,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
+                    ),
+                    const SizedBox(width: 5),
 
-                      Text(
+                    Expanded(
+                      child: Text(
+                        overflow: TextOverflow.ellipsis,
                         Constants.calculateMembershipDuration(context,
                             widget.recipe.dateCreated), // Format the date
                         style: TextStyle(
@@ -157,76 +159,86 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                           color: Colors.black,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          overflow: TextOverflow.ellipsis,
-                          widget.recipe.recipeTitle.toUpperCase(),
-                          style: GoogleFonts.getFont(
-                            widget.recipe.categoryFont,
-                            fontSize: Responsive.isDesktop(context)
-                                ? Constants.desktopFontSize
-                                : Constants.mobileFontSize,
-                            fontWeight: FontWeight.bold,
-                            color: HexColor(widget.recipe.categoryColor)
-                                .withOpacity(0.7),
-                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        overflow: TextOverflow.ellipsis,
+                        widget.recipe.recipeTitle.toUpperCase(),
+                        style: GoogleFonts.getFont(
+                          widget.recipe.categoryFont,
+                          fontSize: Responsive.isDesktop(context)
+                              ? Constants.desktopFontSize
+                              : Constants.mobileFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: HexColor(widget.recipe.categoryColor)
+                              .withOpacity(0.7),
                         ),
                       ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Spacer(),
-                      if (isOwner &&
-                          isAuthenticated &&
-                          widget.internalUse != 'MainScreen' &&
-                          widget.internalUse != 'RecipePage' &&
-                          widget.internalUse != 'AddWeeklyMenuPage')
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AddRecipePage(
-                                  recipe: widget.recipe,
-                                  isForEdit: isOwner,
-                                  user: null,
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.edit),
-                        ),
-                      if (isOwner &&
-                          isAuthenticated &&
-                          widget.internalUse != 'MainScreen' &&
-                          widget.internalUse != 'RecipePage')
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  RecipeDeletionConfirmationScreen(
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Spacer(),
+                    if (isOwner &&
+                        isAuthenticated &&
+                        widget.internalUse != 'MainScreen' &&
+                        widget.internalUse != 'RecipePage' &&
+                        widget.internalUse != 'AddWeeklyMenuPage')
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddRecipePage(
                                 recipe: widget.recipe,
+                                isForEdit: isOwner,
+                                user: null,
                               ),
-                            ));
-                          },
-                          icon: const Icon(Icons.delete),
-                        ),
-                      const Icon(Icons.favorite_border),
-                      Text(
-                        widget.recipe.likedBy.length.toString(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.edit),
                       ),
-                    ],
-                  )
-                ],
-              ))
+                    if (isOwner &&
+                        isAuthenticated &&
+                        widget.internalUse != 'MainScreen' &&
+                        widget.internalUse != 'RecipePage')
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                RecipeDeletionConfirmationScreen(
+                              recipe: widget.recipe,
+                            ),
+                          ));
+                        },
+                        icon: const Icon(Icons.delete),
+                      ),
+                    const Icon(
+                      Icons.favorite_border,
+                      color: Colors.black,
+                    ),
+                    Text(
+                      widget.recipe.likedBy.length.toString(),
+                    ),
+                  ],
+                ),
+                if (widget.internalUse == 'RecipePage' &&
+                    (uniqueIngredients?.isNotEmpty ?? false))
+                  Text(
+                      'There Are Missing Ingredients: ${uniqueIngredients?.length ?? 0}',
+                      style: TextStyle(color: Colors.red.withOpacity(0.7))),
+              ],
+            ),
+          )
         ],
       ),
     );

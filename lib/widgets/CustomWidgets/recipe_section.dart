@@ -64,7 +64,7 @@ class _RecipeSectionState extends State<RecipeSection> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                RecipeDetailPage(recipe: recipe),
+                                RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
                           ),
                         );
                       },

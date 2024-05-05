@@ -205,12 +205,14 @@ class _RecipePageState extends State<RecipePage> {
                               height: 300,
                               width: 300,
                               child: InkWell(
+                                 splashColor: Colors.transparent, // Ensures no splash color is shown
+    highlightColor: Colors.transparent, // Ensures no highlight color on tap
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          RecipeDetailPage(recipe: recipe),
+                                          RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
                                     ),
                                   );
                                 },

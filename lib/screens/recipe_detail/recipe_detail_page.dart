@@ -16,7 +16,13 @@ import '../../models/comment.dart';
 
 class RecipeDetailPage extends StatefulWidget {
   final Recipe recipe;
-  const RecipeDetailPage({super.key, required this.recipe});
+  final String internalUse;
+  final List<String> missingIngredients;
+  const RecipeDetailPage(
+      {super.key,
+      required this.recipe,
+      required this.internalUse,
+      required this.missingIngredients});
 
   @override
   State<RecipeDetailPage> createState() => _RecipeDetailPageState();
@@ -51,12 +57,13 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = Responsive.isDesktop(context);
     final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
-       final isAndroid =  Constants.checiIfAndroid(context);
+    final isAndroid = Constants.checiIfAndroid(context);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -206,17 +213,31 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ),
           const SizedBox(height: 20.0),
           // Ingredients section
-          const Text(
-            'Ingredients',
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          
+           Text(
+            AppLocalizations.of(context)
+                        .translate('Ingredients'),
+            style:const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10.0),
           ListView.builder(
-            shrinkWrap: true, // Prevent list view from taking unnecessary space
-            itemCount: widget.recipe.ingredients.length,
-            itemBuilder: (context, index) =>
-                Text(widget.recipe.ingredients[index]),
-          ),
+              shrinkWrap:
+                  true, // Prevent list view from taking unnecessary space
+              itemCount: widget.recipe.ingredients.length,
+              itemBuilder: (context, index) {
+                bool isMissing = widget.missingIngredients
+                    .contains(widget.recipe.ingredients[index]);
+                return Text(
+                  widget.recipe.ingredients[index],
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: isMissing
+                        ? Colors.red
+                        : Colors.black, // Red if missing, black otherwise
+                    fontWeight: isMissing ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }),
           const SizedBox(height: 20.0),
           // Like and save buttons
           Row(

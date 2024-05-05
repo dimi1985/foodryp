@@ -206,11 +206,11 @@ class _MyFridgePageState extends State<MyFridgePage>
           }
         }
 
-        // // Optionally print missing ingredients for each recipe
-        //         recipeMissingIngredients.forEach((id, missing) {
-        //           print(
-        //               'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
-        //         });
+        // Optionally print missing ingredients for each recipe
+                recipeMissingIngredients.forEach((id, missing) {
+                  print(
+                      'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
+                });
       }
 
       setState(() {
@@ -557,7 +557,7 @@ class _MyFridgePageState extends State<MyFridgePage>
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    RecipeDetailPage(recipe: recipe),
+                                    RecipeDetailPage(recipe: recipe, internalUse: 'RecipePage',  missingIngredients: missingIngredients,),
                               ),
                             );
                           },

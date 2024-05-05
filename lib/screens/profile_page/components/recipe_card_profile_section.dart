@@ -151,7 +151,7 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              RecipeDetailPage(recipe: recipe),
+                              RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
                         ),
                       );
                     },
@@ -205,11 +205,13 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                     return Padding(
                         padding: EdgeInsets.all(Responsive.isDesktop(context) ? 25 : 8),
                         child: InkWell(
+                           splashColor: Colors.transparent, // Ensures no splash color is shown
+    highlightColor: Colors.transparent, // Ensures no highlight color on tap
                             onTap: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => RecipeDetailPage(recipe: recipe),
+                                        builder: (context) => RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
                                     ),
                                 );
                             },
