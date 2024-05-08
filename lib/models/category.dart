@@ -1,8 +1,8 @@
 class CategoryModel {
     final String? id;
-  final String name;
-  final String font;
-  final String color;
+  final String? name;
+  final String? font;
+  final String? color;
   // final String? categoryImage; 
   final List<String>? recipes; 
 

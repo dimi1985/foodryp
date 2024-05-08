@@ -1,13 +1,11 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/foundation.dart';
-import 'package:universal_io/io.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/database/database_helper.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/celebration_settings_provider.dart';
-import 'package:foodryp/utils/connectivity_provider.dart';
 import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
@@ -39,7 +37,6 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => UsersListProvider()),
         ChangeNotifierProvider(create: (_) => SearchSettingsProvider()),
-        ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
            ChangeNotifierProvider(create: (_) => CelebrationSettingsProvider()),
                ChangeNotifierProvider(create: (_) => UserProfileProvider()),
       ],

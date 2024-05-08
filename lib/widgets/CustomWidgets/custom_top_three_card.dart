@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 
-class CustomCategoryTopThreeMobileCard extends StatelessWidget {
+class CustomCategoryTopThreeCard extends StatelessWidget {
   final String title;
   final String imageUrl;
   final Color color;
@@ -13,7 +14,7 @@ class CustomCategoryTopThreeMobileCard extends StatelessWidget {
   final String userImageURL;
   final DateTime date;
 
-  const CustomCategoryTopThreeMobileCard({
+  const CustomCategoryTopThreeCard({
     super.key,
     required this.title,
     required this.imageUrl,
@@ -28,6 +29,8 @@ class CustomCategoryTopThreeMobileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final recipeImage =
+        ('${Constants.baseUrl}/$imageUrl').replaceAll('\\', '/');
     return InkWell(
       // Wrap with InkWell for interaction (optional)
       onTap: onTap,
@@ -39,7 +42,7 @@ class CustomCategoryTopThreeMobileCard extends StatelessWidget {
           child: Stack(
             children: [
               Image.network(
-                imageUrl,
+                recipeImage,
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,
@@ -71,12 +74,13 @@ class CustomCategoryTopThreeMobileCard extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          // Image avatar (assuming you have a 'userImage' field)
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(userImageURL),
-                            // Handle missing image (optional)
-                            backgroundColor: Colors.grey[200],
-                            radius: 10,
+                          ImagePickerPreviewContainer(
+                            initialImagePath: userImageURL,
+                            containerSize: 30,
+                            onImageSelected: (iamge, bytes) {},
+                            gender: Constants.emptyField,
+                            isFor: Constants.emptyField,
+                            isForEdit: Constants.defaultBoolValue,
                           ),
                           const SizedBox(width: 10),
                           // Username (assuming you have a 'username' field)

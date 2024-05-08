@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -30,7 +31,8 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
   bool _isLoading = false;
   int _currentPage = 1;
   final int _pageSize = 10;
-  double lastScrollPosition = 0; // Add a field to keep track of the last scroll position
+  double lastScrollPosition =
+      0; // Add a field to keep track of the last scroll position
 
   @override
   void initState() {
@@ -125,9 +127,11 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
 
   @override
   Widget build(BuildContext context) {
-    Size screenSize =  MediaQuery.of(context).size;
+    Size screenSize = MediaQuery.of(context).size;
     final bool isAndroid = Constants.checiIfAndroid(context);
-    return isAndroid ? _buildAndroidRecipeList(screenSize) : _buildWebRecipeList(screenSize);
+    return isAndroid
+        ? _buildAndroidRecipeList(screenSize)
+        : _buildWebRecipeList(screenSize);
   }
 
   Widget _buildAndroidRecipeList(Size screenSize) {
@@ -135,13 +139,15 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
       padding: EdgeInsets.all(Responsive.isDesktop(context) ? 32 : 16),
       child: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
+            
+            Flexible(
               // Use Expanded instead of SizedBox to fill the available space
-              child: ListView.separated(
-                controller:
-                    _scrollController, 
-                    shrinkWrap: true,
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                controller: _scrollController,
+                shrinkWrap: true,
                 itemCount: recipes.length,
                 itemBuilder: (context, index) {
                   final recipe = recipes[index];
@@ -150,26 +156,27 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
+                          builder: (context) => RecipeDetailPage(
+                            recipe: recipe,
+                            internalUse: Constants.emptyField,
+                            missingIngredients: const [],
+                          ),
                         ),
                       );
                     },
                     child: Padding(
                       padding: EdgeInsets.all(
                           Responsive.isDesktop(context) ? 25 : 8),
-                      child: CustomProfileRecipeCard(
-                        internalUse: '',
-                        recipe: recipe,
+                      child: Padding(
+                         padding: EdgeInsets.zero,
+                        child: CustomProfileRecipeCard(
+                          internalUse: Constants.emptyField,
+                          recipe: recipe,
+                        ),
                       ),
                     ),
                   );
                 },
-                separatorBuilder: (context, index) => Divider(
-                  height: Responsive.isDesktop(context)
-                      ? 32
-                      : 16, // Adjustable based on your design
-                ),
               ),
             ),
             if (_isLoading)
@@ -193,34 +200,41 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
             Expanded(
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: Responsive.isDesktop(context) ? 3 : 2,
-                    crossAxisSpacing: 20.0,
-                    mainAxisSpacing: 20.0,
-                    childAspectRatio: 1.0,
+                  crossAxisCount: Responsive.isDesktop(context) ? 3 : 2,
+                  crossAxisSpacing: 20.0,
+                  mainAxisSpacing: 20.0,
+                  childAspectRatio: 1.0,
                 ),
                 controller: _scrollController,
                 itemCount: recipes.length,
                 itemBuilder: (context, index) {
-                    final recipe = recipes[index];
-                    return Padding(
-                        padding: EdgeInsets.all(Responsive.isDesktop(context) ? 25 : 8),
-                        child: InkWell(
-                           splashColor: Colors.transparent, // Ensures no splash color is shown
-    highlightColor: Colors.transparent, // Ensures no highlight color on tap
-                            onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
-                                    ),
-                                );
-                            },
-                            child: CustomRecipeCard(
-                                internalUse: '',
-                                recipe: recipe,
+                  final recipe = recipes[index];
+                  return Padding(
+                    padding:
+                        EdgeInsets.all(Responsive.isDesktop(context) ? 25 : 8),
+                    child: InkWell(
+                      splashColor: Colors
+                          .transparent, // Ensures no splash color is shown
+                      highlightColor: Colors
+                          .transparent, // Ensures no highlight color on tap
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RecipeDetailPage(
+                              recipe: recipe,
+                              internalUse: '',
+                              missingIngredients: [],
                             ),
-                        ),
-                    );
+                          ),
+                        );
+                      },
+                      child: CustomRecipeCard(
+                        internalUse: '',
+                        recipe: recipe,
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
@@ -234,5 +248,4 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
       ),
     );
   }
-
 }

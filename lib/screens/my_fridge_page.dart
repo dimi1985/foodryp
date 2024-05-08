@@ -16,7 +16,7 @@ import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 import 'package:foodryp/models/user.dart';
 
-enum Category { vegetables, milkAndDairy, meatAndFish }
+enum Category { vegetables, generalItems, meatAndFish }
 
 class MyFridgePage extends StatefulWidget {
   final User user;
@@ -33,7 +33,7 @@ class _MyFridgePageState extends State<MyFridgePage>
   late String currentPage;
   bool doorsOpened = false;
   final List<String> vegetablesList = [];
-  final List<String> milkAndDairyList = [];
+  final List<String> generalItemsList = [];
   final List<String> meatAndFishList = [];
   List<String> generalListItems = [];
   List<dynamic>? fridgeItems;
@@ -85,7 +85,7 @@ class _MyFridgePageState extends State<MyFridgePage>
     if (fridgeItems != null) {
       // Clear existing items
       vegetablesList.clear();
-      milkAndDairyList.clear();
+      generalItemsList.clear();
       meatAndFishList.clear();
 
       for (var item in fridgeItems!) {
@@ -93,8 +93,8 @@ class _MyFridgePageState extends State<MyFridgePage>
           case 'vegetables':
             vegetablesList.add(item['name']);
             break;
-          case 'milkAndDairy':
-            milkAndDairyList.add(item['name']);
+          case 'generalItems':
+            generalItemsList.add(item['name']);
             break;
           case 'meatAndFish':
             meatAndFishList.add(item['name']);
@@ -188,7 +188,7 @@ class _MyFridgePageState extends State<MyFridgePage>
           bool hasMatchingIngredient = false;
           List<String> missingIngredients = [];
 
-          for (var ingredient in recipe.ingredients) {
+          for (var ingredient in recipe.ingredients ?? []) {
             if (ingredientMatches(ingredient, fridgeItemsNormalized)) {
               hasMatchingIngredient = true; // At least one ingredient matches
             } else {
@@ -256,8 +256,8 @@ class _MyFridgePageState extends State<MyFridgePage>
 
     Map<Category, String> categoryNames = {
       Category.vegetables: AppLocalizations.of(context).translate('Vegetables'),
-      Category.milkAndDairy:
-          AppLocalizations.of(context).translate('Milk and Dairy'),
+      Category.generalItems:
+          AppLocalizations.of(context).translate('General Items'),
       Category.meatAndFish:
           AppLocalizations.of(context).translate('Meat and Fish'),
     };
@@ -283,7 +283,7 @@ class _MyFridgePageState extends State<MyFridgePage>
                   : Container(),
             )
           : AppBar(),
-      endDrawer: !isDesktop
+      endDrawer: !isDesktop && kIsWeb
           ? MenuWebItems(user: widget.user, currentPage: currentPage)
           : null,
       body: SingleChildScrollView(
@@ -303,8 +303,8 @@ class _MyFridgePageState extends State<MyFridgePage>
                                     isDesktop)),
                             Expanded(
                                 child: _buildColumn(
-                                    Category.milkAndDairy,
-                                    categoryNames[Category.milkAndDairy]!,
+                                    Category.generalItems,
+                                    categoryNames[Category.generalItems]!,
                                     isDesktop)),
                             Expanded(
                                 child: _buildColumn(
@@ -324,8 +324,8 @@ class _MyFridgePageState extends State<MyFridgePage>
                             ),
                             Expanded(
                               child: _buildColumn(
-                                  Category.milkAndDairy,
-                                  categoryNames[Category.milkAndDairy]!,
+                                  Category.generalItems,
+                                  categoryNames[Category.generalItems]!,
                                   isDesktop),
                             ),
                             Expanded(
@@ -421,8 +421,8 @@ class _MyFridgePageState extends State<MyFridgePage>
     switch (category) {
       case Category.vegetables:
         return vegetablesList;
-      case Category.milkAndDairy:
-        return milkAndDairyList;
+      case Category.generalItems:
+        return generalItemsList;
       case Category.meatAndFish:
         return meatAndFishList;
     }
@@ -463,8 +463,8 @@ class _MyFridgePageState extends State<MyFridgePage>
       case Category.vegetables:
         vegetablesList.add(item);
         break;
-      case Category.milkAndDairy:
-        milkAndDairyList.add(item);
+      case Category.generalItems:
+        generalItemsList.add(item);
         break;
       case Category.meatAndFish:
         meatAndFishList.add(item);
@@ -595,66 +595,78 @@ class _MyFridgePageState extends State<MyFridgePage>
         TextEditingController(text: existingItem);
 
     showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate(getCategoryName(category)),
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                  CustomTextField(
-                    controller: controller,
-                    hintText: AppLocalizations.of(context)
-                        .translate('Add your fridge item'),
-                    labelText: AppLocalizations.of(context)
-                        .translate('Add your fridge item'),
-                  ),
+  context: context,
+  isScrollControlled: true,
+  builder: (BuildContext context) {
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        final keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
+        final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+        return SingleChildScrollView(
+          reverse: true,
+          child: Container(
+            padding: EdgeInsets.only(
+              bottom: keyboardPadding + bottomPadding + 16.0, // Adjust padding based on keyboard height
+              left: 16.0,
+              right: 16.0,
+              top: 16.0,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  AppLocalizations.of(context)
+                      .translate(getCategoryName(category)),
+                  style: const TextStyle(fontSize: 24),
+                ),
+                CustomTextField(
+                  controller: controller,
+                  hintText: AppLocalizations.of(context)
+                      .translate('Add your fridge item'),
+                  labelText: AppLocalizations.of(context)
+                      .translate('Add your fridge item'),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () {
+                    if (isForEdit) {
+                      updateFridgeItem(context, category, existingItem,
+                          controller.text.trim());
+                    } else {
+                      addItemToList(category, controller.text.trim());
+                      _onAddFridgeItem(category, controller.text.trim());
+                    }
+                    updateListUI();
+                    _fetchRecipes();
+
+                    Navigator.pop(context);
+                  },
+                  child: Text(AppLocalizations.of(context)
+                      .translate(isForEdit ? 'Update' : 'Add')),
+                ),
+                if (isForEdit) ...[
                   const SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: () {
-                      if (isForEdit) {
-                        updateFridgeItem(context, category, existingItem,
-                            controller.text.trim());
-                      } else {
-                        addItemToList(category, controller.text.trim());
-                        _onAddFridgeItem(category, controller.text.trim());
-                      }
-                      updateListUI();
-                      _fetchRecipes();
+                      deleteFridgeItem(existingItem, category);
 
                       Navigator.pop(context);
                     },
-                    child: Text(AppLocalizations.of(context)
-                        .translate(isForEdit ? 'Update' : 'Add')),
+                    child: Text(
+                        AppLocalizations.of(context).translate('Delete')),
                   ),
-                  if (isForEdit) ...[
-                    const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        deleteFridgeItem(existingItem, category);
-
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                          AppLocalizations.of(context).translate('Delete')),
-                    ),
-                  ],
                 ],
-              ),
-            );
-          },
+              ],
+            ),
+          ),
         );
       },
     );
+  },
+);
+;
   }
 
   void updateFridgeItem(
@@ -696,8 +708,8 @@ class _MyFridgePageState extends State<MyFridgePage>
           case Category.vegetables:
             vegetablesList.remove(item);
             break;
-          case Category.milkAndDairy:
-            milkAndDairyList.remove(item);
+          case Category.generalItems:
+            generalItemsList.remove(item);
             break;
           case Category.meatAndFish:
             meatAndFishList.remove(item);

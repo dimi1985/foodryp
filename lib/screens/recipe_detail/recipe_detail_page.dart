@@ -43,7 +43,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   void initLikeStatus() async {
     String getCurrentUserId = await UserService().getCurrentUserId();
     setState(() {
-      isLiked = widget.recipe.likedBy.contains(getCurrentUserId);
+      isLiked = widget.recipe.likedBy?.contains(getCurrentUserId) ?? false;
     });
   }
 
@@ -196,19 +196,19 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.recipe.recipeTitle,
+            widget.recipe.recipeTitle ?? Constants.emptyField,
             style: GoogleFonts.getFont(
-              widget.recipe.categoryFont,
+              widget.recipe.categoryFont ?? Constants.emptyField,
               fontSize: Responsive.isDesktop(context)
                   ? Constants.desktopHeadingTitleSize
                   : Constants.mobileHeadingTitleSize,
               fontWeight: FontWeight.bold,
-              color: HexColor(widget.recipe.categoryColor).withOpacity(0.7),
+              color: HexColor(widget.recipe.categoryColor ??Constants.emptyField).withOpacity(0.7),
             ),
           ),
           const SizedBox(height: 10.0),
           Text(
-            widget.recipe.description,
+            widget.recipe.description ??Constants.emptyField,
             style: const TextStyle(fontSize: 16.0),
           ),
           const SizedBox(height: 20.0),
@@ -223,12 +223,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ListView.builder(
               shrinkWrap:
                   true, // Prevent list view from taking unnecessary space
-              itemCount: widget.recipe.ingredients.length,
+              itemCount: widget.recipe.ingredients?.length,
               itemBuilder: (context, index) {
                 bool isMissing = widget.missingIngredients
-                    .contains(widget.recipe.ingredients[index]);
+                    .contains(widget.recipe.ingredients?[index]);
                 return Text(
-                  widget.recipe.ingredients[index],
+                  widget.recipe.ingredients?[index]  ??Constants.emptyField,
                   style: TextStyle(
                     fontSize: 16.0,
                     color: isMissing
@@ -291,10 +291,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           const SizedBox(height: 10.0),
           ListView.builder(
             shrinkWrap: true,
-            itemCount: widget.recipe.instructions.length,
+            itemCount: widget.recipe.instructions?.length ,
             itemBuilder: (context, index) =>
                 Text('${AppLocalizations.of(context).translate('Step')}'
-                    '${index + 1}: ${widget.recipe.instructions[index]}'),
+                    '${index + 1}: ${widget.recipe.instructions?[index] }'),
           ),
         ],
       ),
@@ -408,7 +408,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               String text = _commentController.text.trim();
               log(text);
               await CommentService().createComment(widget.recipe.id ?? '', text,
-                  widget.recipe.username, widget.recipe.useImage ?? '', []);
+                  widget.recipe.username  ??Constants.emptyField, widget.recipe.useImage ?? '', []);
               _commentController.clear();
               setState(() {
                 fetchComments();

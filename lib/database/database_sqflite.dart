@@ -4,6 +4,7 @@ import 'package:foodryp/models/celebration_day.dart';
 import 'package:foodryp/models/comment.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -79,6 +80,16 @@ class DatabaseSqflite implements DatabaseInterface {
   static const String userFollowRequestsCanceled =
       'followRequestsCanceled'; // Store as JSON string
 
+// For WeeklyMenu
+  static const String weeklyMenuTable = 'weekly_menus';
+  static const String weeklyMenuId = 'id';
+  static const String weeklyMenuTitle = 'title';
+  static const String weeklyMenuDayOfWeek = 'dayOfWeek'; // Store as JSON string
+  static const String weeklyMenuUserId = 'userId';
+  static const String weeklyMenuUsername = 'username';
+  static const String weeklyMenuUserProfileImage = 'userProfileImage';
+  static const String weeklyMenuDateCreated = 'dateCreated';
+
   static Database? _database;
 
   @override
@@ -96,6 +107,7 @@ class DatabaseSqflite implements DatabaseInterface {
         await _createRecipeTable(db);
         await _createCommentTable(db);
         await _createUserTable(db);
+        await _createWeeklyMenuTable(db);
       },
     );
   }
@@ -191,6 +203,21 @@ class DatabaseSqflite implements DatabaseInterface {
     ''');
   }
 
+  // For weeklyMenuTable
+  Future<void> _createWeeklyMenuTable(Database db) async {
+    await db.execute('''
+    CREATE TABLE $weeklyMenuTable (
+      $weeklyMenuId TEXT PRIMARY KEY,
+      $weeklyMenuTitle TEXT NOT NULL,
+      $weeklyMenuDayOfWeek TEXT NOT NULL,
+      $weeklyMenuUserId TEXT NOT NULL,
+      $weeklyMenuUsername TEXT NOT NULL,
+      $weeklyMenuUserProfileImage TEXT,
+      $weeklyMenuDateCreated TEXT NOT NULL
+    )
+  ''');
+  }
+
 //For Celebrate days
   @override
   Future<int> insertCelebration(CelebrationDay celebration) async {
@@ -227,21 +254,24 @@ class DatabaseSqflite implements DatabaseInterface {
   }
 
   //For Categories
+  @override
   Future<int> insertCategory(CategoryModel category) async {
-    final db = await _database;
+    final db = _database;
     return await db!.insert(categoryTable, category.toJson());
   }
 
-  Future<List<CategoryModel>> getAllCategories() async {
-    final db = await _database;
+  @override
+  Future<List<CategoryModel>> queryAllCategories() async {
+    final db = _database;
     final List<Map<String, dynamic>> maps = await db!.query(categoryTable);
     return List.generate(maps.length, (i) {
       return CategoryModel.fromJson(maps[i]);
     });
   }
 
+  @override
   Future<int> updateCategory(CategoryModel category) async {
-    final db = await _database;
+    final db = _database;
     return await db!.update(
       categoryTable,
       category.toJson(),
@@ -250,8 +280,9 @@ class DatabaseSqflite implements DatabaseInterface {
     );
   }
 
-  Future<int> deleteCategory(String id) async {
-    final db = await _database;
+  @override
+  Future<int> deleteCategory(int id) async {
+    final db = _database;
     return await db!.delete(
       categoryTable,
       where: '$categoryId = ?',
@@ -261,21 +292,33 @@ class DatabaseSqflite implements DatabaseInterface {
 
   //For Recipes
 
+  @override
   Future<int> insertRecipe(Recipe recipe) async {
-    final db = await _database;
+    final db = _database;
     return await db!.insert(recipeTable, recipe.toJson());
   }
 
-  Future<List<Recipe>> getAllRecipes() async {
-    final db = await _database;
+  @override
+  Future<List<Recipe>> queryAllRecipes() async {
+    final db = _database;
     final List<Map<String, dynamic>> maps = await db!.query(recipeTable);
     return List.generate(maps.length, (i) {
       return Recipe.fromJson(maps[i]);
     });
   }
+@override
+  Future<List<Recipe>> queryTopThreeRecipes() async {
+    final db = _database;
+    final List<Map<String, dynamic>> maps =
+        await db!.query(recipeTable, orderBy: '$recipeLikedBy DESC', limit: 3);
+    return List.generate(maps.length, (i) {
+      return Recipe.fromJson(maps[i]);
+    });
+  }
 
+  @override
   Future<int> updateRecipe(Recipe recipe) async {
-    final db = await _database;
+    final db = _database;
     return await db!.update(
       recipeTable,
       recipe.toJson(),
@@ -284,8 +327,9 @@ class DatabaseSqflite implements DatabaseInterface {
     );
   }
 
-  Future<int> deleteRecipe(String id) async {
-    final db = await _database;
+  @override
+  Future<int> deleteRecipe(int id) async {
+    final db = _database;
     return await db!.delete(
       recipeTable,
       where: '$recipeId = ?',
@@ -293,23 +337,63 @@ class DatabaseSqflite implements DatabaseInterface {
     );
   }
 
-  //For Comments
+  //For Users
 
+  @override
+  Future<int> insertUser(User user) async {
+    final db = _database;
+    return await db!.insert(userTable, user.toJson());
+  }
+
+  @override
+  Future<List<User>> queryAllUsers() async {
+    final db = _database;
+    final List<Map<String, dynamic>> maps = await db!.query(userTable);
+    return List.generate(maps.length, (i) {
+      return User.fromJson(maps[i]);
+    });
+  }
+
+  @override
+  Future<int> updateUser(User user) async {
+    final db = _database;
+    return await db!.update(
+      userTable,
+      user.toJson(),
+      where: '$recipeId = ?',
+      whereArgs: [user.id],
+    );
+  }
+
+  @override
+  Future<int> deleteUser(int id) async {
+    final db = _database;
+    return await db!.delete(
+      userTable,
+      where: '$userId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  //For Comments
+  @override
   Future<int> insertComment(Comment comment) async {
-    final db = await _database;
+    final db = _database;
     return await db!.insert(commentTable, comment.toJson());
   }
 
-  Future<List<Comment>> getAllComments() async {
-    final db = await _database;
+  @override
+  Future<List<Comment>> queryAllComments() async {
+    final db = _database;
     final List<Map<String, dynamic>> maps = await db!.query(commentTable);
     return List.generate(maps.length, (i) {
       return Comment.fromJson(maps[i]);
     });
   }
 
+  @override
   Future<int> updateComment(Comment comment) async {
-    final db = await _database;
+    final db = _database;
     return await db!.update(
       commentTable,
       comment.toJson(),
@@ -318,8 +402,9 @@ class DatabaseSqflite implements DatabaseInterface {
     );
   }
 
-  Future<int> deleteComment(String id) async {
-    final db = await _database;
+  @override
+  Future<int> deleteComment(int id) async {
+    final db = _database;
     return await db!.delete(
       commentTable,
       where: '$commentId = ?',
@@ -327,38 +412,39 @@ class DatabaseSqflite implements DatabaseInterface {
     );
   }
 
-  //For Users
+  @override
+//for weekly menus
+  Future<int> insertWeeklyMenu(WeeklyMenu weeklyMenu) async {
+    final db = _database;
+    return await db!.insert(weeklyMenuTable, weeklyMenu.toJson());
+  }
 
-  Future<int> insertUser(User user) async {
-  final db = await _database;
-  return await db!.insert(userTable, user.toJson());
-}
+  @override
+  Future<List<WeeklyMenu>> queryAllWeeklyMenu() async {
+    final db = _database;
+    final List<Map<String, dynamic>> maps = await db!.query(weeklyMenuTable);
+    return List.generate(maps.length, (i) {
+      return WeeklyMenu.fromJson(maps[i]);
+    });
+  }
 
-Future<List<User>> getAllUsers() async {
-  final db = await _database;
-  final List<Map<String, dynamic>> maps = await db!.query(userTable);
-  return List.generate(maps.length, (i) {
-    return User.fromJson(maps[i]);
-  });
-}
+  @override
+  Future<int> updateWeeklyMenu(WeeklyMenu weeklyMenu) async {
+    final db = _database;
+    return await db!.delete(
+      weeklyMenuTable,
+      where: '$userId = ?',
+      whereArgs: [weeklyMenu.id],
+    );
+  }
 
-Future<int> updateUser(User user) async {
-  final db = await _database;
-  return await db!.update(
-    userTable,
-    user.toJson(),
-    where: '$userId = ?',
-    whereArgs: [user.id],
-  );
-}
-
-Future<int> deleteUser(String id) async {
-  final db = await _database;
-  return await db!.delete(
-    userTable,
-    where: '$userId = ?',
-    whereArgs: [id],
-  );
-}
-
+  @override
+  Future<int> deleteWeeklyMenu(int id) async {
+    final db = _database;
+    return await db!.delete(
+      weeklyMenuTable,
+      where: '$userId = ?',
+      whereArgs: [id],
+    );
+  }
 }

@@ -44,13 +44,13 @@ class CustomCategoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      category.name,
+                      category.name ??Constants.emptyField,
                       style: GoogleFonts.getFont(
                         
-                        category.font,
+                        category.font ??Constants.emptyField,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: HexColor(category.color).withOpacity(0.7),
+                        color: HexColor(category.color ??Constants.emptyField).withOpacity(0.7),
                       ),
                     ),
                     const SizedBox(
@@ -59,12 +59,12 @@ class CustomCategoryCard extends StatelessWidget {
                     Text(
                       ('(${category.recipes!.length.toString()})'),
                       style: GoogleFonts.getFont(
-                        category.font,
+                        category.font ??Constants.emptyField,
                         fontSize: Responsive.isDesktop(context)
                             ? Constants.desktopFontSize
                             : Constants.mobileFontSize,
                         fontWeight: FontWeight.bold,
-                        color: HexColor(category.color).withOpacity(0.7),
+                        color: HexColor(category.color ??Constants.emptyField).withOpacity(0.7),
                       ),
                     ),
                   ],

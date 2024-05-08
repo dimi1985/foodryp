@@ -84,6 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
       body: ListView(
+        padding: EdgeInsets.zero,
         shrinkWrap: true,
         children: [
           TopProfile(user: widget.user),

@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
@@ -24,17 +25,23 @@ class BottomNavScreen extends StatefulWidget {
 class _BottomNavScreenState extends State<BottomNavScreen> {
   int _selectedIndex = 0;
   User? user;
-  bool _isLoading = true;
-  bool userIsNull = false;
+
+  bool userIsNull = true;
 
   @override
   void initState() {
     super.initState();
-    fetchUserProfile().then((_) {
-      setState(() {
-        _isLoading = false;
+
+    if (kIsWeb) {
+      fetchUserProfile();
+       userIsNull = false;
+    } else {
+      fetchUserProfile().then((value) {
+        setState(() {
+          userIsNull = false;
+        });
       });
-    });
+    }
   }
 
   Future<void> fetchUserProfile() async {
@@ -51,9 +58,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
       }
 
       setState(() {
-       
-          user = userProfile;
-     
+        user = userProfile;
       });
       log('Got user Info: ${user?.id}');
     } catch (e) {
@@ -81,7 +86,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isLoading
+      body: userIsNull
           ? const Center(child: CircularProgressIndicator())
           : IndexedStack(
               index: _selectedIndex,

@@ -90,9 +90,9 @@ class WeeklyMenuDetailPage extends StatelessWidget {
   }
 
   Widget _buildColumnWithData(Recipe recipe, bool isDesktop, int index) {
-    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont,
+    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont ??Constants.emptyField,
         color: HexColor(
-          recipe.categoryColor,
+          recipe.categoryColor ??Constants.emptyField,
         ).withOpacity(0.7),
         fontSize: isDesktop
             ? Constants.desktopHeadingTitleSize
@@ -108,19 +108,19 @@ class WeeklyMenuDetailPage extends StatelessWidget {
           height: 50,
         ),
         Text(
-          recipe.recipeTitle,
+          recipe.recipeTitle ??Constants.emptyField,
           style: textStyle,
         ),
         Divider(
           endIndent: 50,
           indent: 50,
           color: HexColor(
-            recipe.categoryColor,
+            recipe.categoryColor ??Constants.emptyField,
           ),
           thickness: 2,
         ), // Add a Divider
         Text(
-          recipe.description,
+          recipe.description ??Constants.emptyField,
           style: textStyle,
         ),
         // Add more data as needed
@@ -143,9 +143,9 @@ class WeeklyMenuDetailPage extends StatelessWidget {
   }
 
   Widget getWeekdayName(int index, Recipe recipe, bool isDesktop) {
-    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont,
+    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont ??Constants.emptyField,
         color: HexColor(
-          recipe.categoryColor,
+          recipe.categoryColor ??Constants.emptyField,
         ).withOpacity(0.7),
         fontSize: isDesktop
             ? Constants.desktopHeadingTitleSize

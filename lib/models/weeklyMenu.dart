@@ -38,4 +38,17 @@ class WeeklyMenu {
           json['dateCreated'] != null ? DateTime.parse(json['dateCreated']) : DateTime.now(),
     );
   }
+
+  Map<String, Object?> toJson() {
+  return {
+    '_id': id,
+    'title': title,
+    'dayOfWeek': dayOfWeek.map((recipe) => recipe.toJson()).toList(),
+    'userId': userId,
+    'username': username,
+    'userProfileImage': userProfileImage,
+    'dateCreated': dateCreated.toIso8601String(),
+  };
+}
+
 }

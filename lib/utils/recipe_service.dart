@@ -376,6 +376,20 @@ class RecipeService {
     }
   }
 
+  Future<List<Recipe>> fetchTopThreeRecipes() async {
+  final response = await http.get(
+    Uri.parse('${Constants.baseUrl}/api/getTopThreeRecipes'),
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((json) => Recipe.fromJson(json)).toList();
+  } else {
+    throw Exception('Failed to fetch top three recipes');
+  }
+  }
+
   Future<void> _saveRecipeIDLocally(String recipeId) async {
     await _initPrefs();
     await _prefs.setString('recipeId', recipeId);

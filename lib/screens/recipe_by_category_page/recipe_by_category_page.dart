@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 
@@ -52,7 +53,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
     });
     try {
       final fetchedRecipes = await RecipeService().getRecipesByCategory(
-        widget.category.name,
+        widget.category.name ??Constants.emptyField,
         _page,
         _pageSize,
       );
@@ -76,7 +77,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
       });
       try {
         final fetchedRecipes = await RecipeService().getRecipesByCategory(
-          widget.category.name,
+          widget.category.name ??Constants.emptyField,
           _page,
           _pageSize,
         );

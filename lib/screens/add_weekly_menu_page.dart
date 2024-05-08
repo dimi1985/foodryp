@@ -89,7 +89,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       userRecipes = await recipeService.getUserRecipesByPage(1, 10);
 
       for (var recipe in userRecipes) {
-        if (recipe.meal.contains(widget.meal?.id)) {
+        if (recipe.meal?.contains(widget.meal?.id) ?? false) {
           setState(() {
             recipeCheckedState[recipe] = true;
           });
@@ -342,13 +342,13 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                                                       // Recipe details
                                                                       Text(
                                                                         recipe
-                                                                            .recipeTitle,
+                                                                            .recipeTitle ??Constants.emptyField,
                                                                         style: GoogleFonts
                                                                             .getFont(
                                                                           recipe
-                                                                              .categoryFont,
+                                                                              .categoryFont ??Constants.emptyField,
                                                                           color:
-                                                                              HexColor(recipe.categoryColor).withOpacity(0.7),
+                                                                              HexColor(recipe.categoryColor ??Constants.emptyField).withOpacity(0.7),
                                                                         ),
                                                                       ),
                                                                       const SizedBox(
@@ -533,10 +533,10 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                             const SizedBox(height: 10),
                             // Recipe details
                             Text(
-                              recipe.recipeTitle,
+                              recipe.recipeTitle ??Constants.emptyField,
                               style: GoogleFonts.getFont(
-                                recipe.categoryFont,
-                                color: HexColor(recipe.categoryColor)
+                                recipe.categoryFont ??Constants.emptyField,
+                                color: HexColor(recipe.categoryColor ??Constants.emptyField)
                                     .withOpacity(0.7),
                               ),
                             ),
@@ -583,9 +583,9 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   }
 
   Widget getWeekdayName(int index, Recipe recipe) {
-    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont,
+    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont ??Constants.emptyField,
         color: HexColor(
-          recipe.categoryColor,
+          recipe.categoryColor ??Constants.emptyField,
         ).withOpacity(0.7),
         fontSize: Responsive.isDesktop(context)
             ? Constants.desktopHeadingTitleSize

@@ -1,10 +1,13 @@
-import 'package:flutter/gestures.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:foodryp/data/demo_data.dart';
+import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
-import 'package:foodryp/widgets/CustomWidgets/topthree_mobile_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/custom_top_three_card.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 class TopThreeRecipeCardSection extends StatefulWidget {
   const TopThreeRecipeCardSection({super.key});
@@ -15,6 +18,27 @@ class TopThreeRecipeCardSection extends StatefulWidget {
 }
 
 class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
+  List<Recipe> _topRecipes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTopThreeRecipes();
+  }
+
+  Future<void> _fetchTopThreeRecipes() async {
+    try {
+      final List<Recipe> recipes = await RecipeService().fetchTopThreeRecipes();
+      setState(() {
+        _topRecipes = recipes;
+      });
+    } catch (e) {
+      // Handle error
+      print('Error fetching top three recipes: $e');
+      // Show error message or handle error scenario
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -41,48 +65,41 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
                 ),
               ),
               Expanded(
-                child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(
-                    dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    },
-                  ),
-                  child: ListView.separated(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 3,
-                    itemBuilder: (context, index) {
-                    final regularRecipe = DemoData.regularRecipes[index];
-                      return SizedBox(
-                        width: screenSize.width <= 1100
-                            ? 260
-                            : screenSize.width <= 1400
-                                ? screenSize.width / 7
-                                : screenSize.width / 8,
-                        height: screenSize.height,
-                        child: CustomCategoryTopThreeMobileCard(
-                          title: regularRecipe['title'],
-                          imageUrl: regularRecipe['image'],
-                          color: regularRecipe['color'],
-                          itemList: regularRecipe.length.toString(),
-                          internalUse: 'top_three',
-                          onTap: () {
-                            // Handle card tap here (optional)
-                          },
-                          username: regularRecipe['username'],
-                          userImageURL: 'https://picsum.photos/200/300',
-                          date: regularRecipe['date'],
-                        ),
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index) {
-                      return SizedBox(
-                        width: Responsive.isMobile(context) ? 10 : 50,
-                      );
-                    },
-                  ),
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _topRecipes.length,
+                  itemBuilder: (context, index) {
+                    Recipe recipe = _topRecipes[index];
+                    return SizedBox(
+                      width: screenSize.width <= 1100
+                          ? 260
+                          : screenSize.width <= 1400
+                              ? screenSize.width / 7
+                              : screenSize.width / 8,
+                      height: screenSize.height,
+                      child: CustomCategoryTopThreeCard(
+                        title: recipe.recipeTitle ?? Constants.emptyField,
+                        imageUrl: recipe.recipeImage ?? Constants.emptyField,
+                        color: HexColor(
+                            recipe.categoryColor ?? Constants.emptyField),
+                        itemList: _topRecipes.length.toString(),
+                        internalUse: 'top_three',
+                        onTap: () {
+                          // Handle card tap here (optional)
+                        },
+                        username: recipe.username ?? Constants.emptyField,
+                        userImageURL: recipe.useImage ?? Constants.emptyField,
+                        date: recipe.dateCreated ?? DateTime.now(),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return SizedBox(
+                      width: Responsive.isMobile(context) ? 10 : 50,
+                    );
+                  },
                 ),
               ),
             ],

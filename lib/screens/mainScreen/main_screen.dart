@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:foodryp/utils/app_localizations.dart';
-import 'package:universal_io/io.dart';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
@@ -36,17 +34,13 @@ class _MainScreenState extends State<MainScreen> {
   UsersListProvider usersProvider = UsersListProvider();
   late String currentPage;
   User user = Constants.defaultUser;
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     if (kIsWeb) {
-      fetchUserProfile().then((_) {
-        setState(() {
-          _isLoading = false;
-        });
-      });
+      fetchUserProfile();
+  
     }
 
     currentPage = 'Home';
@@ -55,8 +49,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> fetchUserProfile() async {
     final userService = UserService();
     final userProfile = await userService.getUserProfile();
-    _prefs = await SharedPreferences.getInstance();
-    userId = _prefs.getString('userId') ?? '';
+    userId = await userService.getCurrentUserId();
     setState(() {
       if (userId.isNotEmpty) {
         isAuthenticated = true;
@@ -72,9 +65,7 @@ class _MainScreenState extends State<MainScreen> {
     final bool isDesktop = Responsive.isDesktop(context);
    final isAndroid =  Constants.checiIfAndroid(context);
     return SafeArea(
-      child: _isLoading && kIsWeb
-          ? const Center(child: CircularProgressIndicator())
-          : Scaffold(
+      child:  Scaffold(
               appBar: isAndroid
                   ? AppBar(
                       toolbarHeight: 80,
@@ -123,7 +114,7 @@ class _MainScreenState extends State<MainScreen> {
                             )
                           : Container(),
                     ),
-              endDrawer: !isDesktop
+              endDrawer: !isDesktop && kIsWeb
                   ? isAndroid
                       ? null
                       : MenuWebItems(user: user, currentPage: currentPage)

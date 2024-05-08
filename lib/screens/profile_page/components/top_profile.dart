@@ -30,26 +30,6 @@ class _TopProfileState extends State<TopProfile> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.all(Constants.defaultPadding),
-              child: IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SettingsPage(
-                              user: widget.user,
-                            )),
-                  );
-                },
-                icon: const Icon(Icons.settings),
-              ),
-            ),
-          ],
-        ),
         SizedBox(
           height: Responsive.isDesktop(context) ? 350 : 250,
           child: Row(

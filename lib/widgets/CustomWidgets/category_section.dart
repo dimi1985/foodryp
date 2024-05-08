@@ -7,7 +7,7 @@ import 'package:foodryp/models/category.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_category_card.dart';
 
 class CategorySection extends StatefulWidget {
-  const CategorySection({Key? key}) : super(key: key);
+  const CategorySection({super.key});
 
   @override
   State<CategorySection> createState() => _CategorySectionState();
@@ -60,14 +60,18 @@ class _CategorySectionState extends State<CategorySection> {
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
+                if (category.name == 'Uncategorized') {
+                  return const SizedBox.shrink();
+                }
                 return InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => RecipeByCategoryPage(
-                                category: category,
-                              )),
+                        builder: (context) => RecipeByCategoryPage(
+                          category: category,
+                        ),
+                      ),
                     );
                   },
                   child: CustomCategoryCard(category: category),

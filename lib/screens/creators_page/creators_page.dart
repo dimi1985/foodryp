@@ -14,7 +14,7 @@ import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 class CreatorsPage extends StatefulWidget {
   final User user;
 
-  const CreatorsPage({Key? key, required this.user}) : super(key: key);
+  const CreatorsPage({super.key, required this.user});
 
   @override
   State<CreatorsPage> createState() => _CreatorsPageState();
@@ -22,21 +22,19 @@ class CreatorsPage extends StatefulWidget {
 
 class _CreatorsPageState extends State<CreatorsPage> {
   late List<User> _users = [];
-  bool _isLoading = false;
+
   String currentPage = 'Creators';
   String currentLoggedUserId = Constants.emptyField;
 
   @override
   void initState() {
     super.initState();
-    log('Creator Page come Bottom NAvgiagation: ${widget.user.email}');
+   
     _fetchUsers();
   }
 
   Future<void> _fetchUsers() async {
-    setState(() {
-      _isLoading = true;
-    });
+ 
     try {
       final users = await UserService.getUsersByPage(1, 10);
       final getCurrentUserId = await UserService().getCurrentUserId();
@@ -46,13 +44,11 @@ class _CreatorsPageState extends State<CreatorsPage> {
 
         _users = users.where((user) => user.id != widget.user.id).toList();
 
-        _isLoading = false;
+   
       });
     } catch (e) {
       print('Error fetching users: $e');
-      setState(() {
-        _isLoading = false;
-      });
+    
     }
   }
 
@@ -82,13 +78,11 @@ class _CreatorsPageState extends State<CreatorsPage> {
                     )
                   : Container(),
             )
-          : AppBar(title: Text(widget.user.email),),
-      endDrawer: !isDesktop
+          : AppBar(),
+      endDrawer: !isDesktop && kIsWeb
           ? MenuWebItems(user: widget.user, currentPage: currentPage)
           : null,
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
+      body: Padding(
               padding: const EdgeInsets.all(Constants.defaultPadding),
               child: ListView.builder(
                 itemCount: _users.length,

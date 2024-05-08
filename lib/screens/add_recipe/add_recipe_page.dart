@@ -92,15 +92,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
     if (widget.recipe != null) {
       // Populate text controllers with recipe data for editing
-      recipeTitleTextController.text = widget.recipe!.recipeTitle;
-      descriptionTextController.text = widget.recipe!.description;
-      servingTextController.text = widget.recipe!.servingNumber;
-      prepDurationTextController.text = widget.recipe!.prepDuration;
-      cookDurationTextController.text = widget.recipe!.cookDuration;
+      recipeTitleTextController.text = widget.recipe!.recipeTitle ?? Constants.emptyField;
+      descriptionTextController.text = widget.recipe!.description?? Constants.emptyField;
+      servingTextController.text = widget.recipe!.servingNumber?? Constants.emptyField;
+      prepDurationTextController.text = widget.recipe!.prepDuration?? Constants.emptyField;
+      cookDurationTextController.text = widget.recipe!.cookDuration?? Constants.emptyField;
 
       // Populate ingredients text controllers
       ingredientsControllers.clear(); // Clear existing controllers
-      for (var ingredient in widget.recipe!.ingredients) {
+      for (var ingredient in widget.recipe!.ingredients ?? []) {
         TextEditingController controller =
             TextEditingController(text: ingredient);
         ingredientsControllers.add(controller);
@@ -108,7 +108,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
       // Populate instructions text controllers
       instructionControllers.clear(); // Clear existing controllers
-      for (var instruction in widget.recipe!.instructions) {
+      for (var instruction in widget.recipe!.instructions ?? []) {
         TextEditingController controller =
             TextEditingController(text: instruction);
         instructionControllers.add(controller);
@@ -130,10 +130,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
         if (categoryIndex != -1) {
           setState(() {
             tappedCategoryIndex = categoryIndex;
-            selectedCategoryColor = categories[categoryIndex].color;
+            selectedCategoryColor = categories[categoryIndex].color ??Constants.emptyField;
             selectedCategoryId = categories[categoryIndex].id!;
-            selectedCategoryFont = categories[categoryIndex].font;
-            selectedCategoryName = categories[categoryIndex].name;
+            selectedCategoryFont = categories[categoryIndex].font ??Constants.emptyField;
+            selectedCategoryName = categories[categoryIndex].name ??Constants.emptyField;
           });
         }
       }
@@ -204,7 +204,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   : Container(),
             )
           : AppBar(),
-      endDrawer: !isDesktop
+      endDrawer: !isDesktop && kIsWeb
           ? MenuWebItems(user: user, currentPage: currentPage)
           : null,
       body: SingleChildScrollView(
@@ -248,10 +248,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                   onTap: () {
                                     setState(() {
                                       tappedCategoryIndex = index;
-                                      selectedCategoryColor = category.color;
+                                      selectedCategoryColor = category.color ??Constants.emptyField;
                                       selectedCategoryId = category.id!;
-                                      selectedCategoryFont = category.font;
-                                      selectedCategoryName = category.name;
+                                      selectedCategoryFont = category.font ??Constants.emptyField;
+                                      selectedCategoryName = category.name ??Constants.emptyField;
                                    
                                     });
                                   },
@@ -263,10 +263,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                       children: [
                                         const SizedBox(height: 8),
                                         Text(
-                                          category.name,
+                                          category.name ??Constants.emptyField,
                                           style: TextStyle(
                                             color: isTapped
-                                                ? HexColor(category.color)
+                                                ? HexColor(category.color ??Constants.emptyField)
                                                 : Colors.grey,
                                             fontWeight: FontWeight.bold,
                                           ),

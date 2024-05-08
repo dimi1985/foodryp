@@ -1,24 +1,24 @@
 class Recipe {
   final String? id;
-  final String recipeTitle;
-  final String recipeImage;
-  final List<String> ingredients;
-  final List<String> instructions;
-  final String prepDuration;
-  final String cookDuration;
-  final String servingNumber;
-  String difficulty;
-  final String username;
+  final String? recipeTitle;
+  final String? recipeImage;
+  final List<String>? ingredients;
+  final List<String>? instructions;
+  final String? prepDuration;
+  final String? cookDuration;
+  final String? servingNumber;
+  String? difficulty;
+  final String? username;
   final String? useImage;
-  final String userId;
-  final DateTime dateCreated;
-  final String description;
-  final String categoryId;
-  final String categoryColor;
-  final String categoryFont;
+  final String? userId;
+  final DateTime? dateCreated;
+  final String? description;
+  final String? categoryId;
+  final String? categoryColor;
+  final String? categoryFont;
   final String categoryName;
-  final List<String> likedBy;
-  final List<String> meal;
+  final List<String>? likedBy;
+  final List<String>? meal;
 
   Recipe({
     this.id,
@@ -89,7 +89,7 @@ class Recipe {
     'username': username,
     'useImage': useImage,
     'userId': userId,
-    'dateCreated': dateCreated.toIso8601String(),
+    'dateCreated': dateCreated?.toIso8601String(),
     'description': description,
     'categoryId': categoryId,
     'categoryColor': categoryColor,

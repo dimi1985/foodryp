@@ -8,11 +8,11 @@ class User {
   final String? role;
   final List<String>? recipes;
   final List<String>? likedRecipes;
-  final List<String> followers;
-  final List<String> following;
-   List<String> followRequestsSent;
-   List<String> followRequestsReceived;
-   List<String> followRequestsCanceled;
+  final List<String>? followers;
+  final List<String>? following;
+   List<String>? followRequestsSent;
+   List<String>? followRequestsReceived;
+   List<String>? followRequestsCanceled;
 
 
   User({

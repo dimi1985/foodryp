@@ -43,7 +43,7 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
     setState(() {
       isAuthenticated = getCurrentUserId.isNotEmpty;
       isOwner =
-          isAuthenticated && widget.recipe.userId.contains(getCurrentUserId);
+          isAuthenticated && (widget.recipe.userId?.contains(getCurrentUserId) ?? false);
     });
   }
 
@@ -64,7 +64,7 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
         ],
       ),
       child: SizedBox(
-        height: screenSize.height * 0.50,
+        height: screenSize.height * 0.35,
         child: Column(
           children: [
             SizedBox(
@@ -99,6 +99,7 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -107,15 +108,15 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
                         ImagePickerPreviewContainer(
                           containerSize: 20,
                           onImageSelected: (file, list) {},
-                          gender: '',
-                          isFor: '',
+                          gender: Constants.emptyField,
+                          isFor: Constants.emptyField,
                           initialImagePath: widget.recipe.useImage!,
                           isForEdit: false,
                           allowSelection: false,
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          widget.recipe.username,
+                          widget.recipe.username ??Constants.emptyField,
                           style: TextStyle(
                             fontSize: Responsive.isDesktop(context)
                                 ? Constants.desktopFontSize
@@ -157,14 +158,14 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
                       children: [
                         Text(
                           overflow: TextOverflow.ellipsis,
-                          widget.recipe.recipeTitle.toUpperCase(),
+                          widget.recipe.recipeTitle?.toUpperCase() ??Constants.emptyField,
                           style: GoogleFonts.getFont(
-                            widget.recipe.categoryFont,
+                            widget.recipe.categoryFont ??Constants.emptyField,
                             fontSize: Responsive.isDesktop(context)
                                 ? Constants.desktopFontSize
                                 : Constants.mobileFontSize,
                             fontWeight: FontWeight.bold,
-                            color: HexColor(widget.recipe.categoryColor)
+                            color: HexColor(widget.recipe.categoryColor ??Constants.emptyField)
                                 .withOpacity(0.7),
                           ),
                         ),
@@ -173,12 +174,12 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
                           overflow: TextOverflow.ellipsis,
                           widget.recipe.categoryName.toUpperCase(),
                           style: GoogleFonts.getFont(
-                            widget.recipe.categoryFont,
+                            widget.recipe.categoryFont ??Constants.emptyField,
                             fontSize: Responsive.isDesktop(context)
                                 ? Constants.desktopFontSize
                                 : Constants.mobileFontSize,
                             fontWeight: FontWeight.bold,
-                            color: HexColor(widget.recipe.categoryColor)
+                            color: HexColor(widget.recipe.categoryColor ??Constants.emptyField)
                                 .withOpacity(0.7),
                           ),
                         ),
@@ -224,7 +225,7 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
                           ),
                         const Icon(Icons.favorite_border),
                         Text(
-                          widget.recipe.likedBy.length.toString(),
+                          widget.recipe.likedBy?.length.toString()  ??Constants.emptyField,
                         ),
                       ],
                     )

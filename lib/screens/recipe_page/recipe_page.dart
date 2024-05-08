@@ -166,7 +166,7 @@ class _RecipePageState extends State<RecipePage> {
                   : Container(),
             )
           : AppBar(),
-      endDrawer: !isDesktop
+      endDrawer: !isDesktop && kIsWeb
           ? MenuWebItems(user: widget.user, currentPage: currentPage)
           : null,
       body: Column(
