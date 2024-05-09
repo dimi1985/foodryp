@@ -10,10 +10,8 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
-import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 import 'package:foodryp/models/user.dart';
 
 enum Category { vegetables, generalItems, meatAndFish }
@@ -70,9 +68,11 @@ class _MyFridgePageState extends State<MyFridgePage>
   }
 
   void _toggleFridge() {
+       if(mounted){
     setState(() {
       doorsOpened = !doorsOpened;
     });
+       }
     if (_controller.status == AnimationStatus.completed) {
       _controller.reverse();
     } else {
@@ -92,16 +92,21 @@ class _MyFridgePageState extends State<MyFridgePage>
         switch (item['category']) {
           case 'vegetables':
             vegetablesList.add(item['name']);
+
             break;
           case 'generalItems':
             generalItemsList.add(item['name']);
+
             break;
           case 'meatAndFish':
             meatAndFishList.add(item['name']);
+
             break;
         }
       }
+         if(mounted){
       setState(() {});
+         }
     }
     return;
   }
@@ -163,22 +168,34 @@ class _MyFridgePageState extends State<MyFridgePage>
             word.length > 2) // Ignore common or short words
         .toList();
 
-    // Check if any significant word in the ingredient matches any fridge item
-    return wordsInIngredient.any(
-        (word) => fridgeItemsNormalized.any((item) => item.contains(word)));
+    // Normalize each fridge item into words
+    List<List<String>> fridgeItemWordsList = fridgeItemsNormalized.map((item) {
+      return normalizeString(item).split(' ');
+    }).toList();
+
+    // Check if any word in the recipe ingredient partially matches any word in any fridge item
+    return wordsInIngredient.any((word) {
+      return fridgeItemWordsList.any((fridgeItemWords) {
+        return fridgeItemWords.any((fridgeWord) {
+          return fridgeWord.contains(word) || word.contains(fridgeWord);
+        });
+      });
+    });
   }
 
   Future<void> _fetchRecipes() async {
+       if(mounted){
     setState(() {
       _isLoading = true;
     });
+       }
     try {
       var fetchedRecipes = await RecipeService().getAllRecipesByPage(
         _currentPage,
         _pageSize,
       );
 
-      // List<dynamic> filteredRecipes = [];  // This will now include all recipes
+      filteredRecipes.clear();
 
       if (fridgeItems != null) {
         List<String> fridgeItemsNormalized =
@@ -206,46 +223,55 @@ class _MyFridgePageState extends State<MyFridgePage>
           }
         }
 
-        // Optionally print missing ingredients for each recipe
-                recipeMissingIngredients.forEach((id, missing) {
-                  print(
-                      'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
-                });
+        // // Optionally print missing ingredients for each recipe
+        // recipeMissingIngredients.forEach((id, missing) {
+        //   print(
+        //       'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
+        // });
       }
-
+   if(mounted){
       setState(() {
         recipes = filteredRecipes;
 
         _isLoading = false;
       });
+   }
     } catch (e) {
       print('Error fetching recipes: $e');
+         if(mounted){
       setState(() {
         _isLoading = false;
       });
+         }
     }
   }
 
   Future<void> _fetchMoreRecipes() async {
     if (!_isLoading) {
+         if(mounted){
       setState(() {
         _isLoading = true;
       });
+         }
       try {
         final fetchedRecipes = await RecipeService().getAllRecipesByPage(
           _currentPage + 1, // Fetch next page
           _pageSize,
         );
+           if(mounted){
         setState(() {
           recipes.addAll(fetchedRecipes);
           _currentPage++; // Increment current page
           _isLoading = false;
         });
+           }
       } catch (e) {
         print('Error fetching more recipes: $e');
+           if(mounted){
         setState(() {
           _isLoading = false;
         });
+           }
       }
     }
   }
@@ -263,29 +289,6 @@ class _MyFridgePageState extends State<MyFridgePage>
     };
 
     return Scaffold(
-      appBar: kIsWeb
-          ? CustomAppBar(
-              isDesktop: true,
-              isAuthenticated: true,
-              profileImage: widget.user.profileImage,
-              username: widget.user.username,
-              onTapProfile: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfilePage(user: widget.user),
-                  ),
-                );
-              },
-              user: widget.user,
-              menuItems: isDesktop
-                  ? MenuWebItems(user: widget.user, currentPage: currentPage)
-                  : Container(),
-            )
-          : AppBar(),
-      endDrawer: !isDesktop && kIsWeb
-          ? MenuWebItems(user: widget.user, currentPage: currentPage)
-          : null,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -473,7 +476,9 @@ class _MyFridgePageState extends State<MyFridgePage>
   }
 
   void updateListUI() {
+       if(mounted){
     setState(() {});
+       }
   }
 
   Widget _buildFridgeVisualization() {
@@ -511,6 +516,9 @@ class _MyFridgePageState extends State<MyFridgePage>
 
     if (success) {
       // Update your UI accordingly
+      await fetchFridgeItems();
+      await _fetchRecipes();
+      updateListUI();
       print('Fridge item added successfully.');
     } else {
       // Show an error message
@@ -544,8 +552,8 @@ class _MyFridgePageState extends State<MyFridgePage>
                 if (index < recipes.length) {
                   final recipe = recipes[index];
                   final missingIngredients =
-                      recipeMissingIngredients[recipe.id] ??
-                          []; // Get missing ingredients if available
+                      recipeMissingIngredients[recipe.id] ?? [];
+
                   return Padding(
                       padding: const EdgeInsets.all(Constants.defaultPadding),
                       child: SizedBox(
@@ -556,8 +564,11 @@ class _MyFridgePageState extends State<MyFridgePage>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    RecipeDetailPage(recipe: recipe, internalUse: 'RecipePage',  missingIngredients: missingIngredients,),
+                                builder: (context) => RecipeDetailPage(
+                                  recipe: recipe,
+                                  internalUse: 'RecipePage',
+                                  missingIngredients: missingIngredients,
+                                ),
                               ),
                             );
                           },
@@ -595,113 +606,118 @@ class _MyFridgePageState extends State<MyFridgePage>
         TextEditingController(text: existingItem);
 
     showModalBottomSheet(
-  context: context,
-  isScrollControlled: true,
-  builder: (BuildContext context) {
-    return StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
-        final keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
-        final bottomPadding = MediaQuery.of(context).padding.bottom;
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            final keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
+            final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-        return SingleChildScrollView(
-          reverse: true,
-          child: Container(
-            padding: EdgeInsets.only(
-              bottom: keyboardPadding + bottomPadding + 16.0, // Adjust padding based on keyboard height
-              left: 16.0,
-              right: 16.0,
-              top: 16.0,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  AppLocalizations.of(context)
-                      .translate(getCategoryName(category)),
-                  style: const TextStyle(fontSize: 24),
+            return SingleChildScrollView(
+              reverse: true,
+              child: Container(
+                padding: EdgeInsets.only(
+                  bottom: keyboardPadding +
+                      bottomPadding +
+                      16.0, // Adjust padding based on keyboard height
+                  left: 16.0,
+                  right: 16.0,
+                  top: 16.0,
                 ),
-                CustomTextField(
-                  controller: controller,
-                  hintText: AppLocalizations.of(context)
-                      .translate('Add your fridge item'),
-                  labelText: AppLocalizations.of(context)
-                      .translate('Add your fridge item'),
-                ),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    if (isForEdit) {
-                      updateFridgeItem(context, category, existingItem,
-                          controller.text.trim());
-                    } else {
-                      addItemToList(category, controller.text.trim());
-                      _onAddFridgeItem(category, controller.text.trim());
-                    }
-                    updateListUI();
-                    _fetchRecipes();
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate(getCategoryName(category)),
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                    CustomTextField(
+                      controller: controller,
+                      hintText: AppLocalizations.of(context)
+                          .translate('Add your fridge item'),
+                      labelText: AppLocalizations.of(context)
+                          .translate('Add your fridge item'),
+                    ),
+                    const SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (isForEdit) {
+                          updateFridgeItem(context, category, existingItem,
+                              controller.text.trim());
+                        } else {
+                          addItemToList(category, controller.text.trim());
+                          _onAddFridgeItem(category, controller.text.trim());
+                        }
 
-                    Navigator.pop(context);
-                  },
-                  child: Text(AppLocalizations.of(context)
-                      .translate(isForEdit ? 'Update' : 'Add')),
-                ),
-                if (isForEdit) ...[
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      deleteFridgeItem(existingItem, category);
+                        Navigator.pop(context);
+                      },
+                      child: Text(AppLocalizations.of(context)
+                          .translate(isForEdit ? 'Update' : 'Add')),
+                    ),
+                    if (isForEdit) ...[
+                      const SizedBox(height: 16.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          deleteFridgeItem(existingItem, category);
 
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                        AppLocalizations.of(context).translate('Delete')),
-                  ),
-                ],
-              ],
-            ),
-          ),
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                            AppLocalizations.of(context).translate('Delete')),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
-  },
-);
-;
+    ;
   }
 
   void updateFridgeItem(
-    BuildContext context,Category category, String oldItem, String newItem) {
-  // Update the item in the local list
-  List<String> itemList = getCategoryItems(category);
-  int index = itemList.indexOf(oldItem);
-  if (index != -1) {
-    itemList[index] = newItem;
-    updateListUI();
+      BuildContext context, Category category, String oldItem, String newItem) {
+    // Update the item in the local list
+    List<String> itemList = getCategoryItems(category);
+    int index = itemList.indexOf(oldItem);
+    if (index != -1) {
+      itemList[index] = newItem;
+      updateListUI();
+    }
+
+    // Get category name as string
+    String categoryStr = categoryToString(category);
+
+    // Call the server update method
+    UserService()
+        .updateFridgeItem(oldItem, newItem, categoryStr)
+        .then((success) async {
+      if (success) {
+        await fetchFridgeItems();
+        await _fetchRecipes();
+        updateListUI();
+        print('Fridge item updated successfully.');
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Fridge item updated successfully!')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to update fridge item.')));
+      }
+    });
   }
 
-  // Get category name as string
-  String categoryStr = categoryToString(category);
-
-  // Call the server update method
-  UserService().updateFridgeItem( oldItem, newItem, categoryStr).then((success) {
-    if (success) {
-      print('Fridge item updated successfully.');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fridge item updated successfully!'))
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update fridge item.'))
-      );
-    }
-  });
-}
-
-
-  void deleteFridgeItem(String item, Category category) {
+  void deleteFridgeItem(String item, Category category) async {
     // Logic to remove an item from the fridge list based on category
-    UserService().deleteFridgeItem(item).then((value) {
+    await UserService().deleteFridgeItem(item).then((value) async {
       if (value) {
+        await fetchFridgeItems();
+        await _fetchRecipes();
+        updateListUI();
         print('Fridge item deleted successfully.');
         // Remove item from the correct list based on category
         switch (category) {
@@ -723,8 +739,8 @@ class _MyFridgePageState extends State<MyFridgePage>
       print('Error deleting fridge item: $error');
     });
   }
-  
+
   String categoryToString(Category category) {
-  return category.toString().split('.').last;
-}
+    return category.toString().split('.').last;
+  }
 }

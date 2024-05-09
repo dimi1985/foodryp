@@ -63,10 +63,16 @@ class _RecipeSectionState extends State<RecipeSection> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
+                            builder: (context) => RecipeDetailPage(
+                              recipe: recipe,
+                              internalUse: '',
+                              missingIngredients: const [],
+                            ),
                           ),
-                        );
+                        ).then((_) {
+                          fetchixedRecipes();
+                          setState(() {});
+                        });
                       },
                       child: CustomRecipeCard(
                         recipe: recipe,

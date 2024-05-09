@@ -353,6 +353,33 @@ class RecipeService {
     }
   }
 
+
+  Future<List<Recipe>> getRecipesByCategoryByLikes(
+    
+      String categoryName, int page, int pageSize) async {
+        print('Method Called');
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '${Constants.baseUrl}/api/getRecipesByCategoryByLikes/$categoryName?page=$page&pageSize=$pageSize'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> decodedData = jsonDecode(response.body);
+
+        final List<Recipe> recipes = decodedData.map((json) {
+          return Recipe.fromJson(json);
+        }).toList();
+
+        return recipes;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
   Future<List<Recipe>> getRecipesBySearch(
       String searchQuery, int page, int pageSize) async {
     // Encodes the search query to handle special characters in URL

@@ -1,15 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/auth_screen/components/reusable_textfield.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
-import 'package:foodryp/screens/mainScreen/main_screen.dart';
+import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:provider/provider.dart';
 
 // Define the Gender enum
 enum Gender {
@@ -261,7 +257,7 @@ final isAndroid =  Constants.checiIfAndroid(context);
   Future<void> navigateToHomeScreen(BuildContext context, bool isAndroid) async {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) =>isAndroid ? const BottomNavScreen(): const MainScreen()),
+      MaterialPageRoute(builder: (context) =>isAndroid ? const BottomNavScreen(): const EntryWebNavigationPage()),
       (Route<dynamic> route) => false,
     );
   }

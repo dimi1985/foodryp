@@ -33,21 +33,39 @@ class CustomRecipeCard extends StatefulWidget {
 class _CustomRecipeCardState extends State<CustomRecipeCard> {
   bool isOwner = false;
   bool isAuthenticated = false;
-  List<String>? uniqueIngredients = [];
+  List<String> uniqueIngredients = [];
+
   @override
   void initState() {
     checkAuthenticationAndOwnershipStatus();
-    uniqueIngredients = widget.missingIngredients?.toSet().toList();
-    log(widget.internalUse);
+    setState(() {
+      updateUniqueIngredients();
+    });
+
+    log(uniqueIngredients.toString());
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(CustomRecipeCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.missingIngredients != oldWidget.missingIngredients) {
+      updateUniqueIngredients();
+    }
+  }
+
+  void updateUniqueIngredients() {
+    setState(() {
+      uniqueIngredients = widget.missingIngredients?.toSet().toList() ?? [];
+    });
   }
 
   Future<void> checkAuthenticationAndOwnershipStatus() async {
     String getCurrentUserId = await UserService().getCurrentUserId();
     setState(() {
       isAuthenticated = getCurrentUserId.isNotEmpty;
-      isOwner =
-          isAuthenticated && (widget.recipe.userId?.contains(getCurrentUserId) ?? false);
+      isOwner = isAuthenticated &&
+          (widget.recipe.userId?.contains(getCurrentUserId) ?? false);
     });
   }
 
@@ -81,14 +99,15 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                   right: 10,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: HexColor(widget.recipe.categoryColor ??Constants.emptyField)
+                      color: HexColor(widget.recipe.categoryColor ??
+                              Constants.emptyField)
                           .withOpacity(0.7),
                     ),
                     child: Text(
                       overflow: TextOverflow.ellipsis,
                       widget.recipe.categoryName.toUpperCase(),
                       style: GoogleFonts.getFont(
-                        widget.recipe.categoryFont ??Constants.emptyField,
+                        widget.recipe.categoryFont ?? Constants.emptyField,
                         fontSize: Responsive.isDesktop(context)
                             ? Constants.desktopFontSize
                             : Constants.mobileFontSize,
@@ -129,7 +148,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      widget.recipe.username ??Constants.emptyField,
+                      widget.recipe.username ?? Constants.emptyField,
                       style: TextStyle(
                         fontSize: Responsive.isDesktop(context) ? 16 : 12,
                         color: Colors.black,
@@ -170,14 +189,16 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     Expanded(
                       child: Text(
                         overflow: TextOverflow.ellipsis,
-                        widget.recipe.recipeTitle?.toUpperCase() ??Constants.emptyField,
+                        widget.recipe.recipeTitle?.toUpperCase() ??
+                            Constants.emptyField,
                         style: GoogleFonts.getFont(
-                          widget.recipe.categoryFont ??Constants.emptyField,
+                          widget.recipe.categoryFont ?? Constants.emptyField,
                           fontSize: Responsive.isDesktop(context)
                               ? Constants.desktopFontSize
                               : Constants.mobileFontSize,
                           fontWeight: FontWeight.bold,
-                          color: HexColor(widget.recipe.categoryColor ??Constants.emptyField)
+                          color: HexColor(widget.recipe.categoryColor ??
+                                  Constants.emptyField)
                               .withOpacity(0.7),
                         ),
                       ),
@@ -227,7 +248,8 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       color: Colors.black,
                     ),
                     Text(
-                      widget.recipe.likedBy?.length.toString() ??Constants.emptyField,
+                      widget.recipe.likedBy?.length.toString() ??
+                          Constants.emptyField,
                     ),
                   ],
                 ),

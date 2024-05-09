@@ -7,17 +7,14 @@ import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
-import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
-import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -77,9 +74,11 @@ class _AddRecipePageState extends State<AddRecipePage> {
   Future<void> fetchUserProfile() async {
     final userService = UserService();
     final userProfile = await userService.getUserProfile();
-    setState(() {
-      user = userProfile ?? Constants.defaultUser;
-    });
+    if (mounted) {
+      setState(() {
+        user = userProfile ?? Constants.defaultUser;
+      });
+    }
   }
 
   @override
@@ -92,11 +91,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
     if (widget.recipe != null) {
       // Populate text controllers with recipe data for editing
-      recipeTitleTextController.text = widget.recipe!.recipeTitle ?? Constants.emptyField;
-      descriptionTextController.text = widget.recipe!.description?? Constants.emptyField;
-      servingTextController.text = widget.recipe!.servingNumber?? Constants.emptyField;
-      prepDurationTextController.text = widget.recipe!.prepDuration?? Constants.emptyField;
-      cookDurationTextController.text = widget.recipe!.cookDuration?? Constants.emptyField;
+      recipeTitleTextController.text =
+          widget.recipe!.recipeTitle ?? Constants.emptyField;
+      descriptionTextController.text =
+          widget.recipe!.description ?? Constants.emptyField;
+      servingTextController.text =
+          widget.recipe!.servingNumber ?? Constants.emptyField;
+      prepDurationTextController.text =
+          widget.recipe!.prepDuration ?? Constants.emptyField;
+      cookDurationTextController.text =
+          widget.recipe!.cookDuration ?? Constants.emptyField;
 
       // Populate ingredients text controllers
       ingredientsControllers.clear(); // Clear existing controllers
@@ -119,22 +123,28 @@ class _AddRecipePageState extends State<AddRecipePage> {
   Future<void> _fetchCategories() async {
     try {
       final categoriesGET = await categoryService.getAllCategories();
-      setState(() {
-        categories = categoriesGET;
-      });
-
+      if (mounted) {
+        setState(() {
+          categories = categoriesGET;
+        });
+      }
       if (widget.isForEdit) {
         int categoryIndex = categories.indexWhere(
             (category) => category.name == widget.recipe!.categoryName);
 
         if (categoryIndex != -1) {
-          setState(() {
-            tappedCategoryIndex = categoryIndex;
-            selectedCategoryColor = categories[categoryIndex].color ??Constants.emptyField;
-            selectedCategoryId = categories[categoryIndex].id!;
-            selectedCategoryFont = categories[categoryIndex].font ??Constants.emptyField;
-            selectedCategoryName = categories[categoryIndex].name ??Constants.emptyField;
-          });
+          if (mounted) {
+            setState(() {
+              tappedCategoryIndex = categoryIndex;
+              selectedCategoryColor =
+                  categories[categoryIndex].color ?? Constants.emptyField;
+              selectedCategoryId = categories[categoryIndex].id!;
+              selectedCategoryFont =
+                  categories[categoryIndex].font ?? Constants.emptyField;
+              selectedCategoryName =
+                  categories[categoryIndex].name ?? Constants.emptyField;
+            });
+          }
         }
       }
     } catch (error) {
@@ -143,27 +153,35 @@ class _AddRecipePageState extends State<AddRecipePage> {
   }
 
   void _addIngredient() {
-    setState(() {
-      ingredientsControllers.add(TextEditingController());
-    });
+    if (mounted) {
+      setState(() {
+        ingredientsControllers.add(TextEditingController());
+      });
+    }
   }
 
   void _removeIngredient(int index) {
-    setState(() {
-      ingredientsControllers.removeAt(index);
-    });
+    if (mounted) {
+      setState(() {
+        ingredientsControllers.removeAt(index);
+      });
+    }
   }
 
   void _addInstruction() {
-    setState(() {
-      instructionControllers.add(TextEditingController());
-    });
+    if (mounted) {
+      setState(() {
+        instructionControllers.add(TextEditingController());
+      });
+    }
   }
 
   void _removeInstruction(int index) {
-    setState(() {
-      instructionControllers.removeAt(index);
-    });
+    if (mounted) {
+      setState(() {
+        instructionControllers.removeAt(index);
+      });
+    }
   }
 
   @override
@@ -179,34 +197,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
       AppLocalizations.of(context).translate('Michelin'): Colors.blue,
     };
     return Scaffold(
-      appBar: kIsWeb
-          ? CustomAppBar(
-              isDesktop: true,
-              isAuthenticated: true,
-              profileImage: user.profileImage,
-              username: user.username,
-              onTapProfile: () {
-                // Handle profile onTap action
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ProfilePage(
-                            user: user,
-                          )),
-                );
-              },
-              user: user,
-              menuItems: isDesktop
-                  ? MenuWebItems(
-                      user: user,
-                      currentPage: currentPage,
-                    )
-                  : Container(),
-            )
-          : AppBar(),
-      endDrawer: !isDesktop && kIsWeb
-          ? MenuWebItems(user: user, currentPage: currentPage)
-          : null,
       body: SingleChildScrollView(
         child: Center(
           child: Container(
@@ -246,14 +236,19 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                 }
                                 return InkWell(
                                   onTap: () {
-                                    setState(() {
-                                      tappedCategoryIndex = index;
-                                      selectedCategoryColor = category.color ??Constants.emptyField;
-                                      selectedCategoryId = category.id!;
-                                      selectedCategoryFont = category.font ??Constants.emptyField;
-                                      selectedCategoryName = category.name ??Constants.emptyField;
-                                   
-                                    });
+                                    if (mounted) {
+                                      setState(() {
+                                        tappedCategoryIndex = index;
+                                        selectedCategoryColor =
+                                            category.color ??
+                                                Constants.emptyField;
+                                        selectedCategoryId = category.id!;
+                                        selectedCategoryFont = category.font ??
+                                            Constants.emptyField;
+                                        selectedCategoryName = category.name ??
+                                            Constants.emptyField;
+                                      });
+                                    }
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -263,10 +258,11 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                       children: [
                                         const SizedBox(height: 8),
                                         Text(
-                                          category.name ??Constants.emptyField,
+                                          category.name ?? Constants.emptyField,
                                           style: TextStyle(
                                             color: isTapped
-                                                ? HexColor(category.color ??Constants.emptyField)
+                                                ? HexColor(category.color ??
+                                                    Constants.emptyField)
                                                 : Colors.grey,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -332,11 +328,13 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       containerSize: isDesktop ? 600 : screenSize.width,
                       onImageSelected: (file, bytes) {
                         // Handle image selection
-                        setState(() {
-                          _imageFile = file;
-                          uint8list = Uint8List.fromList(bytes);
-                          imageIsPicked = true;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _imageFile = file;
+                            uint8list = Uint8List.fromList(bytes);
+                            imageIsPicked = true;
+                          });
+                        }
                       },
                       gender: '',
                       isFor: 'Other',
@@ -511,15 +509,17 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                       .white, // Optional: Set selected color
                                   onSelected: (selected) {
                                     if (selected) {
-                                      setState(() {
-                                        if (widget.isForEdit) {
-                                          widget.recipe!.difficulty =
-                                              value; // Update the model
-                                        } else {
-                                          _selectedDifficulty =
-                                              value; // Update local state
-                                        }
-                                      });
+                                      if (mounted) {
+                                        setState(() {
+                                          if (widget.isForEdit) {
+                                            widget.recipe!.difficulty =
+                                                value; // Update the model
+                                          } else {
+                                            _selectedDifficulty =
+                                                value; // Update local state
+                                          }
+                                        });
+                                      }
                                     }
                                   },
                                 ),
@@ -551,7 +551,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                             log('selectedCategoryName in showDialog:  $selectedCategoryName');
+                          log('selectedCategoryName in showDialog:  $selectedCategoryName');
                           return Dialog(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16.0),
@@ -627,7 +627,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                           Text(
                                             AppLocalizations.of(context)
                                                 .translate('Category'),
-                                                
                                             style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),

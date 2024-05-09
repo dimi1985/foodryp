@@ -7,9 +7,6 @@ import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dar
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDesktop;
   final bool isAuthenticated;
-
-  final String profileImage;
-  final String username;
   final Function()? onTapProfile;
   final Widget menuItems;
   final User user;
@@ -18,8 +15,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.isDesktop,
     required this.isAuthenticated,
-    required this.profileImage,
-    required this.username,
     this.onTapProfile,
     required this.menuItems,
     required this.user,
@@ -28,8 +23,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    final finalProfileImageURL =
-        ('${Constants.baseUrl}/${user.profileImage}').replaceAll('\\', '/');
+
     return AppBar(
       surfaceTintColor: Colors.white,
       toolbarHeight: 80,
@@ -41,42 +35,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           const Text('Foodryp'),
           if (isDesktop)
             Expanded(
-              flex: isDesktop ? 3 :1,
+              flex: isDesktop ? 3 : 1,
               child: SizedBox(
                 width: screenSize.width,
-                height: isDesktop ? 100:50,
+                height: isDesktop ? 100 : 50,
                 child: menuItems,
-              ),
-            ),
-    
-          if (isAuthenticated)
-            Padding(
-              padding: const EdgeInsets.only(right: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  finalProfileImageURL == Constants.imageURL || username.isEmpty
-                      ? Container()
-                      : ImagePickerPreviewContainer(
-                          initialImagePath: user.profileImage,
-                          containerSize:isDesktop ?  30 : 20,
-                          onImageSelected: (iamge, bytes) {},
-                          gender: user.gender ?? '',
-                          isFor: '',
-                          isForEdit: false,
-                          allowSelection: false,
-                        ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  username.isEmpty
-                      ? Container()
-                      : InkWell(
-                          onTap: onTapProfile,
-                          child: Text(username),
-                        ),
-                ],
               ),
             ),
         ],

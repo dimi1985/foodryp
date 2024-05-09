@@ -10,9 +10,7 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
-import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 import 'package:provider/provider.dart';
 
 class RecipePage extends StatefulWidget {
@@ -62,50 +60,64 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> fetchRecipesBySearch(String searchQuery) async {
-    setState(() => _isLoading = true);
+    if (mounted) {
+      setState(() => _isLoading = true);
+    }
     try {
       final fetchedRecipes = await RecipeService().getRecipesBySearch(
         searchQuery,
         _pageSize,
         _currentPage,
       );
-      setState(() {
-        if (_currentPage == 1) recipes.clear();
-        recipes.addAll(fetchedRecipes);
-        _noResultsFound = fetchedRecipes.isEmpty;
-      });
+      if (mounted) {
+        setState(() {
+          if (_currentPage == 1) recipes.clear();
+          recipes.addAll(fetchedRecipes);
+          _noResultsFound = fetchedRecipes.isEmpty;
+        });
+      }
     } catch (e) {
       print('Error fetching recipes: $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _fetchRecipes() async {
-    setState(() {
-      _isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
     try {
       fetchedRecipes = await RecipeService().getAllRecipesByPage(
         _currentPage,
         _pageSize,
       );
-      setState(() {
-        recipes = fetchedRecipes;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          recipes = fetchedRecipes;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _fetchMoreRecipes() async {
     if (!_isLoading) {
-      setState(() {
-        _isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
       try {
         fetchedRecipes = await RecipeService().getAllRecipesByPage(
           _currentPage + 1, // Fetch next page
@@ -113,21 +125,27 @@ class _RecipePageState extends State<RecipePage> {
         );
         if (fetchedRecipes.isEmpty) {
           // No more recipes to fetch, stop loading
-          setState(() {
-            _isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+          }
         } else {
-          setState(() {
-            recipes.addAll(fetchedRecipes);
-            _currentPage++; // Increment current page
-            _isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              recipes.addAll(fetchedRecipes);
+              _currentPage++; // Increment current page
+              _isLoading = false;
+            });
+          }
         }
       } catch (e) {
         print('Error fetching more recipes: $e');
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -138,37 +156,7 @@ class _RecipePageState extends State<RecipePage> {
     final searchSettingsProvider = Provider.of<SearchSettingsProvider>(context);
     bool searchOnEveryKeystroke = searchSettingsProvider.searchOnEveryKeystroke;
 
-
-
     return Scaffold(
-      appBar: kIsWeb
-          ? CustomAppBar(
-              isDesktop: true,
-              isAuthenticated: true,
-              profileImage: widget.user?.profileImage ?? '',
-              username: widget.user?.username ?? '',
-              onTapProfile: () {
-                // Handle profile onTap action
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ProfilePage(
-                            user: widget.user ?? Constants.defaultUser,
-                          )),
-                );
-              },
-              user: widget.user ?? Constants.defaultUser,
-              menuItems: isDesktop
-                  ? MenuWebItems(
-                      user: widget.user,
-                      currentPage: currentPage,
-                    )
-                  : Container(),
-            )
-          : AppBar(),
-      endDrawer: !isDesktop && kIsWeb
-          ? MenuWebItems(user: widget.user, currentPage: currentPage)
-          : null,
       body: Column(
         children: [
           Container(
@@ -205,16 +193,28 @@ class _RecipePageState extends State<RecipePage> {
                               height: 300,
                               width: 300,
                               child: InkWell(
-                                 splashColor: Colors.transparent, // Ensures no splash color is shown
-    highlightColor: Colors.transparent, // Ensures no highlight color on tap
+                                splashColor: Colors
+                                    .transparent, // Ensures no splash color is shown
+                                highlightColor: Colors
+                                    .transparent, // Ensures no highlight color on tap
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
+                                      builder: (context) => RecipeDetailPage(
+                                        recipe: recipe,
+                                        internalUse: '',
+                                        missingIngredients: const [],
+                                      ),
                                     ),
-                                  );
+                                  ).then((_) {
+                                    // Update the state of the recipe list after navigating back
+
+                                    _fetchRecipes();
+                                    if (mounted) {
+                                      setState(() {});
+                                    }
+                                  });
                                 },
                                 child: CustomRecipeCard(
                                     internalUse: 'RecipePage', recipe: recipe),
@@ -257,15 +257,31 @@ class _RecipePageState extends State<RecipePage> {
         onChanged: (value) {
           if (value.isEmpty) {
             // If the TextField is empty, reset searchQuery and fetch normal recipes
-            setState(() {
-              _searchQuery = '';
-              _currentPage = 1;
-              recipes.clear();
-              _fetchRecipes(); // Fetch normal recipes
-            });
+            if (mounted) {
+              setState(() {
+                _searchQuery = '';
+                _currentPage = 1;
+                recipes.clear();
+                _fetchRecipes(); // Fetch normal recipes
+              });
+            }
           } else {
             // If the TextField has a value, perform search based on search behavior
             if (searchOnEveryKeystroke) {
+              if (mounted) {
+                setState(() {
+                  _currentPage = 1;
+                  _searchQuery = value;
+                  recipes.clear();
+                  fetchRecipesBySearch(value);
+                });
+              }
+            }
+          }
+        },
+        onSubmitted: (value) {
+          if (!searchOnEveryKeystroke) {
+            if (mounted) {
               setState(() {
                 _currentPage = 1;
                 _searchQuery = value;
@@ -273,16 +289,6 @@ class _RecipePageState extends State<RecipePage> {
                 fetchRecipesBySearch(value);
               });
             }
-          }
-        },
-        onSubmitted: (value) {
-          if (!searchOnEveryKeystroke) {
-            setState(() {
-              _currentPage = 1;
-              _searchQuery = value;
-              recipes.clear();
-              fetchRecipesBySearch(value);
-            });
           }
         },
       ),

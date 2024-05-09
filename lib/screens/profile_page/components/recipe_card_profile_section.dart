@@ -224,7 +224,7 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                             builder: (context) => RecipeDetailPage(
                               recipe: recipe,
                               internalUse: '',
-                              missingIngredients: [],
+                              missingIngredients: const [],
                             ),
                           ),
                         );

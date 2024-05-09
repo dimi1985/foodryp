@@ -4,9 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/database/database_helper.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
+import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/language_provider.dart';
+import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_profile_provider.dart';
@@ -20,8 +22,8 @@ void main() async {
   // Initialize the language provider and load the language
   // Ensure that the necessary bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
-   var db = getDatabase(); // This will fetch the appropriate database instance
-  await db.init();        // Initialize the database
+  var db = getDatabase(); // This will fetch the appropriate database instance
+  await db.init(); // Initialize the database
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? languageCode = prefs.getString('languageCode');
   String? countryCode = prefs.getString('countryCode');
@@ -37,8 +39,9 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => UsersListProvider()),
         ChangeNotifierProvider(create: (_) => SearchSettingsProvider()),
-           ChangeNotifierProvider(create: (_) => CelebrationSettingsProvider()),
-               ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+        ChangeNotifierProvider(create: (_) => CelebrationSettingsProvider()),
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+        ChangeNotifierProvider(create: (_) => RecipeProvider()),
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),
@@ -66,8 +69,6 @@ class _FoodrypState extends State<Foodryp> {
 
   @override
   Widget build(BuildContext context) {
-    
-
     return ChangeNotifierProvider(
       create: (BuildContext context) => ThemeProvider(),
       child: Consumer<ThemeProvider>(
@@ -102,16 +103,14 @@ class _FoodrypState extends State<Foodryp> {
       _locale = locale;
     });
   }
-  
-  
+
   Widget determineMobileLayout() {
     // Check if the platform is Android
     if (kIsWeb) {
-      return const MainScreen() ;
+      return const EntryWebNavigationPage();
     } else {
       // Optionally handle other platforms, such as iOS
-      return const BottomNavScreen();  // Default to web layout for other platforms
+      return const BottomNavScreen(); // Default to web layout for other platforms
     }
   }
-
 }

@@ -6,12 +6,14 @@ import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/comment_service.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 import '../../models/comment.dart';
 
 class RecipeDetailPage extends StatefulWidget {
@@ -40,7 +42,18 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     fetchComments();
   }
 
-  void initLikeStatus() async {
+
+   @override
+  void didUpdateWidget(RecipeDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.recipe.id != oldWidget.recipe.id) {
+      // If the recipe changes, update like status and comments
+      initLikeStatus();
+      fetchComments();
+    }
+  }
+
+   void initLikeStatus() async {
     String getCurrentUserId = await UserService().getCurrentUserId();
     setState(() {
       isLiked = widget.recipe.likedBy?.contains(getCurrentUserId) ?? false;
@@ -64,7 +77,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final isDesktop = Responsive.isDesktop(context);
     final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
     final isAndroid = Constants.checiIfAndroid(context);
-
+final recipesProvider = Provider.of<RecipeProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -228,7 +241,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                 bool isMissing = widget.missingIngredients
                     .contains(widget.recipe.ingredients?[index]);
                 return Text(
-                  widget.recipe.ingredients?[index]  ??Constants.emptyField,
+                  widget.recipe.ingredients?[index]  ?? Constants.emptyField,
                   style: TextStyle(
                     fontSize: 16.0,
                     color: isMissing
@@ -252,6 +265,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                         .then((_) => setState(() {
                               // Update the UI state after the recipe is disliked
                               isLiked = false;
+
                             }))
                         .catchError((error) {
                       // Handle any errors that occur during the disliking process

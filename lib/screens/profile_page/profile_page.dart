@@ -1,5 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api, must_be_immutable
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_page/components/recipe_card_profile_section.dart';
@@ -8,11 +8,8 @@ import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/settings_page/settings_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_app_bar.dart';
 import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
-import 'package:foodryp/widgets/CustomWidgets/menuWebItems.dart';
 import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -56,33 +53,26 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
-      appBar: kIsWeb
-          ? CustomAppBar(
-              isDesktop: true,
-              isAuthenticated: true,
-              profileImage: '',
-              username: '',
-              user: widget.user,
-              menuItems: isDesktop
-                  ? MenuWebItems(
-                      user: widget.user,
-                      currentPage: currentPage,
-                    )
-                  : Container(),
-            )
-            
-          : AppBar(
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    _goToSettingsPage(userProfile);
-                  },
-                  icon: const Icon(Icons.settings),
-                ),
-              ],
+      appBar: AppBar(
+        actions: [
+          if (currentPage == 'ProfilePage')
+            IconButton(
+              // Show the settings icon button if 'ProfilePage' is present
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                // Navigate to ProfilePage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SettingsPage(
+                            user: widget.user,
+                          )),
+                );
+              },
             ),
+        ],
+      ),
       body: ListView(
         padding: EdgeInsets.zero,
         shrinkWrap: true,

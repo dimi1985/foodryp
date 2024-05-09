@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/main.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/admin/admin_panel_screen.dart';
-import 'package:foodryp/screens/profile_page/profile_page.dart';
+import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/screens/settings_page/components/delete_account_page.dart';
-import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -558,13 +557,14 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
+
   void signout(BuildContext context) async {
     // Clear user ID from shared preferences
     await UserService().clearUserId();
     // Navigating to the main screen
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => MainScreen()),
+      MaterialPageRoute(builder: (context) => const EntryWebNavigationPage()),
       (route) => false,
     );
   }

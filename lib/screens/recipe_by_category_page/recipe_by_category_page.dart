@@ -5,8 +5,10 @@ import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
+import 'package:provider/provider.dart';
 
 class RecipeByCategoryPage extends StatefulWidget {
   final CategoryModel category;
@@ -22,8 +24,9 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
   late ScrollController _scrollController;
   List<Recipe> recipes = [];
   bool _isLoading = false;
-  int _page = 1; // Initial page number
-  final int _pageSize = 10; // Number of recipes per page
+  int _page = 1;
+  int _pageSize = 10;
+  int timesCalled = 0;
 
   @override
   void initState() {
@@ -31,6 +34,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
     _scrollController = ScrollController()..addListener(_scrollListener);
     if (recipes.isEmpty) {
       _fetchRecipesByCategory();
+        _fetchRecipesByCategoryByLikes();
     }
   }
 
@@ -50,14 +54,26 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
   Future<void> _fetchRecipesByCategory() async {
     setState(() {
       _isLoading = true;
+      timesCalled += 1;
     });
     try {
+      if (timesCalled == 2) {
+        setState(() {
+          _page = 1;
+          _pageSize = 10;
+          
+        });
+      }
+
       final fetchedRecipes = await RecipeService().getRecipesByCategory(
-        widget.category.name ??Constants.emptyField,
+        widget.category.name ?? Constants.emptyField,
         _page,
         _pageSize,
       );
       setState(() {
+        if (timesCalled == 2) {
+          recipes.clear();
+        }
         recipes.addAll(fetchedRecipes);
         _isLoading = false;
         _page++; // Increment page number for the next fetch
@@ -66,6 +82,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
       print('Error fetching recipes: $e');
       setState(() {
         _isLoading = false;
+        timesCalled = 0;
       });
     }
   }
@@ -77,7 +94,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
       });
       try {
         final fetchedRecipes = await RecipeService().getRecipesByCategory(
-          widget.category.name ??Constants.emptyField,
+          widget.category.name ?? Constants.emptyField,
           _page,
           _pageSize,
         );
@@ -92,6 +109,36 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _fetchRecipesByCategoryByLikes() async {
+    setState(() {
+      _isLoading = true;
+     
+    });
+    try {
+     
+
+      final fetchedRecipes = await RecipeService().getRecipesByCategoryByLikes(
+        widget.category.name ?? Constants.emptyField,
+        _page,
+        _pageSize,
+      );
+      setState(() {
+        if (timesCalled == 2) {
+          recipes.clear();
+        }
+        recipes.addAll(fetchedRecipes);
+        _isLoading = false;
+        _page++; // Increment page number for the next fetch
+      });
+    } catch (e) {
+      print('Error fetching recipes: $e');
+      setState(() {
+        _isLoading = false;
+        timesCalled = 0;
+      });
     }
   }
 
@@ -114,14 +161,19 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
                   height: 300,
                   width: 300,
                   child: InkWell(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              RecipeDetailPage(recipe: recipe, internalUse: '', missingIngredients: [],),
+                          builder: (context) => RecipeDetailPage(
+                            recipe: recipe,
+                            internalUse: '',
+                            missingIngredients: const [],
+                          ),
                         ),
-                      );
+                      ).then((_) {
+                        _fetchRecipesByCategory();
+                      });
                     },
                     child: CustomRecipeCard(
                       recipe: recipe,
