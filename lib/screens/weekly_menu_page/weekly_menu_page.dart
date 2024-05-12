@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
+import 'package:foodryp/screens/weekly_menu_detail_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -126,7 +127,12 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
                 return Padding(
                   padding: const EdgeInsets.all(Constants.defaultPadding),
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) =>  WeeklyMenuDetailPage(meal: meal,)),
+              );
+                    },
                     child: CustomWeeklyMenuCard(
                       meal: meal,
                       currentPage: currentPage,

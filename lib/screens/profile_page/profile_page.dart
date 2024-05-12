@@ -88,7 +88,8 @@ class _ProfilePageState extends State<ProfilePage> {
           WeeklyMenuSection(
               showAll: false,
               publicUsername: widget.user.username,
-              publicUserId: widget.user.id),
+              publicUserId: widget.user.id,
+              userRecipes: widget.user.recipes),
           const SizedBox(height: 25.0),
           HeadingTitleRow(
               title: AppLocalizations.of(context).translate('Recipes'),
@@ -113,13 +114,5 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _goToSettingsPage(User? userProfile) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => SettingsPage(
-                user: userProfile ?? Constants.defaultUser,
-              )),
-    );
-  }
+
 }

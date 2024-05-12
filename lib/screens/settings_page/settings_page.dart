@@ -1,10 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/main.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/admin/admin_panel_screen.dart';
+import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/screens/settings_page/components/delete_account_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
@@ -94,15 +96,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         builder: (context) => const AdminPanelScreen()),
                   );
                 },
-                child:
-                    Text(AppLocalizations.of(context).translate('Settings')))
+                child: Text(AppLocalizations.of(context).translate('Settings')))
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
         children: [
           _sectionTitle(AppLocalizations.of(context).translate('Account')),
-    
+
           userImageSection(context, isDesktop),
           //Maybe Later in Future update
           // _settingTile(
@@ -165,7 +166,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   seconds: 2), // Adjust duration as needed
                             ),
                           );
-    
+
                           signout(_scaffoldKey.currentContext!);
                         } else {
                           // Failed to change email
@@ -230,7 +231,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   seconds: 2), // Adjust duration as needed
                             ),
                           );
-    
+
                           signout(_scaffoldKey.currentContext!);
                         } else {
                           // Failed to change password
@@ -312,7 +313,7 @@ class _SettingsPageState extends State<SettingsPage> {
               );
             },
           ),
-    
+
           _sectionTitle(AppLocalizations.of(context).translate('App Theme')),
           // Add app theme settings tiles here
           SizedBox(
@@ -334,7 +335,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-    
+
           _sectionTitle(AppLocalizations.of(context).translate('Language')),
           LanguageSettingsTile(
             title: AppLocalizations.of(context).translate('English'),
@@ -362,19 +363,19 @@ class _SettingsPageState extends State<SettingsPage> {
               Foodryp.setLocale(context, locale);
             },
           ),
-    
-          _sectionTitle(AppLocalizations.of(context)
-              .translate('Units and Measurements')),
-    
+
+          _sectionTitle(
+              AppLocalizations.of(context).translate('Units and Measurements')),
+
           _sectionTitle(AppLocalizations.of(context).translate(
               AppLocalizations.of(context).translate('Search Settings'))),
-    
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                title: Text(AppLocalizations.of(context)
-                    .translate('Search on Submit')),
+                title: Text(
+                    AppLocalizations.of(context).translate('Search on Submit')),
                 leading: Radio(
                   value: false,
                   groupValue: searchSettingsProvider.searchOnEveryKeystroke,
@@ -403,10 +404,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
           _sectionTitle(AppLocalizations.of(context).translate(
-              AppLocalizations.of(context)
-                  .translate('Celebration Day Input'))),
+              AppLocalizations.of(context).translate('Celebration Day Input'))),
           const SizedBox(height: 400, child: CelebrationInput()),
-    
+
           _sectionTitle(AppLocalizations.of(context).translate(
               AppLocalizations.of(context)
                   .translate('Celebration Day Notification'))),
@@ -557,14 +557,16 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-
   void signout(BuildContext context) async {
     // Clear user ID from shared preferences
     await UserService().clearUserId();
     // Navigating to the main screen
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const EntryWebNavigationPage()),
+      MaterialPageRoute(
+        builder: (context) =>
+            kIsWeb ? const EntryWebNavigationPage() : const BottomNavScreen(),
+      ),
       (route) => false,
     );
   }

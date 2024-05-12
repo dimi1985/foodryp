@@ -1,10 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api, unused_field
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';

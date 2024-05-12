@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 
 class SectionTitle extends StatelessWidget {
@@ -16,7 +17,8 @@ class SectionTitle extends StatelessWidget {
     return Align(
       alignment: Alignment.topLeft,
       child: Text(
-        title,
+        
+        AppLocalizations.of(context).translate(title),
         style: TextStyle(
           color: Colors.black,
           fontSize: isDesktop

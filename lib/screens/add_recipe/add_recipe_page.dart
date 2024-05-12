@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
@@ -867,7 +868,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          MainScreen()),
+
+                                                          const EntryWebNavigationPage()),
                                                   (Route<dynamic> route) =>
                                                       false,
                                                 );

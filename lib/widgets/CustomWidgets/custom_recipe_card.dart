@@ -1,18 +1,20 @@
 import 'dart:developer';
-
-import 'package:flutter/cupertino.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:foodryp/database/database_helper.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/recipe_deletion_confirmation_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 
 class CustomRecipeCard extends StatefulWidget {
   final String internalUse;
@@ -38,11 +40,12 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
   @override
   void initState() {
     checkAuthenticationAndOwnershipStatus();
-    setState(() {
-      updateUniqueIngredients();
-    });
+    if (mounted) {
+      setState(() {
+        updateUniqueIngredients();
+      });
+    }
 
-    log(uniqueIngredients.toString());
     super.initState();
   }
 
@@ -55,18 +58,22 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
   }
 
   void updateUniqueIngredients() {
-    setState(() {
-      uniqueIngredients = widget.missingIngredients?.toSet().toList() ?? [];
-    });
+    if (mounted) {
+      setState(() {
+        uniqueIngredients = widget.missingIngredients?.toSet().toList() ?? [];
+      });
+    }
   }
 
   Future<void> checkAuthenticationAndOwnershipStatus() async {
     String getCurrentUserId = await UserService().getCurrentUserId();
-    setState(() {
-      isAuthenticated = getCurrentUserId.isNotEmpty;
-      isOwner = isAuthenticated &&
-          (widget.recipe.userId?.contains(getCurrentUserId) ?? false);
-    });
+    if (mounted) {
+      setState(() {
+        isAuthenticated = getCurrentUserId.isNotEmpty;
+        isOwner = isAuthenticated &&
+            (widget.recipe.userId?.contains(getCurrentUserId) ?? false);
+      });
+    }
   }
 
   @override
@@ -75,6 +82,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     bool isDesktop = Responsive.isDesktop(context);
     final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Card(
       surfaceTintColor: Colors.white70,
       child: Column(
@@ -122,9 +130,11 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
           ),
           Container(
             padding: const EdgeInsets.all(Constants.defaultPadding),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: themeProvider.currentTheme == ThemeType.dark
+                  ? const Color.fromARGB(255, 37, 36, 37)
+                  : Colors.white,
+              borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(Constants.defaultPadding),
                 bottomRight: Radius.circular(Constants.defaultPadding),
               ),
@@ -151,7 +161,9 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       widget.recipe.username ?? Constants.emptyField,
                       style: TextStyle(
                         fontSize: Responsive.isDesktop(context) ? 16 : 12,
-                        color: Colors.black,
+                        color: themeProvider.currentTheme == ThemeType.dark
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                     const SizedBox(width: 5), // Adjust the spacing as needed
@@ -161,7 +173,9 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         fontSize: Responsive.isDesktop(context)
                             ? Constants.desktopFontSize
                             : Constants.mobileFontSize,
-                        color: Colors.black,
+                        color: themeProvider.currentTheme == ThemeType.dark
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -175,7 +189,9 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                           fontSize: Responsive.isDesktop(context)
                               ? Constants.desktopFontSize
                               : Constants.mobileFontSize,
-                          color: Colors.black,
+                          color: themeProvider.currentTheme == ThemeType.dark
+                              ? Colors.white
+                              : Colors.black,
                         ),
                       ),
                     ),
@@ -254,9 +270,9 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                   ],
                 ),
                 if (widget.internalUse == 'RecipePage' &&
-                    (uniqueIngredients?.isNotEmpty ?? false))
+                    (uniqueIngredients.isNotEmpty))
                   Text(
-                      'There Are Missing Ingredients: ${uniqueIngredients?.length ?? 0}',
+                      '${AppLocalizations.of(context).translate('There Are Missing Ingredients:')} ${uniqueIngredients.length}',
                       style: TextStyle(color: Colors.red.withOpacity(0.7))),
               ],
             ),

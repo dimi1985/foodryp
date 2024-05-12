@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -51,10 +52,10 @@ class WeeklyMenuDetailPage extends StatelessWidget {
                               .replaceAll('\\', '/');
                       if (index.isEven) {
                         return _buildRow(
-                            dayOfWeek, recipeImage, isDesktop, index);
+                            dayOfWeek, recipeImage, isDesktop, index,context);
                       } else {
                         return _buildReversedRow(
-                            dayOfWeek, recipeImage, isDesktop, index);
+                            dayOfWeek, recipeImage, isDesktop, index,context);
                       }
                     },
                     separatorBuilder: (context, index) =>
@@ -70,26 +71,26 @@ class WeeklyMenuDetailPage extends StatelessWidget {
   }
 
   Widget _buildRow(
-      Recipe recipe, String recipeImage, bool isDesktop, int index) {
+      Recipe recipe, String recipeImage, bool isDesktop, int index, BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _buildColumnWithData(recipe, isDesktop, index)),
-        Expanded(child: _buildImageData(recipeImage, isDesktop, index)),
+        Expanded(child: _buildColumnWithData(recipe, isDesktop, index,context)),
+        Expanded(child: _buildImageData(recipeImage, isDesktop, index,context)),
       ],
     );
   }
 
   Widget _buildReversedRow(
-      Recipe recipe, String recipeImage, bool isDesktop, int index) {
+      Recipe recipe, String recipeImage, bool isDesktop, int index, BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _buildImageData(recipeImage, isDesktop, index)),
-        Expanded(child: _buildColumnWithData(recipe, isDesktop, index)),
+        Expanded(child: _buildImageData(recipeImage, isDesktop, index,context)),
+        Expanded(child: _buildColumnWithData(recipe, isDesktop, index,context)),
       ],
     );
   }
 
-  Widget _buildColumnWithData(Recipe recipe, bool isDesktop, int index) {
+  Widget _buildColumnWithData(Recipe recipe, bool isDesktop, int index, BuildContext context) {
     TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont ??Constants.emptyField,
         color: HexColor(
           recipe.categoryColor ??Constants.emptyField,
@@ -103,7 +104,7 @@ class WeeklyMenuDetailPage extends StatelessWidget {
         const SizedBox(
           height: 25,
         ),
-        getWeekdayName(index, recipe, isDesktop),
+        getWeekdayName(index, recipe, isDesktop,context),
         const SizedBox(
           height: 50,
         ),
@@ -128,7 +129,7 @@ class WeeklyMenuDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildImageData(String recipeImage, bool isDesktop, int index) {
+  Widget _buildImageData(String recipeImage, bool isDesktop, int index, BuildContext context) {
     return Container(
       width: 500, // Adjust width as needed
       height: 350, // Adjust height as needed
@@ -142,7 +143,7 @@ class WeeklyMenuDetailPage extends StatelessWidget {
     );
   }
 
-  Widget getWeekdayName(int index, Recipe recipe, bool isDesktop) {
+  Widget getWeekdayName(int index, Recipe recipe, bool isDesktop, BuildContext context) {
     TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont ??Constants.emptyField,
         color: HexColor(
           recipe.categoryColor ??Constants.emptyField,
@@ -154,37 +155,37 @@ class WeeklyMenuDetailPage extends StatelessWidget {
     switch (index) {
       case 0:
         return Text(
-          'Monday',
+          AppLocalizations.of(context).translate('Monday'),
           style: textStyle,
         );
       case 1:
         return Text(
-          'Tuesday',
+          AppLocalizations.of(context).translate('Tuesday'),
           style: textStyle,
         );
       case 2:
         return Text(
-          'Wednesday',
+          AppLocalizations.of(context).translate('Wednesday'),
           style: textStyle,
         );
       case 3:
         return Text(
-          'Thursday',
+          AppLocalizations.of(context).translate('Thursday'),
           style: textStyle,
         );
       case 4:
         return Text(
-          'Friday',
+          AppLocalizations.of(context).translate('Friday'),
           style: textStyle,
         );
       case 5:
         return Text(
-          'Saturday',
+          AppLocalizations.of(context).translate('Saturday'),
           style: textStyle,
         );
       case 6:
         return Text(
-          'Sunday',
+          AppLocalizations.of(context).translate('Sunday'),
           style: textStyle,
         );
       default:

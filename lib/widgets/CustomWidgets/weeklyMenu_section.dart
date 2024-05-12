@@ -11,12 +11,14 @@ class WeeklyMenuSection extends StatefulWidget {
   final bool showAll;
   final String publicUsername;
   final String publicUserId;
+  final List<String>? userRecipes;
 
   const WeeklyMenuSection(
       {super.key,
       required this.showAll,
       required this.publicUsername,
-      required this.publicUserId});
+      required this.publicUserId,
+      this.userRecipes});
 
   @override
   State<WeeklyMenuSection> createState() => _WeeklyMenuSectionState();
@@ -30,12 +32,11 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
   @override
   void initState() {
     super.initState();
-    fetchWeeklyMenus().then((_){
+    fetchWeeklyMenus().then((_) {
       setState(() {
         isLoading = false;
       });
-    } 
-    );
+    });
   }
 
   Future<void> fetchWeeklyMenus() async {
@@ -83,6 +84,36 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
             : widget.showAll
                 ? Container()
                 : Center(
+                    child: widget.userRecipes!.length < 7
+                        ? null
+                        : MaterialButton(
+                            onPressed: () async{
+                         await     Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AddWeeklyMenuPage(
+                                          meal: null,
+                                          isForEdit: false,
+                                        )),
+                              );
+                            },
+                            child: const Text('Add Weekly Menu'),
+                          ),
+                  )
+        : ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              },
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                if (!widget.showAll && widget.publicUserId == currentUserId)
+                  Center(
                     child: MaterialButton(
                       onPressed: () {
                         Navigator.push(
@@ -96,64 +127,37 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                       },
                       child: const Text('Add Weekly Menu'),
                     ),
-                  )
-        : ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            },
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              if (!widget.showAll && widget.publicUserId == currentUserId)
-                Center(
-                  child: MaterialButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AddWeeklyMenuPage(
-                                  meal: null,
-                                  isForEdit: false,
-                                )),
-                      );
-                    },
-                    child: const Text('Add Weekly Menu'),
                   ),
-                ),
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: weeklyList.length,
-                  itemBuilder: (context, index) {
-                    final meal = weeklyList[index];
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  WeeklyMenuDetailPage(meal: meal)),
-                        );
-                      },
-                      child: CustomWeeklyMenuCard(
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: weeklyList.length,
+                    itemBuilder: (context, index) {
+                      final meal = weeklyList[index];
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    WeeklyMenuDetailPage(meal: meal)),
+                          );
+                        },
+                        child: CustomWeeklyMenuCard(
                           meal: meal,
                           currentPage: '',
                           isForAll: widget.showAll,
                           publicUserId: widget.publicUserId,
                           currentUserId: currentUserId,
                         ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
+              ],
+            ),
+          );
   }
 }

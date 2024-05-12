@@ -36,9 +36,9 @@ class DesktopMiddleSide extends StatelessWidget {
                     const SizedBox(height: 25),
                   HeadingTitleRow(
                     title: AppLocalizations.of(context).translate('Categories'),
-                    onPressed: () {
+                    onPressed: () async{
                       // Navigate to the corresponding page
-                      Navigator.push(
+                    await  Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const CategoryPage()),
@@ -56,9 +56,9 @@ class DesktopMiddleSide extends StatelessWidget {
                               : 50),
                   HeadingTitleRow(
                     title: AppLocalizations.of(context).translate('Recipes'),
-                    onPressed: () {
+                    onPressed: () async{
                       // Navigate to the corresponding page
-                      Navigator.push(
+                    await  Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const RecipePage()),
@@ -71,9 +71,9 @@ class DesktopMiddleSide extends StatelessWidget {
                   HeadingTitleRow(
                     title:
                         AppLocalizations.of(context).translate('Weekly Menus'),
-                    onPressed: () {
+                    onPressed: ()async {
                       // Navigate to the corresponding page
-                      Navigator.push(
+                    await  Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const WeeklyMenuPage()),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
+import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
@@ -145,8 +146,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
     log(MediaQuery.of(context).size.height.toString());
     return Scaffold(
       appBar: AppBar(
-        
-        title:  Text(AppLocalizations.of(context).translate('Add Weekly Menu')),
+        title: Text(AppLocalizations.of(context).translate('Add Weekly Menu')),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -180,17 +180,16 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      
                       '${userProfile.username} ${AppLocalizations.of(context).translate('Here you can check and put the meals of the day')}',
                     ),
                     Padding(
                       padding: const EdgeInsets.all(Constants.defaultPadding),
                       child: CustomTextField(
-                        
-                          
                           controller: titleController,
-                          hintText: AppLocalizations.of(context).translate('Enter Title'),
-                          labelText: AppLocalizations.of(context).translate('Title')),
+                          hintText: AppLocalizations.of(context)
+                              .translate('Enter Title'),
+                          labelText:
+                              AppLocalizations.of(context).translate('Title')),
                     ),
                     TextButton(
                       onPressed: isLoading
@@ -211,6 +210,16 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                       .then((value) {
                                       if (value) {
                                         //PUT SNAK
+                                           Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const EntryWebNavigationPage(),
+                                                maintainState: false),
+                                            (Route<dynamic> route) => false);
+                                        setState(() {
+                                          isLoading = false;
+                                        });
                                         setState(() {
                                           isLoading = false;
                                         });
@@ -225,6 +234,13 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                       .then((value) {
                                       if (value) {
                                         //PUT SNAKS
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const EntryWebNavigationPage(),
+                                                maintainState: false),
+                                            (Route<dynamic> route) => false);
                                         setState(() {
                                           isLoading = false;
                                         });
@@ -341,14 +357,14 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                                                     children: [
                                                                       // Recipe details
                                                                       Text(
-                                                                        recipe
-                                                                            .recipeTitle ??Constants.emptyField,
+                                                                        recipe.recipeTitle ??
+                                                                            Constants.emptyField,
                                                                         style: GoogleFonts
                                                                             .getFont(
-                                                                          recipe
-                                                                              .categoryFont ??Constants.emptyField,
+                                                                          recipe.categoryFont ??
+                                                                              Constants.emptyField,
                                                                           color:
-                                                                              HexColor(recipe.categoryColor ??Constants.emptyField).withOpacity(0.7),
+                                                                              HexColor(recipe.categoryColor ?? Constants.emptyField).withOpacity(0.7),
                                                                         ),
                                                                       ),
                                                                       const SizedBox(
@@ -519,7 +535,6 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            
                             Text(
                               '${AppLocalizations.of(context).translate('Day')} ${index + 1}', // Adjust day text as needed
                               style: TextStyle(
@@ -532,12 +547,16 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                             getWeekdayName(index, recipe),
                             const SizedBox(height: 10),
                             // Recipe details
-                            Text(
-                              recipe.recipeTitle ??Constants.emptyField,
-                              style: GoogleFonts.getFont(
-                                recipe.categoryFont ??Constants.emptyField,
-                                color: HexColor(recipe.categoryColor ??Constants.emptyField)
-                                    .withOpacity(0.7),
+                            Expanded(
+                              child: Text(
+                                overflow: TextOverflow.ellipsis,
+                                recipe.recipeTitle ?? Constants.emptyField,
+                                style: GoogleFonts.getFont(
+                                  recipe.categoryFont ?? Constants.emptyField,
+                                  color: HexColor(recipe.categoryColor ??
+                                          Constants.emptyField)
+                                      .withOpacity(0.7),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 10),
@@ -583,9 +602,10 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   }
 
   Widget getWeekdayName(int index, Recipe recipe) {
-    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont ??Constants.emptyField,
+    TextStyle textStyle = GoogleFonts.getFont(
+        recipe.categoryFont ?? Constants.emptyField,
         color: HexColor(
-          recipe.categoryColor ??Constants.emptyField,
+          recipe.categoryColor ?? Constants.emptyField,
         ).withOpacity(0.7),
         fontSize: Responsive.isDesktop(context)
             ? Constants.desktopHeadingTitleSize
@@ -593,20 +613,13 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
 
     switch (index) {
       case 0:
-     
-     
-      
-      
-     
-      
-      
         return Text(
-           AppLocalizations.of(context).translate('Monday'),
+          AppLocalizations.of(context).translate('Monday'),
           style: textStyle,
         );
       case 1:
         return Text(
-           AppLocalizations.of(context).translate('Tuesday'),
+          AppLocalizations.of(context).translate('Tuesday'),
           style: textStyle,
         );
       case 2:
@@ -621,7 +634,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
         );
       case 4:
         return Text(
-           AppLocalizations.of(context).translate('Friday'),
+          AppLocalizations.of(context).translate('Friday'),
           style: textStyle,
         );
       case 5:

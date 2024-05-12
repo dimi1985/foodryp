@@ -64,8 +64,8 @@ class _CategorySectionState extends State<CategorySection> {
                   return const SizedBox.shrink();
                 }
                 return InkWell(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async{
+                   await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => RecipeByCategoryPage(

@@ -9,6 +9,7 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,7 +78,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final isDesktop = Responsive.isDesktop(context);
     final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
     final isAndroid = Constants.checiIfAndroid(context);
-final recipesProvider = Provider.of<RecipeProvider>(context);
+final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -125,7 +126,7 @@ final recipesProvider = Provider.of<RecipeProvider>(context);
                               child: Align(
                                 alignment: Alignment
                                     .centerRight, // Align the details to the right
-                                child: _buildRecipeDetails(context),
+                                child: _buildRecipeDetails(context,themeProvider),
                               ),
                             ),
                           ),
@@ -189,11 +190,12 @@ final recipesProvider = Provider.of<RecipeProvider>(context);
                 ),
                 // Recipe details
                 const SizedBox(height: 20),
-                _buildRecipeDetails(context),
+                _buildRecipeDetails(context,themeProvider),
                 const SizedBox(height: 20),
                 _displayCommentsSection(),
                 const SizedBox(height: 20),
-                _buildCommentInput()
+                _buildCommentInput(),
+                const SizedBox(height: 20),
               ],
             ],
           ),
@@ -202,7 +204,7 @@ final recipesProvider = Provider.of<RecipeProvider>(context);
     );
   }
 
-  Widget _buildRecipeDetails(BuildContext context) {
+  Widget _buildRecipeDetails(BuildContext context, ThemeProvider themeProvider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40.0),
       child: Column(
@@ -246,7 +248,9 @@ final recipesProvider = Provider.of<RecipeProvider>(context);
                     fontSize: 16.0,
                     color: isMissing
                         ? Colors.red
-                        : Colors.black, // Red if missing, black otherwise
+                        : themeProvider.currentTheme == ThemeType.dark
+                    ? Colors.white
+                    : Colors.black, // Red if missing, black otherwise
                     fontWeight: isMissing ? FontWeight.bold : FontWeight.normal,
                   ),
                 );
@@ -401,7 +405,7 @@ final recipesProvider = Provider.of<RecipeProvider>(context);
   Widget _buildCommentInput() {
     final TextEditingController _commentController = TextEditingController();
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding:  EdgeInsets.symmetric(horizontal: Responsive.isDesktop(context) ? 30 :8),
       child: Row(
         children: [
           Expanded(

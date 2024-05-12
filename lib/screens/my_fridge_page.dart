@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -68,11 +69,11 @@ class _MyFridgePageState extends State<MyFridgePage>
   }
 
   void _toggleFridge() {
-       if(mounted){
-    setState(() {
-      doorsOpened = !doorsOpened;
-    });
-       }
+    if (mounted) {
+      setState(() {
+        doorsOpened = !doorsOpened;
+      });
+    }
     if (_controller.status == AnimationStatus.completed) {
       _controller.reverse();
     } else {
@@ -104,9 +105,9 @@ class _MyFridgePageState extends State<MyFridgePage>
             break;
         }
       }
-         if(mounted){
-      setState(() {});
-         }
+      if (mounted) {
+        setState(() {});
+      }
     }
     return;
   }
@@ -184,11 +185,11 @@ class _MyFridgePageState extends State<MyFridgePage>
   }
 
   Future<void> _fetchRecipes() async {
-       if(mounted){
-    setState(() {
-      _isLoading = true;
-    });
-       }
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
     try {
       var fetchedRecipes = await RecipeService().getAllRecipesByPage(
         _currentPage,
@@ -220,6 +221,11 @@ class _MyFridgePageState extends State<MyFridgePage>
 
           if (missingIngredients.isNotEmpty) {
             recipeMissingIngredients[recipe.id!] = missingIngredients;
+          } else {
+            if(missingIngredients.isNotEmpty){
+recipeMissingIngredients[recipe.id!] = [];
+            }
+            
           }
         }
 
@@ -229,49 +235,49 @@ class _MyFridgePageState extends State<MyFridgePage>
         //       'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
         // });
       }
-   if(mounted){
-      setState(() {
-        recipes = filteredRecipes;
+      if (mounted) {
+        setState(() {
+          recipes = filteredRecipes;
 
-        _isLoading = false;
-      });
-   }
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       print('Error fetching recipes: $e');
-         if(mounted){
-      setState(() {
-        _isLoading = false;
-      });
-         }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _fetchMoreRecipes() async {
     if (!_isLoading) {
-         if(mounted){
-      setState(() {
-        _isLoading = true;
-      });
-         }
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
       try {
         final fetchedRecipes = await RecipeService().getAllRecipesByPage(
           _currentPage + 1, // Fetch next page
           _pageSize,
         );
-           if(mounted){
-        setState(() {
-          recipes.addAll(fetchedRecipes);
-          _currentPage++; // Increment current page
-          _isLoading = false;
-        });
-           }
+        if (mounted) {
+          setState(() {
+            recipes.addAll(fetchedRecipes);
+            _currentPage++; // Increment current page
+            _isLoading = false;
+          });
+        }
       } catch (e) {
         print('Error fetching more recipes: $e');
-           if(mounted){
-        setState(() {
-          _isLoading = false;
-        });
-           }
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -462,7 +468,7 @@ class _MyFridgePageState extends State<MyFridgePage>
   }
 
   void addItemToList(Category category, String item) {
-    switch (category) {
+    switch (category) {   
       case Category.vegetables:
         vegetablesList.add(item);
         break;
@@ -476,9 +482,9 @@ class _MyFridgePageState extends State<MyFridgePage>
   }
 
   void updateListUI() {
-       if(mounted){
-    setState(() {});
-       }
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Widget _buildFridgeVisualization() {
@@ -634,25 +640,61 @@ class _MyFridgePageState extends State<MyFridgePage>
                           .translate(getCategoryName(category)),
                       style: const TextStyle(fontSize: 24),
                     ),
-                    CustomTextField(
+                    const SizedBox(height: 16.0),
+                    TextField(
                       controller: controller,
-                      hintText: AppLocalizations.of(context)
-                          .translate('Add your fridge item'),
-                      labelText: AppLocalizations.of(context)
-                          .translate('Add your fridge item'),
+                      decoration: InputDecoration(
+                        hintText: 'dasdasdasd',
+                        enabledBorder: const OutlineInputBorder(
+                          // width: 0.0 produces a thin "hairline" border
+                          borderSide:
+                              BorderSide(color: Colors.green, width: 0.0),
+                        ),
+                        border: const OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: BorderSide(
+                            color: Colors.blueGrey
+                                .withOpacity(0.5), // Set border color here
+                            width: 1, // Set border width here
+                          ),
+                        ),
+                      ),
+                      keyboardType: TextInputType.text,
                     ),
                     const SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: () {
-                        if (isForEdit) {
-                          updateFridgeItem(context, category, existingItem,
-                              controller.text.trim());
-                        } else {
-                          addItemToList(category, controller.text.trim());
-                          _onAddFridgeItem(category, controller.text.trim());
-                        }
+                        showDialog(
+                          context: context,
+                          barrierDismissible:
+                              false, // Prevent dismissing the dialog by tapping outside
+                          builder: (BuildContext context) {
+                            return const AlertDialog(
+                              content: Row(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(width: 16),
+                                  Text("Processing..."),
+                                ],
+                              ),
+                            );
+                          },
+                        );
 
-                        Navigator.pop(context);
+                        Future.delayed(
+                            Duration(seconds: Random().nextInt(3) + 1), () {
+                          if (isForEdit) {
+                            updateFridgeItem(context, category, existingItem,
+                                controller.text.trim());
+                          } else {
+                            addItemToList(category, controller.text.trim());
+                            _onAddFridgeItem(category, controller.text.trim());
+                          }
+                          Navigator.pop(
+                              context); // Dismiss the dialog after operation is initiated
+                          Navigator.pop(context);
+                        });
                       },
                       child: Text(AppLocalizations.of(context)
                           .translate(isForEdit ? 'Update' : 'Add')),
@@ -661,9 +703,29 @@ class _MyFridgePageState extends State<MyFridgePage>
                       const SizedBox(height: 16.0),
                       ElevatedButton(
                         onPressed: () {
-                          deleteFridgeItem(existingItem, category);
+                          showDialog(
+                            context: context,
+                            barrierDismissible:
+                                false, // Prevent dismissing the dialog by tapping outside
+                            builder: (BuildContext context) {
+                              return const AlertDialog(
+                                content: Row(
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(width: 16),
+                                    Text("Processing..."),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
 
-                          Navigator.pop(context);
+                          Future.delayed(
+                              Duration(seconds: Random().nextInt(3) + 1), () {
+                            deleteFridgeItem(existingItem, category);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          });
                         },
                         child: Text(
                             AppLocalizations.of(context).translate('Delete')),
@@ -715,8 +777,8 @@ class _MyFridgePageState extends State<MyFridgePage>
     // Logic to remove an item from the fridge list based on category
     await UserService().deleteFridgeItem(item).then((value) async {
       if (value) {
-        await fetchFridgeItems();
-        await _fetchRecipes();
+         fetchFridgeItems();
+         _fetchRecipes();
         updateListUI();
         print('Fridge item deleted successfully.');
         // Remove item from the correct list based on category

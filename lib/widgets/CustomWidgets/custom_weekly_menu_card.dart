@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/screens/add_weekly_menu_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class CustomWeeklyMenuCard extends StatefulWidget {
   final WeeklyMenu meal;
@@ -32,6 +33,7 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
     double cardWidth = MediaQuery.of(context).size.width < 600
         ? MediaQuery.of(context).size.width
         : 300;
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Center(
       child: Card(
         surfaceTintColor: Colors.white,
@@ -96,7 +98,9 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                         fontSize: Responsive.isDesktop(context)
                             ? Constants.desktopFontSize
                             : Constants.mobileFontSize,
-                        color: Colors.black,
+                        color: themeProvider.currentTheme == ThemeType.dark
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                     const SizedBox(width: 5), // Adjust the spacing as needed
@@ -106,11 +110,13 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                         fontSize: Responsive.isDesktop(context)
                             ? Constants.desktopFontSize
                             : Constants.mobileFontSize,
-                        color: Colors.black,
+                        color: themeProvider.currentTheme == ThemeType.dark
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                     const SizedBox(width: 5),
-                
+
                     Text(
                       DateFormat('dd MMM yyyy')
                           .format(widget.meal.dateCreated), // Format the date
@@ -118,26 +124,26 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                         fontSize: Responsive.isDesktop(context)
                             ? Constants.desktopFontSize
                             : Constants.mobileFontSize,
-                        color: Colors.black,
+                        color: themeProvider.currentTheme == ThemeType.dark
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                     !widget.isForAll &&
-                                      widget.publicUserId ==
-                                          widget.currentUserId
-                                  ? IconButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  AddWeeklyMenuPage(
-                                                    meal: widget.meal,
-                                                    isForEdit: true,
-                                                  )),
-                                        );
-                                      },
-                                      icon: const Icon(Icons.edit))
-                                  : Container()
+                            widget.publicUserId == widget.currentUserId
+                        ? IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AddWeeklyMenuPage(
+                                          meal: widget.meal,
+                                          isForEdit: true,
+                                        )),
+                              );
+                            },
+                            icon: const Icon(Icons.edit))
+                        : Container()
                   ],
                 ),
               ),
@@ -151,9 +157,6 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                         child: Text(widget.meal.title,
                             style: Theme.of(context).textTheme.headline6),
                       ),
-                        
-                              
-                    
                     ],
                   ),
                 ),

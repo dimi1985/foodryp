@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
+import 'package:foodryp/screens/auth_screen/auth_screen.dart';
 import 'package:foodryp/screens/creators_page/creators_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/screens/my_fridge_page.dart';
@@ -69,11 +70,17 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   List<Widget> _widgetOptions(BuildContext context) {
     return <Widget>[
       MainScreen(user: user ?? Constants.defaultUser),
+       if (user != null)
       CreatorsPage(user: user ?? Constants.defaultUser),
+       if (user != null)
       MyFridgePage(user: user ?? Constants.defaultUser),
       const RecipePage(),
+       if (user != null)
       const AddRecipePage(isForEdit: false),
+      if (user != null)
       ProfilePage(user: user ?? Constants.defaultUser),
+       if (user == null)
+      AuthScreen()
     ];
   }
 
@@ -86,9 +93,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: userIsNull
-          ? const Center(child: CircularProgressIndicator())
-          : IndexedStack(
+      body:  IndexedStack(
               index: _selectedIndex,
               children: _widgetOptions(context),
             ),
@@ -100,10 +105,12 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
               icon: const Icon(Icons.home),
               label: AppLocalizations.of(context).translate('Home'),
             ),
+             if (user != null)
             BottomNavigationBarItem(
               icon: const Icon(Icons.people_alt),
               label: AppLocalizations.of(context).translate('Creators'),
             ),
+             if (user != null)
             BottomNavigationBarItem(
               icon: const Icon(Icons.check_box_outline_blank_outlined),
               label: AppLocalizations.of(context).translate('My Fridge'),
@@ -112,6 +119,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
               icon: const Icon(Icons.food_bank),
               label: AppLocalizations.of(context).translate('Recipes'),
             ),
+             if (user != null)
             BottomNavigationBarItem(
               icon: const Icon(Icons.add),
               label: AppLocalizations.of(context).translate('Add Recipes'),
@@ -139,6 +147,11 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                 ),
                 label: AppLocalizations.of(context).translate('Profile'),
               ),
+                if (user == null)
+                BottomNavigationBarItem(
+              icon: const Icon(Icons.account_circle),
+              label: AppLocalizations.of(context).translate('Auth Screen'),
+            ),
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.amber[800],

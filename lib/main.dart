@@ -15,7 +15,6 @@ import 'package:foodryp/utils/user_profile_provider.dart';
 import 'package:foodryp/utils/users_list_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'screens/mainScreen/main_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
@@ -66,6 +65,9 @@ class Foodryp extends StatefulWidget {
 
 class _FoodrypState extends State<Foodryp> {
   late Locale _locale = const Locale('el');
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +76,7 @@ class _FoodrypState extends State<Foodryp> {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
           return MaterialApp(
+            navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
             title: 'Foodryp',
             theme: themeProvider.themeData,

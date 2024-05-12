@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
@@ -87,7 +88,16 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
                         itemList: _topRecipes.length.toString(),
                         internalUse: 'top_three',
                         onTap: () {
-                          // Handle card tap here (optional)
+                          // Navigate to ProfilePage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RecipeDetailPage(
+                                      recipe: recipe,
+                                      internalUse: Constants.emptyField,
+                                      missingIngredients: const [],
+                                    )),
+                          );
                         },
                         username: recipe.username ?? Constants.emptyField,
                         userImageURL: recipe.useImage ?? Constants.emptyField,

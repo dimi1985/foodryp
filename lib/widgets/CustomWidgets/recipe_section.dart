@@ -59,8 +59,8 @@ class _RecipeSectionState extends State<RecipeSection> {
                   child: SizedBox(
                     width: 250,
                     child: InkWell(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async{
+                       await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => RecipeDetailPage(

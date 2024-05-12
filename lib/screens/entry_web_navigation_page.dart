@@ -14,9 +14,11 @@ import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/utils/users_list_provider.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:provider/provider.dart';
 
 class EntryWebNavigationPage extends StatefulWidget {
   const EntryWebNavigationPage({super.key});
@@ -99,8 +101,8 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       if (!isAuthenticated) 'Sign Up/Sign In',
       if (isForInternalUse) 'ProfilePage',
     ];
-    final finalProfileImageURL =
-        ('${Constants.baseUrl}/${user.profileImage}').replaceAll('\\', '/');
+    // final finalProfileImageURL =
+    //     ('${Constants.baseUrl}/${user.profileImage}').replaceAll('\\', '/');
 
     return Scaffold(
       appBar: AppBar(
@@ -112,22 +114,25 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
             const LogoWidget(),
             const Text('Foodryp'),
             if (isDesktop)
-              Expanded(
-                flex: 3,
-                child: SizedBox(
-                  height: 100,
-                  child: ListView(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: menuItems
-                        .where((item) =>
-                            item !=
-                            'ProfilePage') // Exclude 'ProfilePage' from view
-                        .map((item) => _buildMenuItem(item))
-                        .toList(),
-                  ),
+              const SizedBox(
+                width: 50,
+              ),
+            Expanded(
+              flex: 3,
+              child: SizedBox(
+                height: 100,
+                child: ListView(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  children: menuItems
+                      .where((item) =>
+                          item !=
+                          'ProfilePage') // Exclude 'ProfilePage' from view
+                      .map((item) => _buildMenuItem(item))
+                      .toList(),
                 ),
               ),
+            ),
           ],
         ),
         actions: [
@@ -146,18 +151,12 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
                       },
                       child: Row(
                         children: [
-                          if (user.profileImage.isNotEmpty)
-                            ImagePickerPreviewContainer(
-                              initialImagePath: finalProfileImageURL,
-                              containerSize: isDesktop ? 30 : 20,
-                              onImageSelected: (image, bytes) {},
-                              gender: user.gender ?? '',
-                              isFor: '',
-                              isForEdit: false,
-                              allowSelection: false,
-                            ),
-                          const SizedBox(width: 8),
-                          Text(user.username),
+                          Text(
+                            user.username,
+                            style: const TextStyle(
+                                fontSize: Constants.desktopFontSize,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ],
                       ),
                     ),
@@ -220,6 +219,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
   }
 
   Widget _buildMenuItem(String item) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Padding(
       padding: EdgeInsets.all(
           Responsive.isMobile(context) ? 0 : Constants.defaultPadding),
@@ -234,7 +234,9 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
           style: TextStyle(
             color: _currentPageIndex == menuItems.indexOf(item)
                 ? Colors.orange
-                : Colors.black,
+                : themeProvider.currentTheme == ThemeType.dark
+                    ? Colors.white
+                    : Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
