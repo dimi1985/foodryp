@@ -210,9 +210,9 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                         EdgeInsets.all(Responsive.isDesktop(context) ? 25 : 8),
                     child: InkWell(
                       splashColor: Colors
-                          .transparent, // Ensures no splash color is shown
+                          .transparent, 
                       highlightColor: Colors
-                          .transparent, // Ensures no highlight color on tap
+                          .transparent, 
                       onTap: () {
                         Navigator.push(
                           context,

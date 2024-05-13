@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 
 class HeadingTitleRow extends StatelessWidget {
   final String title;
@@ -7,7 +8,8 @@ class HeadingTitleRow extends StatelessWidget {
   const HeadingTitleRow({
     super.key,
     required this.title,
-    required this.onPressed, required this.showSeeALl,
+    required this.onPressed,
+    required this.showSeeALl,
   });
 
   @override
@@ -24,17 +26,17 @@ class HeadingTitleRow extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          if(showSeeALl)
-          TextButton(
-            onPressed: onPressed, // Use the onPressed callback
-            child: const Text(
-              'See all',
-              style: TextStyle(
-                fontSize: 15.0,
-                fontWeight: FontWeight.w300,
+          if (showSeeALl)
+            TextButton(
+              onPressed: onPressed,
+              child: Text(
+                AppLocalizations.of(context).translate('See all'),
+                style: const TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w300,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

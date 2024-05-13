@@ -135,6 +135,7 @@
     "Processing...": "Processing...",
     "You cannot delete this recipe as it is part of a weekly meal\nRemove it first from weekly menu and than try to delete it again.": "You cannot delete this recipe as it is part of a weekly meal\nRemove it first from weekly menu and than try to delete it again.",
     "Confirm Deletion": "Confirm Deletion",
-    "See All": "See All"
+    "See all": "See all",
+    "Only logged users can comment": "Only logged users can comment"
   }
   

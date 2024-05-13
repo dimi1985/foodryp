@@ -34,7 +34,8 @@ class Constants {
     following: [],
     followRequestsSent: [],
     followRequestsReceived: [],
-    followRequestsCanceled: [],
+    followRequestsCanceled: [], 
+    commentId: [],
   );
   static String emptyField = '';
   static bool defaultBoolValue = false;

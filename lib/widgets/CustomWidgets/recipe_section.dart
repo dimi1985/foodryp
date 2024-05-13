@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/comment.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -8,7 +9,7 @@ import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 
 class RecipeSection extends StatefulWidget {
   final isFor;
-  const RecipeSection({Key? key, required this.isFor}) : super(key: key);
+  const RecipeSection({super.key, required this.isFor});
 
   @override
   State<RecipeSection> createState() => _RecipeSectionState();
@@ -16,11 +17,12 @@ class RecipeSection extends StatefulWidget {
 
 class _RecipeSectionState extends State<RecipeSection> {
   List<Recipe> recipes = [];
-
+  late List<Comment> comments = [];
   @override
   void initState() {
     super.initState();
     fetchixedRecipes();
+    
   }
 
   Future<void> fetchixedRecipes() async {

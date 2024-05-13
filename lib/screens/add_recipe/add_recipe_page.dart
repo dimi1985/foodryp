@@ -7,7 +7,6 @@ import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
-import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -536,9 +535,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () {
-                      String finalProfileImageURL =
-                          ('${Constants.baseUrl}/${widget.recipe?.recipeImage}')
-                              .replaceAll('\\', '/');
+                   
                       //  previewIngredientsAndInstructions();
                       ingredients = getIngredients();
                       instructions = getInstructions();
@@ -581,10 +578,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                               borderRadius: const BorderRadius
                                                   .vertical(
                                                   top: Radius.circular(16.0)),
-                                              child: finalProfileImageURL
-                                                      .isNotEmpty
+                                              child: widget.recipe?.recipeImage
+                                                      ?.isNotEmpty  ?? Constants.defaultBoolValue
                                                   ? Image.network(
-                                                      finalProfileImageURL,
+                                                      widget.recipe?.recipeImage ?? Constants.emptyField,
                                                       fit: BoxFit.cover,
                                                     )
                                                   : Container(),
@@ -844,7 +841,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                   ),
                                                 );
                                                 if (imageIsPicked) {
-                                                  if (_imageFile != null) {
+                                                  if (_imageFile != null || uint8list.isNotEmpty) {
                                                     RecipeService()
                                                         .uploadRecipeImage(
                                                             _imageFile!,

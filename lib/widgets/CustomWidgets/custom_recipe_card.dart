@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ui';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/database/database_helper.dart';
@@ -81,7 +82,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
     final screenSize = MediaQuery.of(context).size;
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     bool isDesktop = Responsive.isDesktop(context);
-    final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
+
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Card(
       surfaceTintColor: Colors.white70,
@@ -97,7 +98,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     topRight: Radius.circular(Constants.defaultPadding),
                   ),
                   child: Image.network(
-                    recipeImage,
+                    widget.recipe.recipeImage ?? Constants.emptyField,
                     fit: BoxFit.cover,
                     width: screenSize.width,
                   ),
@@ -259,9 +260,21 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         },
                         icon: const Icon(Icons.delete),
                       ),
-                    const Icon(
+                    Icon(
+                      Icons.comment,
+                      color: themeProvider.currentTheme == ThemeType.light
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                    Text(
+                      widget.recipe.commentId?.length.toString() ??
+                          Constants.emptyField,
+                    ),
+                    Icon(
                       Icons.favorite_border,
-                      color: Colors.black,
+                      color: themeProvider.currentTheme == ThemeType.light
+                          ? Colors.black
+                          : Colors.white,
                     ),
                     Text(
                       widget.recipe.likedBy?.length.toString() ??

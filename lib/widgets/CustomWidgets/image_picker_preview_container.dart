@@ -38,14 +38,10 @@ class _ImagePickerPreviewContainerState
   late File? _imageFile = File('');
   late Uint8List uint8list = Uint8List(0);
   bool imageIsPicked = false;
-  String finalProfileImageURL = '';
 
   @override
   void initState() {
     super.initState();
-
-    finalProfileImageURL = ('${Constants.baseUrl}/${widget.initialImagePath}')
-        .replaceAll('\\', '/');
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -119,7 +115,7 @@ class _ImagePickerPreviewContainerState
                                         : 'assets/default_avatar_male.jpg',
                                   )
                             : Image.network(
-                                finalProfileImageURL,
+                                widget.initialImagePath!,
                                 fit: BoxFit.cover,
                               )
                     : isAndroid

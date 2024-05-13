@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/settings_page/settings_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/celebration_meal_suggester.dart';
@@ -25,7 +24,6 @@ class TopProfile extends StatefulWidget {
 class _TopProfileState extends State<TopProfile> {
   @override
   Widget build(BuildContext context) {
-    final isAndroid = Constants.checiIfAndroid(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -65,7 +63,7 @@ class _TopProfileState extends State<TopProfile> {
                   ],
                 ),
               ),
-              const Expanded(child: CelebrationMealSuggester()),
+            
             ],
           ),
         ),

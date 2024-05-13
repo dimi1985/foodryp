@@ -13,6 +13,7 @@ class User {
    List<String>? followRequestsSent;
    List<String>? followRequestsReceived;
    List<String>? followRequestsCanceled;
+    final List<String>? commentId;
 
 
   User({
@@ -30,6 +31,7 @@ class User {
     required this.followRequestsSent,
     required this.followRequestsReceived,
     required this.followRequestsCanceled,
+     required this.commentId,
 
   });
 
@@ -52,6 +54,7 @@ class User {
       followRequestsSent: json['followRequestsSent']?.cast<String>(),
       followRequestsReceived: json['followRequestsReceived']?.cast<String>(),
       followRequestsCanceled: json['followRequestsCanceled']?.cast<String>(),
+       commentId: json['commentId']?.cast<String>(),
     );
   }
 
@@ -72,5 +75,6 @@ class User {
         'followRequestsSent': followRequestsSent,
         'followRequestsReceived': followRequestsReceived,
         'followRequestsCanceled': followRequestsCanceled,
+          'commentId': commentId,
       };
 }

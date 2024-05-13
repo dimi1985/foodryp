@@ -19,6 +19,7 @@ class Recipe {
   final String categoryName;
   final List<String>? likedBy;
   final List<String>? meal;
+    final List<String>? commentId;
 
   Recipe({
     this.id,
@@ -41,6 +42,7 @@ class Recipe {
     required this.categoryName,
     required this.likedBy,
     required this.meal,
+      required this.commentId,
   });
 
 
@@ -72,6 +74,7 @@ class Recipe {
       likedBy:
           (json['likedBy'] as List<dynamic>?)?.cast<String>().toList() ?? [],
       meal: (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
+       commentId: (json['commentId'] as List<dynamic>?)?.cast<String>().toList() ?? [],
     );
   }
 
@@ -97,6 +100,7 @@ class Recipe {
     'categoryName': categoryName,
     'likedBy': likedBy,
     'meal': meal,
+     'commentId': commentId,
   };
 }
 

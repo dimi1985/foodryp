@@ -105,34 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _sectionTitle(AppLocalizations.of(context).translate('Account')),
 
           userImageSection(context, isDesktop),
-          //Maybe Later in Future update
-          // _settingTile(
-          //   context,
-          //   'Change Username',
-          //   Icons.account_circle,
-          //   () {
-          //     showDialog(
-          //       context: context,
-          //       builder: (BuildContext context) {
-          //         return ChangeFieldDialog(
-          //           context: context,
-          //           title:
-          //               'Change Username(${widget.profileName})\n(Signout is automatic after change)',
-          //           hintText: 'Enter new username',
-          //           newHintText: '',
-          //           onSave: (String newUsername, String nullValue) {
-          //             UserService().changeCredentials(
-          //                 oldPassword: '',
-          //                 newUsername: newUsername,
-          //                 newEmail: '',
-          //                 newPassword: '');
-          //           },
-          //           isForPassword: false,
-          //         );
-          //       },
-          //     );
-          //   },
-          // ),
+          
           _settingTile(
             context,
             'Change Email Address',
@@ -403,41 +376,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
           ),
-          _sectionTitle(AppLocalizations.of(context).translate(
-              AppLocalizations.of(context).translate('Celebration Day Input'))),
-          const SizedBox(height: 400, child: CelebrationInput()),
-
-          _sectionTitle(AppLocalizations.of(context).translate(
-              AppLocalizations.of(context)
-                  .translate('Celebration Day Notification'))),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Days Before Notification',
-                style: TextStyle(fontSize: 20),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 400,
-                child: ListView.builder(
-                  itemCount: 31,
-                  itemBuilder: (context, index) {
-                    final days = index + 1;
-                    return RadioListTile<int>(
-                      title: Text('$days days'),
-                      value: days,
-                      groupValue: currentSelection,
-                      onChanged: (value) {
-                        settingsProvider.setDaysBeforeNotification(value!);
-                        log(value.toString());
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          )
+     
           // Add units and measurements settings tiles here
         ],
       ),

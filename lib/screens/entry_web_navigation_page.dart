@@ -80,8 +80,8 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
     });
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.easeInOut,
+      duration: const Duration(seconds: 1),
+      curve: Curves.fastEaseInToSlowEaseOut,
     );
   }
 
@@ -101,9 +101,8 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       if (!isAuthenticated) 'Sign Up/Sign In',
       if (isForInternalUse) 'ProfilePage',
     ];
-    // final finalProfileImageURL =
-    //     ('${Constants.baseUrl}/${user.profileImage}').replaceAll('\\', '/');
 
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
@@ -112,72 +111,142 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
         title: Row(
           children: [
             const LogoWidget(),
-            const Text('Foodryp'),
+            InkWell(
+              onTap: () {
+                _navigateToPage(menuItems.indexOf('Home'));
+              },
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontSize: isDesktop ? 32 : 16, // Adjust font size as needed
+                    fontWeight: FontWeight.bold, // Bold text
+                    color: themeProvider.currentTheme == ThemeType.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                  children: const <TextSpan>[
+                    TextSpan(
+                      text: 'Food',
+                    ),
+                    TextSpan(
+                      text: 'ryp',
+                      style: TextStyle(
+                        color: Colors.orange, // Orange color for "ryp"
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             if (isDesktop)
               const SizedBox(
                 width: 50,
               ),
-            Expanded(
-              flex: 3,
-              child: SizedBox(
-                height: 100,
-                child: ListView(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  children: menuItems
-                      .where((item) =>
-                          item !=
-                          'ProfilePage') // Exclude 'ProfilePage' from view
-                      .map((item) => _buildMenuItem(item))
-                      .toList(),
+            if (isDesktop)
+              Expanded(
+                flex: 3,
+                child: SizedBox(
+                  height: 100,
+                  child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: menuItems
+                        .where((item) =>
+                            item !=
+                            'ProfilePage') // Exclude 'ProfilePage' from view
+                        .map((item) => _buildMenuItem(item))
+                        .toList(),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
         actions: [
-          if (isAuthenticated)
-            Padding(
-              padding: const EdgeInsets.only(right: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Profile section components
-                  if (user.username.isNotEmpty)
-                    InkWell(
-                      onTap: () {
-                        _navigateToPage(menuItems.indexOf('ProfilePage'));
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            user.username,
-                            style: const TextStyle(
-                                fontSize: Constants.desktopFontSize,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
+          Padding(
+            padding: const EdgeInsets.only(right: 25),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Profile section components
+                if (user.username.isNotEmpty)
+                  InkWell(
+                    onTap: () {
+                      _navigateToPage(menuItems.indexOf('ProfilePage'));
+                    },
+                    child: Row(
+                      children: [
+                        user.gender!.contains('female')
+                            ? ImagePickerPreviewContainer(
+                                containerSize: 50.0,
+                                initialImagePath: user.profileImage,
+                                allowSelection: false,
+                                gender: user.gender!,
+                                isFor: '',
+                                isForEdit: false,
+                                onImageSelected: (imageFile, bytes) {},
+                              )
+                            : user.gender!.contains('male')
+                                ? ImagePickerPreviewContainer(
+                                    containerSize: 50.0,
+                                    initialImagePath: user.profileImage,
+                                    onImageSelected: (imageFile, bytes) {},
+                                    allowSelection: false,
+                                    gender: user.gender!,
+                                    isFor: '',
+                                    isForEdit: false,
+                                  )
+                                : Container(),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          user.username,
+                          style: const TextStyle(
+                              fontSize: Constants.desktopFontSize,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
+                  ),
 
-                  if (isMobile && kIsWeb && !isAndroid || !isAuthenticated)
-                    PopupMenuButton<String>(
-                      itemBuilder: (context) => menuItems.map((item) {
+                if (!isDesktop)
+                  PopupMenuButton<String>(
+                    itemBuilder: (context) {
+                      return menuItems
+                          .where((item) =>
+                              (item != 'Creators' || isAuthenticated) &&
+                              (item != 'My Fridge' || isAuthenticated) &&
+                              (item != 'Add Recipe' || isAuthenticated) &&
+                              (item != 'Sign Up/Sign In' || !isAuthenticated))
+                          .where((item) =>
+                              item != 'ProfilePage') // Exclude 'ProfilePage'
+                          .map((item) {
                         return PopupMenuItem<String>(
                           value: item,
-                          child: Text(item),
+                          child: Text(
+                            AppLocalizations.of(context).translate(item),
+                            style: TextStyle(
+                              color: _currentPageIndex ==
+                                      menuItems.indexOf(item)
+                                  ? Colors.orange
+                                  : themeProvider.currentTheme == ThemeType.dark
+                                      ? Colors.white
+                                      : Colors.black,
+                            ),
+                          ),
                         );
-                      }).toList(),
-                      onSelected: (String item) {
-                        // Handle item selection here
-                        _navigateToPage(menuItems.indexOf(item));
-                      },
-                      icon: const Icon(Icons.menu),
-                    ),
-                ],
-              ),
+                      }).toList();
+                    },
+                    onSelected: (String item) {
+                      // Handle item selection here
+                      _navigateToPage(menuItems.indexOf(item));
+                    },
+                    icon: const Icon(Icons.menu),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
       body: PageView(

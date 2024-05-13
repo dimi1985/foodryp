@@ -36,9 +36,9 @@ class DesktopMiddleSide extends StatelessWidget {
                     const SizedBox(height: 25),
                   HeadingTitleRow(
                     title: AppLocalizations.of(context).translate('Categories'),
-                    onPressed: () async{
+                    onPressed: () {
                       // Navigate to the corresponding page
-                    await  Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const CategoryPage()),
@@ -56,9 +56,9 @@ class DesktopMiddleSide extends StatelessWidget {
                               : 50),
                   HeadingTitleRow(
                     title: AppLocalizations.of(context).translate('Recipes'),
-                    onPressed: () async{
+                    onPressed: () {
                       // Navigate to the corresponding page
-                    await  Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const RecipePage()),
@@ -71,9 +71,9 @@ class DesktopMiddleSide extends StatelessWidget {
                   HeadingTitleRow(
                     title:
                         AppLocalizations.of(context).translate('Weekly Menus'),
-                    onPressed: ()async {
+                    onPressed: () {
                       // Navigate to the corresponding page
-                    await  Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const WeeklyMenuPage()),
@@ -81,12 +81,11 @@ class DesktopMiddleSide extends StatelessWidget {
                     },
                     showSeeALl: true,
                   ),
-                  
-                const  Padding(
-                    padding:  EdgeInsets.all(16),
-                    child:  Align(
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Align(
                       alignment: Alignment.topLeft,
-                      child:  WeeklyMenuSection(
+                      child: WeeklyMenuSection(
                         showAll: true,
                         publicUsername: '',
                         publicUserId: '',

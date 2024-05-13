@@ -29,8 +29,6 @@ class CustomCategoryTopThreeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recipeImage =
-        ('${Constants.baseUrl}/$imageUrl').replaceAll('\\', '/');
     return InkWell(
       // Wrap with InkWell for interaction (optional)
       onTap: onTap,
@@ -42,7 +40,7 @@ class CustomCategoryTopThreeCard extends StatelessWidget {
           child: Stack(
             children: [
               Image.network(
-                recipeImage,
+                imageUrl,
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,

@@ -31,34 +31,38 @@ class RecipeDetailPage extends StatefulWidget {
   State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
 
+
 class _RecipeDetailPageState extends State<RecipeDetailPage> {
   late bool isLiked = false;
   late List<Comment> comments = [];
   late List<String> commentUI = [];
+  bool isAuthenticated = false;
 
   @override
   void initState() {
     super.initState();
-    initLikeStatus();
+    initLikeAndAuthStatus();
     fetchComments();
   }
 
-
-   @override
+  @override
   void didUpdateWidget(RecipeDetailPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.recipe.id != oldWidget.recipe.id) {
       // If the recipe changes, update like status and comments
-      initLikeStatus();
+      initLikeAndAuthStatus();
       fetchComments();
     }
   }
 
-   void initLikeStatus() async {
+  void initLikeAndAuthStatus() async {
     String getCurrentUserId = await UserService().getCurrentUserId();
-    setState(() {
-      isLiked = widget.recipe.likedBy?.contains(getCurrentUserId) ?? false;
-    });
+    if (getCurrentUserId.isNotEmpty) {
+      setState(() {
+        isLiked = widget.recipe.likedBy?.contains(getCurrentUserId) ?? false;
+        isAuthenticated = true;
+      });
+    }
   }
 
   void fetchComments() async {
@@ -71,14 +75,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = Responsive.isDesktop(context);
-    final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
     final isAndroid = Constants.checiIfAndroid(context);
-final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -108,7 +110,8 @@ final themeProvider = Provider.of<ThemeProvider>(context);
                               borderRadius: BorderRadius.circular(
                                   10.0), // Rounded corners
                               child: Image.network(
-                                recipeImage,
+                                widget.recipe.recipeImage ??
+                                    Constants.emptyField,
                                 fit: BoxFit
                                     .cover, // Fill the box while preserving the aspect ratio
                               ),
@@ -126,14 +129,15 @@ final themeProvider = Provider.of<ThemeProvider>(context);
                               child: Align(
                                 alignment: Alignment
                                     .centerRight, // Align the details to the right
-                                child: _buildRecipeDetails(context,themeProvider),
+                                child:
+                                    _buildRecipeDetails(context, themeProvider),
                               ),
                             ),
                           ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    _displayCommentsSection(),
+                    _displayCommentsSection(themeProvider),
                     const SizedBox(height: 20),
                     _buildCommentInput()
                   ],
@@ -168,7 +172,7 @@ final themeProvider = Provider.of<ThemeProvider>(context);
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         child: Image.network(
-                          recipeImage,
+                          widget.recipe.recipeImage ?? Constants.emptyField,
                           width: screenSize.width, // Take full width
                           height: 250.0, // Adjust height as needed
                           fit: BoxFit.cover,
@@ -190,9 +194,9 @@ final themeProvider = Provider.of<ThemeProvider>(context);
                 ),
                 // Recipe details
                 const SizedBox(height: 20),
-                _buildRecipeDetails(context,themeProvider),
+                _buildRecipeDetails(context, themeProvider),
                 const SizedBox(height: 20),
-                _displayCommentsSection(),
+                _displayCommentsSection(themeProvider),
                 const SizedBox(height: 20),
                 _buildCommentInput(),
                 const SizedBox(height: 20),
@@ -204,7 +208,8 @@ final themeProvider = Provider.of<ThemeProvider>(context);
     );
   }
 
-  Widget _buildRecipeDetails(BuildContext context, ThemeProvider themeProvider) {
+  Widget _buildRecipeDetails(
+      BuildContext context, ThemeProvider themeProvider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40.0),
       child: Column(
@@ -218,21 +223,22 @@ final themeProvider = Provider.of<ThemeProvider>(context);
                   ? Constants.desktopHeadingTitleSize
                   : Constants.mobileHeadingTitleSize,
               fontWeight: FontWeight.bold,
-              color: HexColor(widget.recipe.categoryColor ??Constants.emptyField).withOpacity(0.7),
+              color:
+                  HexColor(widget.recipe.categoryColor ?? Constants.emptyField)
+                      .withOpacity(0.7),
             ),
           ),
           const SizedBox(height: 10.0),
           Text(
-            widget.recipe.description ??Constants.emptyField,
+            widget.recipe.description ?? Constants.emptyField,
             style: const TextStyle(fontSize: 16.0),
           ),
           const SizedBox(height: 20.0),
           // Ingredients section
-          
-           Text(
-            AppLocalizations.of(context)
-                        .translate('Ingredients'),
-            style:const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+
+          Text(
+            AppLocalizations.of(context).translate('Ingredients'),
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10.0),
           ListView.builder(
@@ -243,63 +249,64 @@ final themeProvider = Provider.of<ThemeProvider>(context);
                 bool isMissing = widget.missingIngredients
                     .contains(widget.recipe.ingredients?[index]);
                 return Text(
-                  widget.recipe.ingredients?[index]  ?? Constants.emptyField,
+                  widget.recipe.ingredients?[index] ?? Constants.emptyField,
                   style: TextStyle(
                     fontSize: 16.0,
                     color: isMissing
                         ? Colors.red
                         : themeProvider.currentTheme == ThemeType.dark
-                    ? Colors.white
-                    : Colors.black, // Red if missing, black otherwise
+                            ? Colors.white
+                            : Colors.black, // Red if missing, black otherwise
                     fontWeight: isMissing ? FontWeight.bold : FontWeight.normal,
                   ),
                 );
               }),
           const SizedBox(height: 20.0),
           // Like and save buttons
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  // Call the likeRecipe method when the favorite icon is pressed
-                  if (isLiked) {
-                    // If already liked, call dislikeRecipe to unlike
-                    RecipeService()
-                        .dislikeRecipe(widget.recipe.id ?? '')
-                        .then((_) => setState(() {
-                              // Update the UI state after the recipe is disliked
-                              isLiked = false;
-
-                            }))
-                        .catchError((error) {
-                      // Handle any errors that occur during the disliking process
-                    });
-                  } else {
-                    // If not liked, call likeRecipe to like
-                    RecipeService()
-                        .likeRecipe(widget.recipe.id ?? '')
-                        .then((_) => setState(() {
-                              // Update the UI state after the recipe is liked
-                              isLiked = true;
-                            }))
-                        .catchError((error) {
-                      // Handle any errors that occur during the liking process
-                    });
-                  }
-                },
-                // Use conditional rendering to change the icon based on whether the recipe is liked
-                icon: Icon(
-                  isLiked ? Icons.favorite : Icons.favorite_border,
-                  color: isLiked ? Colors.red : null,
+          if (isAuthenticated)
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    // Call the likeRecipe method when the favorite icon is pressed
+                    if (isLiked) {
+                      // If already liked, call dislikeRecipe to unlike
+                      RecipeService()
+                          .dislikeRecipe(widget.recipe.id ?? '')
+                          .then((_) => setState(() {
+                                // Update the UI state after the recipe is disliked
+                                isLiked = false;
+                              }))
+                          .catchError((error) {
+                        // Handle any errors that occur during the disliking process
+                      });
+                    } else {
+                      // If not liked, call likeRecipe to like
+                      RecipeService()
+                          .likeRecipe(widget.recipe.id ?? '')
+                          .then((_) => setState(() {
+                                // Update the UI state after the recipe is liked
+                                isLiked = true;
+                              }))
+                          .catchError((error) {
+                        // Handle any errors that occur during the liking process
+                      });
+                    }
+                  },
+                  // Use conditional rendering to change the icon based on whether the recipe is liked
+                  icon: Icon(
+                    isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: isLiked ? Colors.red : null,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10.0),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.save),
-              ),
-            ],
-          ),
+                const SizedBox(width: 10.0),
+                if (isAuthenticated)
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.save),
+                  ),
+              ],
+            ),
           const SizedBox(height: 20.0),
           // Steps section
           Text(
@@ -309,17 +316,17 @@ final themeProvider = Provider.of<ThemeProvider>(context);
           const SizedBox(height: 10.0),
           ListView.builder(
             shrinkWrap: true,
-            itemCount: widget.recipe.instructions?.length ,
+            itemCount: widget.recipe.instructions?.length,
             itemBuilder: (context, index) =>
                 Text('${AppLocalizations.of(context).translate('Step')}'
-                    '${index + 1}: ${widget.recipe.instructions?[index] }'),
+                    '${index + 1}: ${widget.recipe.instructions?[index]}'),
           ),
         ],
       ),
     );
   }
 
-  Widget _displayCommentsSection() {
+  Widget _displayCommentsSection(ThemeProvider themeProvider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -380,19 +387,14 @@ final themeProvider = Provider.of<ThemeProvider>(context);
                       ),
                     ],
                   ),
-
                   subtitle: Text(
                     comments[index].text,
-                    style: const TextStyle(color: Colors.black87),
+                    style: TextStyle(
+                        color: themeProvider.currentTheme == ThemeType.dark
+                            ? Colors.white
+                            : Colors.black),
                   ),
-                  isThreeLine: true, // Allows for more space if the text wraps
-                  trailing: IconButton(
-                    icon: const Icon(Icons.reply,
-                        color: Colors.deepPurple), // Reply button, optional
-                    onPressed: () {
-                      // Implement reply functionality or other interaction
-                    },
-                  ),
+                  isThreeLine: true,
                 ),
               );
             },
@@ -404,16 +406,25 @@ final themeProvider = Provider.of<ThemeProvider>(context);
 
   Widget _buildCommentInput() {
     final TextEditingController _commentController = TextEditingController();
+
+    final bool isEnabled =
+        isAuthenticated; // Input is enabled only if the user is authenticated
+
     return Padding(
-      padding:  EdgeInsets.symmetric(horizontal: Responsive.isDesktop(context) ? 30 :8),
+      padding: EdgeInsets.symmetric(
+          horizontal: Responsive.isDesktop(context) ? 30 : 8),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: _commentController,
+              enabled: isEnabled,
               decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)
-                    .translate('Write a comment...'),
+                labelText: isEnabled
+                    ? AppLocalizations.of(context)
+                        .translate('Write a comment...')
+                    : AppLocalizations.of(context)
+                        .translate('Only logged users can comment'),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -422,16 +433,21 @@ final themeProvider = Provider.of<ThemeProvider>(context);
           ),
           IconButton(
             icon: const Icon(Icons.send),
-            onPressed: () async {
-              String text = _commentController.text.trim();
-              log(text);
-              await CommentService().createComment(widget.recipe.id ?? '', text,
-                  widget.recipe.username  ??Constants.emptyField, widget.recipe.useImage ?? '', []);
-              _commentController.clear();
-              setState(() {
-                fetchComments();
-              });
-            },
+            onPressed: isEnabled
+                ? () async {
+                    String text = _commentController.text.trim();
+                    log(text);
+                    await CommentService().createComment(
+                        widget.recipe.id ?? '',
+                        text,
+                        widget.recipe.username ?? Constants.emptyField,
+                        widget.recipe.useImage ?? '', []);
+                    _commentController.clear();
+                    setState(() {
+                      fetchComments();
+                    });
+                  }
+                : null, // Disable onPressed if the user is not authenticated
           ),
         ],
       ),
