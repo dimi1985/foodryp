@@ -82,6 +82,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final isAndroid = Constants.checiIfAndroid(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
+       appBar: AppBar(
+        title: Text('${AppLocalizations.of(context).translate('Details for')} ${widget.recipe.recipeTitle}'),
+      ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Column(

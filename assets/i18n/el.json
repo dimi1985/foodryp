@@ -138,6 +138,9 @@
     "You cannot delete this recipe as it is part of a weekly meal\nRemove it first from weekly menu and than try to delete it again.": "Δεν μπορείτε να διαγράψετε αυτήν τη συνταγή, καθώς αποτελεί μέρος ενός εβδομαδιαίου γεύματος\nΚαταργήστε τη πρώτα από το εβδομαδιαίο μενού και στη συνέχεια προσπαθήστε να τη διαγράψετε ξανά.",
     "Confirm Deletion": "Επιβεβαίωση Διαγραφής",
     "See all": "Προβολή όλων",
-    "Only logged users can comment": "Μόνο οι εγγεγραμμένοι χρήστες μπορούν να σχολιάσουν"
+    "Only logged users can comment": "Μόνο οι εγγεγραμμένοι χρήστες μπορούν να σχολιάσουν",
+    "Recipes for": "Συνταγές για",
+    "Details for": "Λεπτομέρειες για",
+    "All Recipes": "Όλες οι συνταγές"
   }
   

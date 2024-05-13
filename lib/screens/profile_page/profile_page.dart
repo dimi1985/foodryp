@@ -99,7 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => RecipePage(
-                            user: widget.user,
+                            user: widget.user, seeAll: false,
                           )),
                 );
               },

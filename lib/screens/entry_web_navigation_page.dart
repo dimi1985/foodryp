@@ -265,7 +265,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
               user: user,
             ),
           RecipePage(
-            user: user,
+            user: user, seeAll: false,
           ),
           WeeklyMenuPage(
             user: user,

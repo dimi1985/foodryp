@@ -61,7 +61,7 @@ class DesktopMiddleSide extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const RecipePage()),
+                            builder: (context) => const RecipePage(seeAll: true)),
                       );
                     },
                     showSeeALl: true,

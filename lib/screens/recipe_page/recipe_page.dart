@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -13,7 +14,8 @@ import 'package:provider/provider.dart';
 
 class RecipePage extends StatefulWidget {
   final User? user;
-  const RecipePage({super.key, this.user});
+  final bool seeAll;
+  const RecipePage({super.key, this.user, required this.seeAll});
 
   @override
   _RecipePageState createState() => _RecipePageState();
@@ -148,6 +150,7 @@ class _RecipePageState extends State<RecipePage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = Responsive.isDesktop(context);
@@ -155,6 +158,9 @@ class _RecipePageState extends State<RecipePage> {
     bool searchOnEveryKeystroke = searchSettingsProvider.searchOnEveryKeystroke;
 
     return Scaffold(
+        appBar:widget.seeAll ? AppBar(
+        title: Text(AppLocalizations.of(context).translate('All Recipes')),
+      ): null,
       body: Column(
         children: [
           Container(

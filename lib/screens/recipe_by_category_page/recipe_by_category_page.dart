@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/recipe_service.dart';
@@ -141,12 +142,13 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
       });
     }
   }
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Recipes for ${widget.category.name}'),
+        title: Text('${AppLocalizations.of(context).translate('Recipes for')} ${widget.category.name}'),
       ),
       body: Center(
         child: SizedBox(

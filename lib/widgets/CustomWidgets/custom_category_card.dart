@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -17,62 +15,54 @@ class CustomCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       height: 150,
       width: 150,
-      child: Card(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // SizedBox(
-            //     height: 120,
-            //     width: 120,
-            //     child: ClipRRect(
-            //       borderRadius: BorderRadius.circular(2),
-            //       child: Image.network(
-            //         categoryImage,
-            //         fit: BoxFit.cover,
-            //         filterQuality: FilterQuality.none,
-            //       ),
-            //     )),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      category.name ??Constants.emptyField,
-                      style: GoogleFonts.getFont(
-                        
-                        category.font ??Constants.emptyField,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: HexColor(category.color ??Constants.emptyField).withOpacity(0.7),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      ('(${category.recipes!.length.toString()})'),
-                      style: GoogleFonts.getFont(
-                        category.font ??Constants.emptyField,
-                        fontSize: Responsive.isDesktop(context)
-                            ? Constants.desktopFontSize
-                            : Constants.mobileFontSize,
-                        fontWeight: FontWeight.bold,
-                        color: HexColor(category.color ??Constants.emptyField).withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+      margin: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: HexColor(category.color ?? Constants.emptyField).withOpacity(0.2),
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4.0,
+            spreadRadius: 1.0,
+            offset: Offset(2.0, 2.0),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.category, // Replace with appropriate icons based on category
+            size: 40,
+            color: HexColor(category.color ?? Constants.emptyField).withOpacity(0.7),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            category.name ?? Constants.emptyField,
+            style: GoogleFonts.getFont(
+              category.font ?? Constants.emptyField,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: HexColor(category.color ?? Constants.emptyField).withOpacity(0.7),
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 5),
+          Text(
+            '(${category.recipes?.length.toString() ?? '0'})',
+            style: GoogleFonts.getFont(
+              category.font ?? Constants.emptyField,
+              fontSize: Responsive.isDesktop(context)
+                  ? Constants.desktopFontSize
+                  : Constants.mobileFontSize,
+              fontWeight: FontWeight.bold,
+              color: HexColor(category.color ?? Constants.emptyField).withOpacity(0.7),
+            ),
+          ),
+        ],
       ),
     );
   }

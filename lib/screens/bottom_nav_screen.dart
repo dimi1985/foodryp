@@ -74,7 +74,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
       CreatorsPage(user: user ?? Constants.defaultUser),
        if (user != null)
       MyFridgePage(user: user ?? Constants.defaultUser),
-      const RecipePage(),
+      const RecipePage(seeAll: false,),
        if (user != null)
       const AddRecipePage(isForEdit: false),
       if (user != null)
