@@ -1,4 +1,7 @@
 import 'dart:developer';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:http/http.dart' as http;
@@ -71,7 +74,7 @@ class CategoryService {
   }
 
   Future<bool> createCategory(String name, String font, String color,
-      String categoryImage, List<String> recipes) async {
+      String categoryImage, List<String> recipes, bool isForDiet, bool isForVegetarians) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/saveCategory'),
@@ -80,9 +83,13 @@ class CategoryService {
           'name': name,
           'font': font,
           'color': color,
+          'categoryImage': categoryImage,
           'recipes': recipes,
+           'isForDiet': isForDiet,
+            'isForVegetarians': isForVegetarians,
         }),
       );
+    
       if (response.statusCode == 201) {
         // Registration successful
         final responseData = jsonDecode(response.body);
@@ -100,8 +107,57 @@ class CategoryService {
     }
   }
 
+  Future<void> uploadCategoryImage(File file, Uint8List uint8list) async {
+    await _initPrefs();
+    final categoryId = _prefs.getString('categoryId');
+    try {
+      String url = '${Constants.baseUrl}/api/uploadCategoryImage';
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+
+      if (file != null || uint8list != null) {
+        String filename = 'category-$categoryId-${DateTime.now()}.jpg';
+
+        if (kIsWeb) {
+          // For web platform
+          request.fields['categoryId'] = categoryId!;
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'categoryImage',
+              uint8list,
+              filename: filename,
+            ),
+          );
+        } else {
+          // For Android platform
+          request.fields['categoryId'] = categoryId!;
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'categoryImage',
+              file.path,
+            ),
+          );
+        }
+
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          // Category image uploaded successfully
+          // Handle the response data as needed
+        } else {
+          // Error uploading category image
+          print('Error uploading category image: ${response.statusCode}');
+        }
+      } else {
+        // No image selected
+        print('No file selected');
+      }
+    } catch (e) {
+      // Handle upload error
+      print('Error uploading category image: $e');
+    }
+  }
+
   Future<bool> updateCategory(String categoryId, String name, String font,
-      String color, String categoryImage, List<String> recipes) async {
+      String color, String categoryImage, List<String> recipes, bool isForDiet, bool isForVegetarians) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/updateCategory/$categoryId'),
@@ -111,6 +167,8 @@ class CategoryService {
           'font': font,
           'color': color,
           'recipes': recipes,
+           'isForDiet': isForDiet,
+            'isForVegetarians': isForVegetarians,
         }),
       );
 

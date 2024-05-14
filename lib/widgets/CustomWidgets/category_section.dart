@@ -15,6 +15,7 @@ class CategorySection extends StatefulWidget {
 
 class _CategorySectionState extends State<CategorySection> {
   List<CategoryModel> categories = [];
+  
 
   @override
   void initState() {

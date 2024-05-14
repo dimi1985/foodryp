@@ -1,11 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
@@ -29,13 +28,15 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
   List<String> _fontNames = [];
   List<String> uniqueFontNames = [];
   String? _selectedFont;
-  String? _selectedTextFieldName;
-  String _selectedLanguage = 'english';
   late Color _selectedColor = Colors.blue; // Default color
   late File? _imageFile = File('');
   late Uint8List uint8list = Uint8List(0);
   String? _getCategoryID;
+
   bool imageIsSelected = false;
+  bool isForDiet = false;
+  bool isForVegetarians = false;
+
   @override
   void initState() {
     super.initState();
@@ -50,9 +51,8 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
   }
 
   Future<void> _fetchGoogleFonts() async {
-    String language = _selectedLanguage == 'english' ? 'english' : 'greek';
     final response = await http.get(Uri.parse(
-        'https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity&key=AIzaSyCbSLWZgc_vzpIMNATNWbj1VrbL4vNEnLs&subset=$language'));
+        'https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity&key=AIzaSyCbSLWZgc_vzpIMNATNWbj1VrbL4vNEnLs'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
@@ -96,6 +96,7 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                                 'Category:',
                                 style: TextStyle(fontSize: 16),
                               ),
+                              const SizedBox(height: 20),
                               CustomTextField(
                                 controller: _nameController,
                                 hintText: 'Enter category name',
@@ -106,23 +107,38 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                                 },
                               ),
                               const SizedBox(height: 20),
-                              DropdownButton<String>(
-                                value: _selectedLanguage,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    _selectedLanguage = newValue ?? '';
-                                    _fetchGoogleFonts();
-                                  });
-                                },
-                                items: <String>[
-                                  'english',
-                                  'greek'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
+                              // Add Chips for "Is for Diet" and "Is for Vegetarians"
+                              const Text(
+                                'Commit it as special category:',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ChoiceChip(
+                                    label: const Text('Is for Diet'),
+                                    selected: isForDiet,
+                                    onSelected: (selected) {
+                                      setState(() {
+                                        isForDiet = selected;
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: ChoiceChip(
+                                      label: const Text('Is for Vegetarians'),
+                                      selected: isForVegetarians,
+                                      onSelected: (selected) {
+                                        setState(() {
+                                          isForVegetarians = selected;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 20),
                               Expanded(
@@ -200,29 +216,29 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                 });
               },
             ),
-            // const SizedBox(height: 16),
-            // const Text('Category Image:'),
-            // SizedBox(
-            //   height: 300,
-            //   child: ImagePickerPreviewContainer(
-            //     initialImagePath: widget.category != null
-            //         ? widget.category?.categoryImage
-            //         : '',
-            //     containerSize: screenSize.width,
-            //     allowSelection: true,
-            //     onImageSelected: (file, bytes) {
-            //       // Handle image selection
-            //       setState(() {
-            //         _imageFile = file;
-            //         uint8list = Uint8List.fromList(bytes);
-            //         imageIsSelected = true;
-            //       });
-            //     },
-            //     gender: '',
-            //     isFor: 'Other',
-            //     isForEdit: false,
-            //   ),
-            // ),
+            const SizedBox(height: 16),
+            const Text('Category Image:'),
+            SizedBox(
+              height: 300,
+              child: ImagePickerPreviewContainer(
+                initialImagePath: widget.category != null
+                    ? widget.category?.categoryImage
+                    : '',
+                containerSize: screenSize.width,
+                allowSelection: true,
+                onImageSelected: (file, bytes) {
+                  // Handle image selection
+                  setState(() {
+                    _imageFile = file;
+                    uint8list = Uint8List.fromList(bytes);
+                    imageIsSelected = true;
+                  });
+                },
+                gender: '',
+                isFor: 'Other',
+                isForEdit: false,
+              ),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
@@ -232,19 +248,23 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
               },
               child: const Text('Preview Category'),
             ),
-            const SizedBox(height: 20,),
-            if(widget.category != null)
-             ElevatedButton(
-              onPressed: () {
-                // Add category logic
-                CategoryService().deleteCategory(widget.category?.id ?? '').then((value) {
-                  if(value){
-                    print('Category Deleted Successfylly!');
-                  }
-                });
-              },
-              child: const Text('Delete Category'),
+            const SizedBox(
+              height: 20,
             ),
+            if (widget.category != null)
+              ElevatedButton(
+                onPressed: () {
+                  // Add category logic
+                  CategoryService()
+                      .deleteCategory(widget.category?.id ?? '')
+                      .then((value) {
+                    if (value) {
+                      print('Category Deleted Successfully!');
+                    }
+                  });
+                },
+                child: const Text('Delete Category'),
+              ),
           ],
         ),
       ),
@@ -260,29 +280,29 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // String finalProfileImageURL =
-        //     ('${Constants.baseUrl}/${widget.category?.categoryImage}')
-        //         .replaceAll('\\', '/');
+        String finalProfileImageURL =
+            ('${Constants.baseUrl}/${widget.category?.categoryImage}')
+                .replaceAll('\\', '/');
         return AlertDialog(
           content: Stack(
             children: [
-              // Hero(
-              //   tag: 'imageHero',
-              //   child: widget.category != null && !imageIsSelected
-              //       ? Image.network(
-              //           finalProfileImageURL,
-              //           fit: BoxFit.cover,
-              //         )
-              //       : kIsWeb
-              //           ? Image.memory(
-              //               uint8list,
-              //               fit: BoxFit.cover,
-              //             )
-              //           : Image.file(
-              //               _imageFile!,
-              //               fit: BoxFit.cover,
-              //             ),
-              // ),
+              Hero(
+                tag: 'imageHero',
+                child: widget.category != null && !imageIsSelected
+                    ? Image.network(
+                        finalProfileImageURL,
+                        fit: BoxFit.cover,
+                      )
+                    : kIsWeb
+                        ? Image.memory(
+                            uint8list,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.file(
+                            _imageFile!,
+                            fit: BoxFit.cover,
+                          ),
+              ),
               Positioned(
                 bottom: 10,
                 left: 10,
@@ -322,6 +342,8 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                 );
 
                 // Perform category update if category exists, otherwise create category
+                    print('isForDiet: $isForDiet');
+                     print('isForVegetarians: $isForVegetarians');
                 bool success = isUpdating
                     ? await CategoryService().updateCategory(
                         widget.category?.id ?? '',
@@ -330,18 +352,21 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                         selectedColor.hex,
                         '',
                         [],
-                      )
+                        isForDiet,
+                        isForVegetarians)
                     : await CategoryService().createCategory(
                         categoryName,
                         selectedFont ?? '',
                         selectedColor.hex,
                         '',
                         [],
-                      );
+                        isForDiet,
+                        isForVegetarians);
 
                 // Handle success or failure
                 if (success) {
                   // Once the category creation or update process is complete, hide the SnackBar
+
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
                   // Show a SnackBar indicating success
@@ -354,12 +379,13 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                       )), // Show success message
                     ),
                   );
-                  // if ((!isUpdating || isUpdating && imageIsSelected) &&
-                  //     success) {
-                  //   // Upload the category image if creating a new category or image is selected during an update
-                  //   CategoryService()
-                  //       .uploadCategoryImage(_imageFile!, uint8list);
-                  // }
+                  if ((!isUpdating && imageIsSelected ||
+                          isUpdating && imageIsSelected) &&
+                      success) {
+                    // Upload the category image if creating a new category or image is selected during an update
+                    CategoryService()
+                        .uploadCategoryImage(_imageFile!, uint8list);
+                  }
 
                   // Remove category ID locally
 

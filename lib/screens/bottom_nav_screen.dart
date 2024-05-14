@@ -61,7 +61,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
       setState(() {
         user = userProfile;
       });
-      log('Got user Info: ${user?.id}');
+
     } catch (e) {
       print("Error fetching user profile: $e");
     }

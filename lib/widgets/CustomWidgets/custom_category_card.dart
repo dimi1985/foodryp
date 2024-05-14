@@ -20,9 +20,10 @@ class CustomCategoryCard extends StatelessWidget {
       width: 150,
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: HexColor(category.color ?? Constants.emptyField).withOpacity(0.2),
+        color:
+            HexColor(category.color ?? Constants.emptyField).withOpacity(0.2),
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4.0,
@@ -37,7 +38,8 @@ class CustomCategoryCard extends StatelessWidget {
           Icon(
             Icons.category, // Replace with appropriate icons based on category
             size: 40,
-            color: HexColor(category.color ?? Constants.emptyField).withOpacity(0.7),
+            color: HexColor(category.color ?? Constants.emptyField)
+                .withOpacity(0.7),
           ),
           const SizedBox(height: 10),
           Text(
@@ -46,7 +48,8 @@ class CustomCategoryCard extends StatelessWidget {
               category.font ?? Constants.emptyField,
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: HexColor(category.color ?? Constants.emptyField).withOpacity(0.7),
+              color: HexColor(category.color ?? Constants.emptyField)
+                  .withOpacity(0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -59,7 +62,8 @@ class CustomCategoryCard extends StatelessWidget {
                   ? Constants.desktopFontSize
                   : Constants.mobileFontSize,
               fontWeight: FontWeight.bold,
-              color: HexColor(category.color ?? Constants.emptyField).withOpacity(0.7),
+              color: HexColor(category.color ?? Constants.emptyField)
+                  .withOpacity(0.7),
             ),
           ),
         ],
