@@ -17,6 +17,7 @@ class MealService {
     List<Recipe> selectedRecipes,
     String username,
     String userProfileImage,
+    bool isForDiet
     
   ) async {
     // Extract recipe IDs from selected recipes
@@ -210,6 +211,7 @@ Future<List<WeeklyMenu>> getWeeklyMenusByPageAndPublicUser(
   List<Recipe> newRecipes,
   String username,
   String userProfileImage,
+  bool isForDiet
 ) async {
   // Extract recipe IDs from old and new recipes
   List<String?> oldRecipeIds = oldRecipes.map((recipe) => recipe.id).toList();

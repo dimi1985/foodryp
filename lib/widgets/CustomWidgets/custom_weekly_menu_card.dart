@@ -51,9 +51,7 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                   shrinkWrap: true,
                   itemCount: widget.meal.dayOfWeek.length,
                   itemBuilder: (context, index) {
-                    final imageUrl =
-                        '${Constants.baseUrl}/${widget.meal.dayOfWeek[index].recipeImage}'
-                            .replaceAll('\\', '/');
+                  
                     return Container(
                       width: cardWidth /
                           widget.meal.dayOfWeek
@@ -62,7 +60,7 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           fit: BoxFit.cover,
-                          image: NetworkImage(imageUrl),
+                          image: NetworkImage(widget.meal.dayOfWeek[index].recipeImage ?? Constants.emptyField),
                         ),
                         borderRadius: index == 0
                             ? const BorderRadius.only(
@@ -138,7 +136,7 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                                 MaterialPageRoute(
                                     builder: (context) => AddWeeklyMenuPage(
                                           meal: widget.meal,
-                                          isForEdit: true,
+                                          isForEdit: true, isForDiet: false,
                                         )),
                               );
                             },

@@ -19,7 +19,9 @@ class Recipe {
   final String categoryName;
   final List<String>? likedBy;
   final List<String>? meal;
-    final List<String>? commentId;
+  final List<String>? commentId;
+  bool isForDiet = false;
+  bool isForVegetarians = false;
 
   Recipe({
     this.id,
@@ -42,9 +44,10 @@ class Recipe {
     required this.categoryName,
     required this.likedBy,
     required this.meal,
-      required this.commentId,
+    required this.commentId,
+    required this.isForDiet,
+    required this.isForVegetarians,
   });
-
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
@@ -62,10 +65,11 @@ class Recipe {
       servingNumber: json['servingNumber'] ?? '',
       difficulty: json['difficulty'] ?? '',
       username: json['username'] ?? '',
-      useImage: json['useImage']?? '', 
+      useImage: json['useImage'] ?? '',
       userId: json['userId']?.toString() ?? '',
-      dateCreated:
-          json['dateCreated'] != null ? DateTime.parse(json['dateCreated']) : DateTime.now(),
+      dateCreated: json['dateCreated'] != null
+          ? DateTime.parse(json['dateCreated'])
+          : DateTime.now(),
       description: json['description'] ?? '',
       categoryId: json['categoryId']?.toString() ?? '',
       categoryColor: json['categoryColor'] ?? '',
@@ -74,34 +78,39 @@ class Recipe {
       likedBy:
           (json['likedBy'] as List<dynamic>?)?.cast<String>().toList() ?? [],
       meal: (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
-       commentId: (json['commentId'] as List<dynamic>?)?.cast<String>().toList() ?? [],
+      commentId:
+          (json['commentId'] as List<dynamic>?)?.cast<String>().toList() ?? [],
+      isForDiet: json['isForDiet'],
+      isForVegetarians: json['isForVegetarians'],
     );
   }
 
   Map<String, Object?> toJson() {
-  return {
-    '_id': id,
-    'recipeTitle': recipeTitle,
-    'recipeImage': recipeImage,
-    'ingredients': ingredients,
-    'instructions': instructions,
-    'prepDuration': prepDuration,
-    'cookDuration': cookDuration,
-    'servingNumber': servingNumber,
-    'difficulty': difficulty,
-    'username': username,
-    'useImage': useImage,
-    'userId': userId,
-    'dateCreated': dateCreated?.toIso8601String(),
-    'description': description,
-    'categoryId': categoryId,
-    'categoryColor': categoryColor,
-    'categoryFont': categoryFont,
-    'categoryName': categoryName,
-    'likedBy': likedBy,
-    'meal': meal,
-     'commentId': commentId,
-  };
+    return {
+      '_id': id,
+      'recipeTitle': recipeTitle,
+      'recipeImage': recipeImage,
+      'ingredients': ingredients,
+      'instructions': instructions,
+      'prepDuration': prepDuration,
+      'cookDuration': cookDuration,
+      'servingNumber': servingNumber,
+      'difficulty': difficulty,
+      'username': username,
+      'useImage': useImage,
+      'userId': userId,
+      'dateCreated': dateCreated?.toIso8601String(),
+      'description': description,
+      'categoryId': categoryId,
+      'categoryColor': categoryColor,
+      'categoryFont': categoryFont,
+      'categoryName': categoryName,
+      'likedBy': likedBy,
+      'meal': meal,
+      'commentId': commentId,
+      'isForDiet': isForDiet,
+      'isForVegetarians': isForVegetarians,
+    };
+  }
 }
 
-}

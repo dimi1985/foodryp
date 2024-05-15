@@ -5,6 +5,7 @@ import 'package:foodryp/screens/category_page/category_page.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/category_section.dart';
@@ -44,7 +45,7 @@ class DesktopMiddleSide extends StatelessWidget {
                             builder: (context) => const CategoryPage()),
                       );
                     },
-                    showSeeALl: true,
+                    showSeeALl: true, isForDiet: false,
                   ),
                   const CategorySection(),
                   const SizedBox(height: 15.0),
@@ -55,7 +56,7 @@ class DesktopMiddleSide extends StatelessWidget {
                               ? 10
                               : 50),
                   HeadingTitleRow(
-                    title: AppLocalizations.of(context).translate('Recipes'),
+                    title: AppLocalizations.of(context).translate('Latest Recipes'),
                     onPressed: () {
                       // Navigate to the corresponding page
                       Navigator.push(
@@ -64,7 +65,7 @@ class DesktopMiddleSide extends StatelessWidget {
                             builder: (context) => const RecipePage(seeAll: true)),
                       );
                     },
-                    showSeeALl: true,
+                    showSeeALl: true, isForDiet: false,
                   ),
                   const RecipeSection(isFor: 'MainScreen'),
                   const SizedBox(height: 15.0),
@@ -79,16 +80,43 @@ class DesktopMiddleSide extends StatelessWidget {
                             builder: (context) => const WeeklyMenuPage()),
                       );
                     },
-                    showSeeALl: true,
+                    showSeeALl: true, isForDiet: false,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(16),
+                   Padding(
+                    padding:const EdgeInsets.all(16),
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: WeeklyMenuSection(
                         showAll: true,
-                        publicUsername: '',
-                        publicUserId: '',
+                        publicUsername: Constants.emptyField,
+                        publicUserId: Constants.emptyField, isForDiet: false,
+                      ),
+                    ),
+                  ),
+                    const SizedBox(height: 15.0),
+                  HeadingTitleRow(
+                    title:
+                        AppLocalizations.of(context).translate('Weekly Diet Menus'),
+                    onPressed: () {
+                      // Navigate to the corresponding page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const WeeklyMenuPage()),
+                      );
+                    },
+                    showSeeALl: true,
+                    isForDiet: true,
+                  ),
+                   Padding(
+                    padding:const EdgeInsets.all(16),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: WeeklyMenuSection(
+                        showAll: true,
+                        publicUsername: Constants.emptyField,
+                        publicUserId: Constants.emptyField,
+                        isForDiet: true
                       ),
                     ),
                   ),

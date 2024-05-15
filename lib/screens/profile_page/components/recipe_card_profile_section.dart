@@ -166,7 +166,7 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                       child: Padding(
                          padding: EdgeInsets.zero,
                         child: CustomProfileRecipeCard(
-                          internalUse: Constants.emptyField,
+                          internalUse: '',
                           recipe: recipe,
                         ),
                       ),

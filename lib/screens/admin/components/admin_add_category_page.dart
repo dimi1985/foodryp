@@ -342,8 +342,7 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                 );
 
                 // Perform category update if category exists, otherwise create category
-                    print('isForDiet: $isForDiet');
-                     print('isForVegetarians: $isForVegetarians');
+                   
                 bool success = isUpdating
                     ? await CategoryService().updateCategory(
                         widget.category?.id ?? '',

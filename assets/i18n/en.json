@@ -3,6 +3,7 @@
     "Home": "Home",
     "Creators": "Creators",
     "Recipes": "Recipes",
+    "Recipes:": "Recipes:",
     "Categories": "Categories",
     "My Fridge": "My Fridge",
     "Sign Up/Sign In": "Sign Up/Sign In",
@@ -117,7 +118,9 @@
     "Remove": "Remove",
     "You have reached the maximum number of selected recipes.": "You have reached the maximum number of selected recipes.",
     "Add Weekly Menu": "Add Weekly Menu",
-    "Here you can check and put the meals of the day": "Here you can check and put the meals of the day",
+    "Add Weekly Diet Menu": "Add Weekly Diet Menu",
+    "Here you can check and put the normal meals of the Week": "Here you can check and put the normal meals of the Week",
+    "Here you can check and put the diet meals of the Week": "Here you can check and put the diet meals of the Week",
     "Enter Title": "Enter Title",
     "Title": "Title",
     "Update Menu": "Update Menu",
@@ -139,6 +142,13 @@
     "Only logged users can comment": "Only logged users can comment",
     "Recipes for": "Recipes for",
     "Details for": "Details for",
-    "All Recipes": "All Recipes"
+    "All Recipes": "All Recipes",
+    "For Diet": "For Diet",
+    "For Vegeterians": "For Vegeterians",
+    "Diet Ready": "Diet Ready",
+    "Vegeterians Ready": "Vegeterians Ready",
+    "Diet and Vegeterian Ready": "Diet and Vegeterian Ready",
+    "Special Nutritions Recipe:": "Special Nutritions Recipe:",
+    "Latest Recipes": "Latest Recipes"
   }
   

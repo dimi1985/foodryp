@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/screens/add_weekly_menu_page.dart';
 import 'package:foodryp/screens/weekly_menu_detail_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_weekly_menu_card.dart';
@@ -12,13 +13,16 @@ class WeeklyMenuSection extends StatefulWidget {
   final String publicUsername;
   final String publicUserId;
   final List<String>? userRecipes;
+  final bool isForDiet;
 
-  const WeeklyMenuSection(
-      {super.key,
-      required this.showAll,
-      required this.publicUsername,
-      required this.publicUserId,
-      this.userRecipes});
+  const WeeklyMenuSection({
+    super.key,
+    required this.showAll,
+    required this.publicUsername,
+    required this.publicUserId,
+    this.userRecipes,
+    required this.isForDiet,
+  });
 
   @override
   State<WeeklyMenuSection> createState() => _WeeklyMenuSectionState();
@@ -67,10 +71,15 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
         }
       }
 
-      setState(() {
-        weeklyList = fetchedMenus;
-        isLoading = false;
-      });
+     setState(() {
+  if (widget.isForDiet) {
+    weeklyList = fetchedMenus.where((menu) => menu.isForDiet == true).toList();
+  } else {
+    weeklyList = fetchedMenus;
+  }
+  isLoading = false;
+  print(weeklyList);
+});
     } catch (e) {
       print('Error fetching weekly menus: $e');
     }
@@ -87,18 +96,20 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                     child: widget.userRecipes!.length < 7
                         ? null
                         : MaterialButton(
-                            onPressed: () async{
-                         await     Navigator.push(
+                            onPressed: () async {
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AddWeeklyMenuPage(
-                                          meal: null,
-                                          isForEdit: false,
-                                        )),
+                                    builder: (context) => AddWeeklyMenuPage(
+                                        meal: null,
+                                        isForEdit: false,
+                                        isForDiet: widget.isForDiet)),
                               );
                             },
-                            child: const Text('Add Weekly Menu'),
+                            child: Text(AppLocalizations.of(context).translate(
+                                widget.isForDiet
+                                    ? 'Add Weekly Diet Menu'
+                                    : 'Add Weekly Menu')),
                           ),
                   )
         : ScrollConfiguration(
@@ -119,13 +130,17 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const AddWeeklyMenuPage(
+                              builder: (context) => AddWeeklyMenuPage(
                                     meal: null,
                                     isForEdit: false,
+                                    isForDiet: widget.isForDiet,
                                   )),
                         );
                       },
-                      child: const Text('Add Weekly Menu'),
+                      child:  Text(AppLocalizations.of(context).translate(
+                                widget.isForDiet
+                                    ? 'Add Weekly Diet Menu'
+                                    : 'Add Weekly Menu')),
                     ),
                   ),
                 SizedBox(

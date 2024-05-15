@@ -83,27 +83,48 @@ class _ProfilePageState extends State<ProfilePage> {
             title: AppLocalizations.of(context).translate('Weekly Menus'),
             onPressed: () {},
             showSeeALl: false,
+            isForDiet: false,
           ),
           const SizedBox(height: 10.0),
           WeeklyMenuSection(
-              showAll: false,
-              publicUsername: widget.user.username,
-              publicUserId: widget.user.id,
-              userRecipes: widget.user.recipes),
+            showAll: false,
+            publicUsername: widget.user.username,
+            publicUserId: widget.user.id,
+            userRecipes: widget.user.recipes,
+            isForDiet: false,
+          ),
           const SizedBox(height: 25.0),
           HeadingTitleRow(
-              title: AppLocalizations.of(context).translate('Recipes'),
-              onPressed: () {
-                // Navigate to the corresponding page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => RecipePage(
-                            user: widget.user, seeAll: false,
-                          )),
-                );
-              },
-              showSeeALl: false),
+            title: AppLocalizations.of(context).translate('Weekly Diet Menus'),
+            onPressed: () {},
+            showSeeALl: false,
+            isForDiet: true,
+          ),
+          const SizedBox(height: 10.0),
+          WeeklyMenuSection(
+            showAll: false,
+            publicUsername: widget.user.username,
+            publicUserId: widget.user.id,
+            userRecipes: widget.user.recipes,
+            isForDiet: true,
+          ),
+          const SizedBox(height: 25.0),
+          HeadingTitleRow(
+            title: AppLocalizations.of(context).translate('Recipes'),
+            onPressed: () {
+              // Navigate to the corresponding page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RecipePage(
+                          user: widget.user,
+                          seeAll: false,
+                        )),
+              );
+            },
+            showSeeALl: false,
+            isForDiet: false,
+          ),
           const SizedBox(height: 10.0),
           SizedBox(
               height: MediaQuery.of(context).size.height,
@@ -113,6 +134,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-
 }

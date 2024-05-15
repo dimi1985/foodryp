@@ -3,6 +3,7 @@
   "Home": "Αρχική",
   "Creators": "Δημιουργοί",
   "Recipes": "Συνταγές",
+  "Recipes:": "Συνταγές:",
   "Categories": "Κατηγορίες",
   "My Fridge": "Το ψυγείο μου",
   "Sign Up/Sign In": "Εγγραφή/Είσοδος",
@@ -119,7 +120,9 @@
     "Remove": "Aφαίρεση",
     "You have reached the maximum number of selected recipes.": "Έχετε φτάσει τον μέγιστο αριθμό επιλεγμένων συνταγών.",
     "Add Weekly Menu": "Προσθήκη εβδομαδιαίου μενού",
-    "Here you can check and put the meals of the day": "Εδώ μπορείτε να ελέγξετε και να βάλετε τα γεύματα της ημέρας",
+    "Add Weekly Diet Menu": "Προσθήκη Εβδομαδιαίου Μενού Διατροφής",
+    "Here you can check and put the normal meals of the Week": "Εδώ μπορείτε να ελέγξετε και να βάλετε τα κανονικά γεύματα της εβδομάδας",
+    "Here you can check and put the diet meals of the Week": "Εδώ μπορείτε να ελέγξετε και να βάλετε τα διαιτητικά γεύματα της Εβδομάδας",
     "Enter Title": "Εισαγάγετε τον τίτλο",
     "Title": "Τίτλο",
     "Update Menu": "Ενημέρωση μενού",
@@ -141,6 +144,13 @@
     "Only logged users can comment": "Μόνο οι εγγεγραμμένοι χρήστες μπορούν να σχολιάσουν",
     "Recipes for": "Συνταγές για",
     "Details for": "Λεπτομέρειες για",
-    "All Recipes": "Όλες οι συνταγές"
+    "All Recipes": "Όλες οι συνταγές",
+    "For Diet": "Για δίαιτα",
+    "For Vegeterians": "Για χορτοφάγους",
+    "Diet Ready": "Έτοιμο για δίαιτα",
+    "Vegeterians Ready": "Έτοιμο για χορτοφάγους",
+    "Diet and Vegeterian Ready": "Έτοιμο για δίαιτα και για χορτοφάγους",
+    "Special Nutritions Recipe:": "Συνταγή Ειδικής Διατροφής:",
+    "Latest Recipes": "Τελευταίες συνταγές"
   }
   

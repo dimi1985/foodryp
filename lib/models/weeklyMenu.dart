@@ -8,8 +8,8 @@ class WeeklyMenu {
   final String userId;
   final String username;
   final String userProfileImage;
-    final DateTime dateCreated;
-
+  final DateTime dateCreated;
+    bool isForDiet = false;
 
   WeeklyMenu({
     required this.id,
@@ -18,7 +18,8 @@ class WeeklyMenu {
     required this.userId,
     required this.username,
     required this.userProfileImage,
-     required this.dateCreated,
+    required this.dateCreated,
+    required this.isForDiet,
   });
 
   factory WeeklyMenu.fromJson(Map<String, dynamic> json) {
@@ -34,21 +35,23 @@ class WeeklyMenu {
       userId: json['userId'],
       username: json['username'],
       userProfileImage: json['userProfileImage'],
-       dateCreated:
-          json['dateCreated'] != null ? DateTime.parse(json['dateCreated']) : DateTime.now(),
+      dateCreated: json['dateCreated'] != null
+          ? DateTime.parse(json['dateCreated'])
+          : DateTime.now(),
+           isForDiet: json['isForDiet'],
     );
   }
 
   Map<String, Object?> toJson() {
-  return {
-    '_id': id,
-    'title': title,
-    'dayOfWeek': dayOfWeek.map((recipe) => recipe.toJson()).toList(),
-    'userId': userId,
-    'username': username,
-    'userProfileImage': userProfileImage,
-    'dateCreated': dateCreated.toIso8601String(),
-  };
-}
-
+    return {
+      '_id': id,
+      'title': title,
+      'dayOfWeek': dayOfWeek.map((recipe) => recipe.toJson()).toList(),
+      'userId': userId,
+      'username': username,
+      'userProfileImage': userProfileImage,
+      'dateCreated': dateCreated.toIso8601String(),
+      'isForDiet': isForDiet,
+    };
+  }
 }

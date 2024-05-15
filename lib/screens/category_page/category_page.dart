@@ -87,52 +87,48 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Categories'),
-      ),
-      body: Center(
-        child: ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            },
-          ),
-          child: GridView.builder(
-            controller: _scrollController,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: Responsive.isDesktop(context) ? 8 : 2,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-              childAspectRatio: 1.0,
-            ),
-            itemCount: categories.length +
-                (_isLoading ? 1 : 0), // Add loading indicator
-            itemBuilder: (context, index) {
-              if (index == categories.length) {
-                return _buildLoader(); // Show loading indicator
-              } else {
-                final category = categories[index];
-                return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RecipeByCategoryPage(
-                                  category: category,
-                                )),
-                      );
-                    },
-                    child: CustomCategoryCard(category: category));
-              }
-            },
-          ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Categories'),
+    ),
+    body: Center(
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          },
+        ),
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: categories.length + (_isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == categories.length) {
+              return _buildLoader(); // Show loading indicator
+            } else {
+              final category = categories[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RecipeByCategoryPage(
+                        category: category,
+                      ),
+                    ),
+                  );
+                },
+                child: CustomCategoryCard(category: category),
+              );
+            }
+          },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildLoader() {
     return const Center(

@@ -52,6 +52,7 @@ dependencies:
   sembast_web: ^2.3.0
   universal_io: ^2.2.2
   internet_connection_checker: ^1.0.0+1
+  material_design_icons_flutter: ^7.0.7296
 
 
   # The following adds the Cupertino Icons font to your application.

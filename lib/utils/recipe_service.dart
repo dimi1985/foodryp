@@ -51,6 +51,7 @@ class RecipeService {
     }
   }
 
+
   Future<bool> createRecipe(
     String recipeTitle,
     List<String> ingredients,
@@ -70,6 +71,8 @@ class RecipeService {
     String selectedCategoryName,
     List<String> likedBy,
     List<WeeklyMenu> meal,
+    bool isForDiet,
+      bool isForVegetarians
   ) async {
     try {
       final response = await http.post(
@@ -93,6 +96,8 @@ class RecipeService {
           'categoryFont': categoryFont,
           'categoryName': selectedCategoryName,
           'likedBy': [],
+          'isForDiet': isForDiet,
+          'isForVegetarians': isForVegetarians,
         }),
       );
       if (response.statusCode == 201) {
@@ -130,7 +135,10 @@ class RecipeService {
     String categoryFont,
     String selectedCategoryName,
     List<String> likedBy,
+    bool isForDiet,
+      bool isForVegetarians
   ) async {
+      print(recipeId);
     try {
       final response = await http.put(
         Uri.parse('${Constants.baseUrl}/api/updateRecipe/$recipeId'),
@@ -153,6 +161,8 @@ class RecipeService {
           'categoryFont': categoryFont,
           'categoryName': selectedCategoryName,
           'likedBy': likedBy,
+          'isForDiet': isForDiet,
+          'isForVegetarians': isForVegetarians,
         }),
       );
       if (response.statusCode == 200) {

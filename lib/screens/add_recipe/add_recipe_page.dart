@@ -69,6 +69,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
   late String currentPage;
   bool isTapped = false;
 
+  bool isForDiet = false;
+  bool isForVegetarians = false;
+
   User user = Constants.defaultUser;
 
   Future<void> fetchUserProfile() async {
@@ -143,6 +146,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   categories[categoryIndex].font ?? Constants.emptyField;
               selectedCategoryName =
                   categories[categoryIndex].name ?? Constants.emptyField;
+
+              // Set booleans for the chips
+              isForDiet = widget.recipe!.isForDiet;
+              isForVegetarians = widget.recipe!.isForVegetarians;
             });
           }
         }
@@ -276,6 +283,44 @@ class _AddRecipePageState extends State<AddRecipePage> {
                           )),
 
                   const SizedBox(height: 50.0),
+                  SectionTitle(
+                    title: AppLocalizations.of(context)
+                        .translate('Special Nutritions Recipe:'),
+                    isDesktop: isDesktop,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ChoiceChip(
+                        label: Text(
+                            AppLocalizations.of(context).translate('For Diet')),
+                        selected: isForDiet,
+                        onSelected: (selected) {
+                          setState(() {
+                            isForDiet = selected;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ChoiceChip(
+                          label: Text(AppLocalizations.of(context)
+                              .translate('For Vegeterians')),
+                          selected: isForVegetarians,
+                          onSelected: (selected) {
+                            setState(() {
+                              isForVegetarians = selected;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20.0),
                   SectionTitle(
                     title:
                         '${AppLocalizations.of(context).translate('Recipe Title')}'
@@ -535,7 +580,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () {
-                   
                       //  previewIngredientsAndInstructions();
                       ingredients = getIngredients();
                       instructions = getInstructions();
@@ -549,7 +593,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          log('selectedCategoryName in showDialog:  $selectedCategoryName');
                           return Dialog(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16.0),
@@ -579,10 +622,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                   .vertical(
                                                   top: Radius.circular(16.0)),
                                               child: widget.recipe?.recipeImage
-                                                      ?.isNotEmpty  ?? Constants.defaultBoolValue
+                                                          ?.isNotEmpty ??
+                                                      Constants.defaultBoolValue
                                                   ? Image.network(
-                                                      widget.recipe?.recipeImage ?? Constants.emptyField,
+                                                      widget.recipe
+                                                              ?.recipeImage ??
+                                                          Constants.emptyField,
                                                       fit: BoxFit.cover,
+                                                      width: screenSize.width,
+                                                      height:
+                                                          screenSize.height / 4,
                                                     )
                                                   : Container(),
                                             ),
@@ -593,12 +642,17 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                   .vertical(
                                                   top: Radius.circular(16.0)),
                                               child: kIsWeb
-                                                  ? Image.memory(uint8list)
+                                                  ? Image.memory(uint8list,
+                                                      fit: BoxFit.cover,
+                                                      width: screenSize.width,
+                                                      height:
+                                                          screenSize.height / 4)
                                                   : Image.file(
                                                       _imageFile!,
                                                       fit: BoxFit.cover,
-                                                      width: double.infinity,
-                                                      height: 200.0,
+                                                      width: screenSize.width,
+                                                      height:
+                                                          screenSize.height / 4,
                                                     ),
                                             ),
                                           ),
@@ -622,6 +676,41 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 const TextStyle(fontSize: 16.0),
                                           ),
                                           const SizedBox(height: 16.0),
+                                          if (isForDiet || isForVegetarians)
+                                            Text(
+                                              AppLocalizations.of(context)
+                                                  .translate(
+                                                      'Special Nutritions Recipe:'),
+                                              style: const TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          const SizedBox(height: 16.0),
+                                          if (isForDiet && !isForVegetarians)
+                                            Text(
+                                              AppLocalizations.of(context)
+                                                  .translate('Diet Ready'),
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                          if (isForVegetarians && !isForDiet)
+                                            Text(
+                                              AppLocalizations.of(context)
+                                                  .translate(
+                                                      'Vegeterians Ready'),
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                          if (isForDiet && isForVegetarians)
+                                            Text(
+                                              AppLocalizations.of(context)
+                                                  .translate(
+                                                      'Diet and Vegeterian Ready'),
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                          if (isForDiet || isForVegetarians)
+                                            const SizedBox(height: 16.0),
                                           Text(
                                             AppLocalizations.of(context)
                                                 .translate('Category'),
@@ -800,7 +889,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                     selectedCategoryFont,
                                                     selectedCategoryName,
                                                     [],
-                                                  )
+                                                    isForDiet,
+                                                    isForVegetarians)
                                                 : RecipeService().createRecipe(
                                                     recipeTitleValue,
                                                     ingredients,
@@ -819,7 +909,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                     selectedCategoryFont,
                                                     selectedCategoryName,
                                                     [],
-                                                    []);
+                                                    [],
+                                                    isForDiet,
+                                                    isForVegetarians,
+                                                  );
 
                                             // Handle the completion of the recipe operation
                                             recipeOperation.then((value) {
@@ -841,7 +934,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                   ),
                                                 );
                                                 if (imageIsPicked) {
-                                                  if (_imageFile != null || uint8list.isNotEmpty) {
+                                                  if (_imageFile != null ||
+                                                      uint8list.isNotEmpty) {
                                                     RecipeService()
                                                         .uploadRecipeImage(
                                                             _imageFile!,
@@ -865,7 +959,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-
                                                           const EntryWebNavigationPage()),
                                                   (Route<dynamic> route) =>
                                                       false,

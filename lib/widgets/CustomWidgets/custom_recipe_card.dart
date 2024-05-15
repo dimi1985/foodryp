@@ -14,6 +14,7 @@ import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -215,21 +216,94 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                               : Constants.mobileFontSize,
                           fontWeight: FontWeight.bold,
                           color: HexColor(widget.recipe.categoryColor ??
-                                  Constants.emptyField)
-                              .withOpacity(0.7),
+                              Constants.emptyField),
                         ),
                       ),
                     ),
+                    if (!isDesktop && widget.internalUse != 'MainScreen')
+                      PopupMenuButton<String>(
+                        onSelected: (String result) {
+                          if (result == 'edit') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddRecipePage(
+                                  recipe: widget.recipe,
+                                  isForEdit: true,
+                                  user: null,
+                                ),
+                              ),
+                            );
+                          } else if (result == 'delete') {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  RecipeDeletionConfirmationScreen(
+                                recipe: widget.recipe,
+                              ),
+                            ));
+                          }
+                        },
+                        itemBuilder: (BuildContext context) =>
+                            <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(
+                            value: 'edit',
+                            child: ListTile(
+                              leading: Icon(Icons.edit),
+                              title: Text('Edit'),
+                            ),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'delete',
+                            child: ListTile(
+                              leading: Icon(Icons.delete),
+                              title: Text('Delete'),
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
                 Row(
                   children: [
+                    if (widget.recipe.isForDiet ||
+                        widget.recipe.isForVegetarians)
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.green.withOpacity(0.5),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Icon(
+                                widget.recipe.isForDiet ? MdiIcons.nutrition:MdiIcons.leaf,
+                                color: Colors.green.withOpacity(0.5),
+                              ),
+                              const SizedBox(width: 8),
+                              _dynamicText(
+                                  widget.recipe.isForDiet,
+                                  widget.recipe.isForVegetarians,
+                                  context,
+                                  widget.internalUse,
+                                  isDesktop),
+                            ],
+                          ),
+                        ),
+                      ),
                     const Spacer(),
                     if (isOwner &&
                         isAuthenticated &&
                         widget.internalUse != 'MainScreen' &&
                         widget.internalUse != 'RecipePage' &&
-                        widget.internalUse != 'AddWeeklyMenuPage')
+                        widget.internalUse != 'AddWeeklyMenuPage' &&
+                        isDesktop)
                       IconButton(
                         onPressed: () {
                           Navigator.push(
@@ -248,7 +322,8 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     if (isOwner &&
                         isAuthenticated &&
                         widget.internalUse != 'MainScreen' &&
-                        widget.internalUse != 'RecipePage')
+                        widget.internalUse != 'RecipePage' &&
+                        isDesktop)
                       IconButton(
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -293,5 +368,54 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
         ],
       ),
     );
+  }
+
+  _dynamicText(bool isForDiet, bool isForVegetarians, BuildContext context,
+      String internalUse, bool isDesktop) {
+    if (isForDiet) {
+      return widget.internalUse == 'MainScreen' ||
+              (widget.internalUse == '' && isDesktop)
+          ? Text(
+              AppLocalizations.of(context).translate('For Diet'),
+              style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.withOpacity(0.5)),
+            )
+          : Container();
+    } else if (isForVegetarians) {
+      return widget.internalUse == 'MainScreen' ||
+              (widget.internalUse == '' && isDesktop)
+          ? Text(
+              AppLocalizations.of(context).translate('For Vegeterians'),
+              style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.withOpacity(0.5)),
+            )
+          : Container();
+    } else {
+      widget.internalUse == 'MainScreen' ||
+              (widget.internalUse == '' && isDesktop)
+          ? Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context).translate('For Diet'),
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.withOpacity(0.5)),
+                ),
+                Text(
+                  AppLocalizations.of(context).translate('For Vegeterians'),
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.withOpacity(0.5)),
+                ),
+              ],
+            )
+          : Container();
+    }
   }
 }

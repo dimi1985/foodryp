@@ -10,17 +10,23 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 
 class AddWeeklyMenuPage extends StatefulWidget {
   final WeeklyMenu? meal;
   final bool isForEdit;
+  final bool isForDiet;
   const AddWeeklyMenuPage(
-      {super.key, required this.meal, required this.isForEdit});
+      {super.key,
+      required this.meal,
+      required this.isForEdit,
+      required this.isForDiet});
 
   @override
   State<AddWeeklyMenuPage> createState() => _AddWeeklyMenuPageState();
@@ -89,6 +95,15 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       // Fetch user recipes with pagination
       userRecipes = await recipeService.getUserRecipesByPage(1, 10);
 
+      // Check if isForDiet is true, filter and exclude non-diet recipes
+      // If false, fetch all recipes but exclude diet ones
+      if (widget.isForDiet) {
+        userRecipes = userRecipes.where((recipe) => recipe.isForDiet).toList();
+      } else {
+        userRecipes = userRecipes.where((recipe) => !recipe.isForDiet).toList();
+      }
+
+      // Check if the meal contains widget meal id and update the checked state accordingly
       for (var recipe in userRecipes) {
         if (recipe.meal?.contains(widget.meal?.id) ?? false) {
           setState(() {
@@ -130,8 +145,14 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
           .where((recipe) => !recipeIds.contains(recipe.id))
           .toList();
 
-      setState(() {
+      // If isForDiet is true, filter out non-diet recipes
+      if (widget.isForDiet) {
+        userRecipes.addAll(filteredRecipes.where((recipe) => recipe.isForDiet));
+      } else {
         userRecipes.addAll(filteredRecipes);
+      }
+
+      setState(() {
         isFetching = false;
       });
     } catch (e) {
@@ -143,10 +164,11 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    log(MediaQuery.of(context).size.height.toString());
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).translate('Add Weekly Menu')),
+        title: Text(AppLocalizations.of(context).translate(
+            widget.isForDiet ? 'Add Weekly Diet Menu' : 'Add Weekly Menu')),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -167,7 +189,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                       scrollDirection: Axis.horizontal,
                       itemCount: 7,
                       itemBuilder: (context, index) {
-                        return _buildSelectedRecipeList(index);
+                        return _buildSelectedRecipeList(index, themeProvider);
                       },
                     ),
                   ),
@@ -180,7 +202,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${userProfile.username} ${AppLocalizations.of(context).translate('Here you can check and put the meals of the day')}',
+                      '${userProfile.username.toUpperCase()} ${AppLocalizations.of(context).translate(widget.isForDiet ? 'Here you can check and put the diet meals of the Week' : 'Here you can check and put the normal meals of the Week')}',
                     ),
                     Padding(
                       padding: const EdgeInsets.all(Constants.defaultPadding),
@@ -201,16 +223,18 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                               widget.isForEdit
                                   ? MealService()
                                       .updateWeeklyMenu(
-                                          widget.meal!.id,
-                                          titleController.text,
-                                          unSelectedRecipes,
-                                          selectedRecipes,
-                                          userProfile.username,
-                                          userProfile.profileImage)
+                                      widget.meal!.id,
+                                      titleController.text,
+                                      unSelectedRecipes,
+                                      selectedRecipes,
+                                      userProfile.username,
+                                      userProfile.profileImage,
+                                      widget.isForDiet,
+                                    )
                                       .then((value) {
                                       if (value) {
                                         //PUT SNAK
-                                           Navigator.pushAndRemoveUntil(
+                                        Navigator.pushAndRemoveUntil(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
@@ -227,10 +251,12 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                     })
                                   : MealService()
                                       .saveWeeklyMenu(
-                                          titleController.text,
-                                          selectedRecipes,
-                                          userProfile.username,
-                                          userProfile.profileImage)
+                                      titleController.text,
+                                      selectedRecipes,
+                                      userProfile.username,
+                                      userProfile.profileImage,
+                                      widget.isForDiet,
+                                    )
                                       .then((value) {
                                       if (value) {
                                         //PUT SNAKS
@@ -277,9 +303,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                           itemBuilder: (context, index) {
                             if (index < userRecipes.length) {
                               final recipe = userRecipes[index];
-                              final recipeImage =
-                                  '${Constants.imageURL}/${recipe.recipeImage}'
-                                      .replaceAll('\r', '/');
+
                               return Padding(
                                 padding: const EdgeInsets.all(
                                     Constants.defaultPadding),
@@ -317,7 +341,13 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                                         width: 300,
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: Colors.white,
+                                                          color: themeProvider
+                                                                      .currentTheme ==
+                                                                  ThemeType.dark
+                                                              ? const Color
+                                                                  .fromARGB(255,
+                                                                  37, 36, 37)
+                                                              : Colors.white,
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(20),
@@ -454,7 +484,9 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                                                     ),
                                                                     child: Image
                                                                         .network(
-                                                                      recipeImage,
+                                                                      recipe.recipeImage ??
+                                                                          Constants
+                                                                              .emptyField,
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       width: double
@@ -497,11 +529,10 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
     );
   }
 
-  Widget _buildSelectedRecipeList(int index) {
+  Widget _buildSelectedRecipeList(int index, ThemeProvider themeProvider) {
     if (index < selectedRecipes.length) {
       final recipe = selectedRecipes[index];
-      final recipeImage =
-          '${Constants.imageURL}/${recipe.recipeImage}'.replaceAll('\r', '/');
+
       return Padding(
         padding: const EdgeInsets.all(32),
         child: Stack(
@@ -510,7 +541,9 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
               height: 200,
               width: 300,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: themeProvider.currentTheme == ThemeType.dark
+                    ? const Color.fromARGB(255, 37, 36, 37)
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
@@ -566,6 +599,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                       ),
                     ),
                     // Right side - Recipe image
+
                     Expanded(
                       flex: 5,
                       child: Container(
@@ -581,7 +615,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                             bottomRight: Radius.circular(20),
                           ),
                           child: Image.network(
-                            recipeImage,
+                            recipe.recipeImage ?? Constants.emptyField,
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,

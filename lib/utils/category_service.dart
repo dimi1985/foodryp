@@ -73,8 +73,14 @@ class CategoryService {
     }
   }
 
-  Future<bool> createCategory(String name, String font, String color,
-      String categoryImage, List<String> recipes, bool isForDiet, bool isForVegetarians) async {
+  Future<bool> createCategory(
+      String name,
+      String font,
+      String color,
+      String categoryImage,
+      List<String> recipes,
+      bool isForDiet,
+      bool isForVegetarians) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/saveCategory'),
@@ -85,11 +91,11 @@ class CategoryService {
           'color': color,
           'categoryImage': categoryImage,
           'recipes': recipes,
-           'isForDiet': isForDiet,
-            'isForVegetarians': isForVegetarians,
+          'isForDiet': isForDiet,
+          'isForVegetarians': isForVegetarians,
         }),
       );
-    
+
       if (response.statusCode == 201) {
         // Registration successful
         final responseData = jsonDecode(response.body);
@@ -156,8 +162,15 @@ class CategoryService {
     }
   }
 
-  Future<bool> updateCategory(String categoryId, String name, String font,
-      String color, String categoryImage, List<String> recipes, bool isForDiet, bool isForVegetarians) async {
+  Future<bool> updateCategory(
+      String categoryId,
+      String name,
+      String font,
+      String color,
+      String categoryImage,
+      List<String> recipes,
+      bool isForDiet,
+      bool isForVegetarians) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/updateCategory/$categoryId'),
@@ -167,8 +180,8 @@ class CategoryService {
           'font': font,
           'color': color,
           'recipes': recipes,
-           'isForDiet': isForDiet,
-            'isForVegetarians': isForVegetarians,
+          'isForDiet': isForDiet,
+          'isForVegetarians': isForVegetarians,
         }),
       );
 

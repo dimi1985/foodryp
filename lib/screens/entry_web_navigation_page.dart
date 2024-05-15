@@ -118,7 +118,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
               child: RichText(
                 text: TextSpan(
                   style: TextStyle(
-                    fontSize: isDesktop ? 32 : 16, // Adjust font size as needed
+                    fontSize: isDesktop ? 32 : 32, // Adjust font size as needed
                     fontWeight: FontWeight.bold, // Bold text
                     color: themeProvider.currentTheme == ThemeType.dark
                         ? Colors.white
