@@ -30,15 +30,15 @@ class CustomCategoryCard extends StatelessWidget {
             height: 200,
             width: 300,
             decoration: BoxDecoration(
-              color:  themeProvider.currentTheme == ThemeType.dark
+              color: themeProvider.currentTheme == ThemeType.dark
                   ? const Color.fromARGB(255, 37, 36, 37)
                   : Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
                   color: themeProvider.currentTheme == ThemeType.dark
-                  ? Colors.grey.withOpacity(0.1)
-                  : Colors.grey.withOpacity(0.5) ,
+                      ? Colors.grey.withOpacity(0.1)
+                      : Colors.grey.withOpacity(0.5),
                   spreadRadius: 2,
                   blurRadius: 5,
                   offset: const Offset(0, 3),
@@ -65,12 +65,11 @@ class CustomCategoryCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               overflow: TextOverflow.ellipsis,
-                              category.name ?? Constants.emptyField,
+                              category.name,
                               style: GoogleFonts.getFont(
-                                category.font ?? Constants.emptyField,
-                                color: HexColor(
-                                        category.color ?? Constants.emptyField)
-                                    .withOpacity(0.7),
+                                category.font,
+                                color:
+                                    HexColor(category.color).withOpacity(0.7),
                               ),
                             ),
                           ),
@@ -82,10 +81,9 @@ class CustomCategoryCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               '${AppLocalizations.of(context).translate('Recipes:')} ${category.recipes?.length.toString()}',
                               style: GoogleFonts.getFont(
-                                category.font ?? Constants.emptyField,
-                                color: HexColor(
-                                        category.color ?? Constants.emptyField)
-                                    .withOpacity(0.7),
+                                category.font,
+                                color:
+                                    HexColor(category.color).withOpacity(0.7),
                               ),
                             ),
                           ),
@@ -117,34 +115,43 @@ class CustomCategoryCard extends StatelessWidget {
                               fit: BoxFit.cover,
                               width: double.infinity,
                               height: double.infinity,
+                              filterQuality: FilterQuality.none,
                             ),
-                            Positioned(
-                              bottom: 10,
-                              right: 10,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Icon(
-                                       category.isForDiet ? MdiIcons.nutrition:MdiIcons.leaf,
-                                        color: Colors.white,
+                            category.isForDiet || category.isForVegetarians
+                                ? Positioned(
+                                    bottom: 10,
+                                    right: 10,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: category.isForDiet
+                                            ? Colors.blue
+                                            : category.isForVegetarians
+                                                ? Colors.green
+                                                : null,
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      const SizedBox(width: 8),
-                                      _dynamicText(category.isForDiet,
-                                          category.isForVegetarians, context),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Icon(
+                                              category.isForDiet
+                                                  ? MdiIcons.nutrition
+                                                  : MdiIcons.leaf,
+                                              color: Colors.white,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            _dynamicText(
+                                                category.isForDiet,
+                                                category.isForVegetarians,
+                                                context),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
                           ],
                         ),
                       ),
@@ -161,34 +168,50 @@ class CustomCategoryCard extends StatelessWidget {
 
   _dynamicText(bool isForDiet, bool isForVegetarians, BuildContext context) {
     if (isForDiet) {
-      return Text(
-        AppLocalizations.of(context)
-            .translate('For Diet'),
-        style: const TextStyle(
-            fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+      return Container(
+        color: Colors.blue,
+        child: Text(
+          AppLocalizations.of(context).translate('For Diet'),
+          style: const TextStyle(
+              fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       );
     } else if (isForVegetarians) {
-      return Text(
-        AppLocalizations.of(context)
-            .translate('For Vegeterians'),
-        style: const TextStyle(
-            fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+      return Container(
+        color: Colors.green,
+        child: Text(
+          AppLocalizations.of(context).translate('For Vegeterians'),
+          style: const TextStyle(
+              fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       );
-    } else {
-      Column(
+    } else if (isForVegetarians && isForDiet) {
+      return Column(
         children: [
-          Text(
-            AppLocalizations.of(context).translate('For Diet'),
-            style: const TextStyle(
-                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+          Container(
+            color: Colors.blue,
+            child: Text(
+              AppLocalizations.of(context).translate('For Diet'),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue),
+            ),
           ),
-          Text(
-            AppLocalizations.of(context).translate('For Vegeterians'),
-            style: const TextStyle(
-                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+          Container(
+            color: Colors.green,
+            child: Text(
+              AppLocalizations.of(context).translate('For Vegeterians'),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green),
+            ),
           ),
         ],
       );
+    } else {
+      return Container();
     }
   }
 }

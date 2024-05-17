@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
@@ -30,6 +31,7 @@ class WeeklyMenuSection extends StatefulWidget {
 
 class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
   List<WeeklyMenu> weeklyList = [];
+  List<WeeklyMenu> weeklyDietList = [];
   bool isLoading = false;
   String currentUserId = '';
 
@@ -46,40 +48,34 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
   Future<void> fetchWeeklyMenus() async {
     final mealService = MealService();
     try {
-      // Fetch weekly menus
       setState(() {
         isLoading = true;
       });
 
-      List<WeeklyMenu> fetchedMenus = [];
-
       currentUserId = await UserService().getCurrentUserId();
+      List<WeeklyMenu> fetchedMenus = [];
 
       if (widget.showAll) {
         fetchedMenus = await mealService.getWeeklyMenusFixedLength(4);
       } else {
         if (widget.publicUserId.isEmpty) {
-          // Fetch user profile if it's the logged-in user's profile
-          mealService.getWeeklyMenusByPageAndUser(
-            1,
-            10,
-          );
+          fetchedMenus = await mealService.getWeeklyMenusByPageAndUser(1, 10);
         } else {
-          // Fetch public user profile if it's a different user's profile
           fetchedMenus = await mealService.getWeeklyMenusByPageAndPublicUser(
               1, 10, widget.publicUserId);
         }
       }
 
-     setState(() {
-  if (widget.isForDiet) {
-    weeklyList = fetchedMenus.where((menu) => menu.isForDiet == true).toList();
-  } else {
-    weeklyList = fetchedMenus;
-  }
-  isLoading = false;
-  print(weeklyList);
-});
+      // Clear existing lists before populating with new data
+      setState(() {
+        if (widget.isForDiet) {
+          weeklyDietList =
+              fetchedMenus.where((menu) => menu.isForDiet).toList();
+        } else {
+          weeklyList = fetchedMenus.where((menu) => !menu.isForDiet).toList();
+        }
+        isLoading = false;
+      });
     } catch (e) {
       print('Error fetching weekly menus: $e');
     }
@@ -87,7 +83,9 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
 
   @override
   Widget build(BuildContext context) {
-    return weeklyList.isEmpty
+    final displayList = widget.isForDiet ? weeklyDietList : weeklyList;
+    log(widget.showAll.toString());
+    return displayList.isEmpty
         ? isLoading
             ? const LinearProgressIndicator()
             : widget.showAll
@@ -137,10 +135,10 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                                   )),
                         );
                       },
-                      child:  Text(AppLocalizations.of(context).translate(
-                                widget.isForDiet
-                                    ? 'Add Weekly Diet Menu'
-                                    : 'Add Weekly Menu')),
+                      child: Text(AppLocalizations.of(context).translate(
+                          widget.isForDiet
+                              ? 'Add Weekly Diet Menu'
+                              : 'Add Weekly Menu')),
                     ),
                   ),
                 SizedBox(
@@ -148,9 +146,9 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
-                    itemCount: weeklyList.length,
+                    itemCount: displayList.length,
                     itemBuilder: (context, index) {
-                      final meal = weeklyList[index];
+                      final meal = displayList[index];
                       return InkWell(
                         onTap: () {
                           Navigator.push(
@@ -166,6 +164,7 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                           isForAll: widget.showAll,
                           publicUserId: widget.publicUserId,
                           currentUserId: currentUserId,
+                          isForDiet: widget.isForDiet,
                         ),
                       );
                     },

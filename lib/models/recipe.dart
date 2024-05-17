@@ -17,11 +17,13 @@ class Recipe {
   final String? categoryColor;
   final String? categoryFont;
   final String categoryName;
-  final List<String>? likedBy;
+  final List<String>? recomendedBy;
   final List<String>? meal;
   final List<String>? commentId;
-  bool isForDiet = false;
-  bool isForVegetarians = false;
+  bool isForDiet;
+  bool isForVegetarians;
+  double rating; // Added for storing average rating
+  int ratingCount; // Added for storing count of ratings
 
   Recipe({
     this.id,
@@ -42,11 +44,13 @@ class Recipe {
     required this.categoryColor,
     required this.categoryFont,
     required this.categoryName,
-    required this.likedBy,
+    required this.recomendedBy,
     required this.meal,
     required this.commentId,
     required this.isForDiet,
     required this.isForVegetarians,
+    required this.rating, // Initialize in constructor
+    required this.ratingCount, // Initialize in constructor
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -75,18 +79,20 @@ class Recipe {
       categoryColor: json['categoryColor'] ?? '',
       categoryFont: json['categoryFont'] ?? '',
       categoryName: json['categoryName'] ?? '',
-      likedBy:
-          (json['likedBy'] as List<dynamic>?)?.cast<String>().toList() ?? [],
+      recomendedBy:
+          (json['recomendedBy'] as List<dynamic>?)?.cast<String>().toList() ?? [],
       meal: (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
       commentId:
           (json['commentId'] as List<dynamic>?)?.cast<String>().toList() ?? [],
-      isForDiet: json['isForDiet'],
-      isForVegetarians: json['isForVegetarians'],
+      isForDiet: json['isForDiet'] ?? false,
+      isForVegetarians: json['isForVegetarians'] ?? false,
+      rating: json['rating']?.toDouble() ?? 0.0,
+      ratingCount: json['ratingCount']?.toInt() ?? 0,
     );
   }
 
   Map<String, Object?> toJson() {
-    return {
+    var map = {
       '_id': id,
       'recipeTitle': recipeTitle,
       'recipeImage': recipeImage,
@@ -105,12 +111,14 @@ class Recipe {
       'categoryColor': categoryColor,
       'categoryFont': categoryFont,
       'categoryName': categoryName,
-      'likedBy': likedBy,
+      'recomendedBy': recomendedBy,
       'meal': meal,
       'commentId': commentId,
       'isForDiet': isForDiet,
       'isForVegetarians': isForVegetarians,
+      'rating': rating,
+      'ratingCount': ratingCount,
     };
+    return map;
   }
 }
-

@@ -292,7 +292,7 @@ class RecipeService {
     }
   }
 
-  Future<void> likeRecipe(String recipeId) async {
+  Future<void> recommendRecipe(String recipeId) async {
     await _initPrefs();
     final userId = _prefs.getString('userId');
     final response = await http.post(
@@ -306,7 +306,7 @@ class RecipeService {
     }
   }
 
-  Future<void> dislikeRecipe(String recipeId) async {
+  Future<void> unRecommendRecipe(String recipeId) async {
     await _initPrefs();
     final userId = _prefs.getString('userId');
     final response = await http.post(
@@ -332,7 +332,7 @@ class RecipeService {
       }),
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode == 200) {
       return true;
     } else {
       return false;
@@ -426,6 +426,21 @@ class RecipeService {
     throw Exception('Failed to fetch top three recipes');
   }
   }
+
+  Future<void> rateRecipe(String recipeId, double rating) async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  final response = await http.post(
+    Uri.parse('${Constants.baseUrl}/api/rateRecipe'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'recipeId': recipeId, 'userId': userId, 'rating': rating}),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Failed to rate recipe');
+  }
+}
+
 
   Future<void> _saveRecipeIDLocally(String recipeId) async {
     await _initPrefs();

@@ -223,10 +223,7 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
                             },
                             icon: const Icon(Icons.delete),
                           ),
-                        const Icon(Icons.favorite_border),
-                        Text(
-                          widget.recipe.likedBy?.length.toString()  ??Constants.emptyField,
-                        ),
+                       
                       ],
                     )
                   ],

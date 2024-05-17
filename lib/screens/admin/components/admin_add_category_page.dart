@@ -280,9 +280,6 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        String finalProfileImageURL =
-            ('${Constants.baseUrl}/${widget.category?.categoryImage}')
-                .replaceAll('\\', '/');
         return AlertDialog(
           content: Stack(
             children: [
@@ -290,7 +287,7 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                 tag: 'imageHero',
                 child: widget.category != null && !imageIsSelected
                     ? Image.network(
-                        finalProfileImageURL,
+                        widget.category?.categoryImage ?? Constants.emptyField,
                         fit: BoxFit.cover,
                       )
                     : kIsWeb

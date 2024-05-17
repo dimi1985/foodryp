@@ -53,6 +53,8 @@ dependencies:
   universal_io: ^2.2.2
   internet_connection_checker: ^1.0.0+1
   material_design_icons_flutter: ^7.0.7296
+  cached_network_image: ^3.3.1
+  flutter_rating_bar: ^4.0.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -84,6 +86,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/logo.png
+    - assets/foodryp_logo.png
     - assets/hero.jpg
     - assets/default_avatar_female.jpg
     - assets/default_avatar_male.jpg

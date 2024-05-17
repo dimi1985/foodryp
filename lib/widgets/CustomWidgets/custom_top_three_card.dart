@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -30,7 +31,6 @@ class CustomCategoryTopThreeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      // Wrap with InkWell for interaction (optional)
       onTap: onTap,
       child: SizedBox(
         height: 150,
@@ -39,63 +39,88 @@ class CustomCategoryTopThreeCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(Constants.defaultPadding),
           child: Stack(
             children: [
-              Image.network(
-                imageUrl,
-                width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              Positioned(
-                  top: Constants.defaultPadding,
-                  left: Constants.defaultPadding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: Responsive.isMobile(context) ? 140 : 120,
-                      ),
-                      SizedBox(
-                        width: Responsive.isMobile(context) ? 150 : 135,
-                        child: Text(
-                          maxLines: Responsive.isMobile(context) ? 4 : 3,
-                          overflow: TextOverflow.ellipsis,
-                          title,
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: color,
-                          ),
+              // Recipe image with gradient overlay
+              Stack(
+                fit: StackFit.expand,
+                children: [
+               
+                  Image.network(
+                    imageUrl,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.none,
+                    frameBuilder:
+                        (context, child, frame, wasSynchronouslyLoaded) {
+                      if (wasSynchronouslyLoaded) {
+                        // Image was loaded synchronously
+                        return child; // Replace YourWidget with your custom widget
+                      } else {
+                        // Image is being loaded asynchronously
+                        return child; // Replace YourLoadingWidget with your loading indicator or placeholder
+                      }
+                    },
+                  ),
+                  const Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.center,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.transparent, Colors.black],
                         ),
                       ),
-                      SizedBox(
-                        height: Responsive.isMobile(context) ? 30 : 50,
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                bottom:
+                    10, // Adjust this value to position it slightly above the bottom
+                left: Constants.defaultPadding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: Responsive.isMobile(context) ? 150 : 135,
+                      child: Text(
+                        title,
+                        maxLines: Responsive.isMobile(context) ? 4 : 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: color, // Keep title color constant
+                        ),
                       ),
-                      Row(
-                        children: [
-                          ImagePickerPreviewContainer(
-                            initialImagePath: userImageURL,
-                            containerSize: 30,
-                            onImageSelected: (iamge, bytes) {},
-                            gender: Constants.emptyField,
-                            isFor: Constants.emptyField,
-                            isForEdit: Constants.defaultBoolValue,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        ImagePickerPreviewContainer(
+                          initialImagePath: userImageURL,
+                          containerSize: 30,
+                          onImageSelected: (image, bytes) {},
+                          gender: Constants.emptyField,
+                          isFor: Constants.emptyField,
+                          isForEdit: Constants.defaultBoolValue,
+                        ),
+                        const SizedBox(width: 10),
+                        // Username (assuming you have a 'username' field)
+                        Text(
+                          username, // Handle missing data
+                          style: TextStyle(
+                            fontSize: Responsive.isDesktop(context)
+                                ? Constants.desktopFontSize
+                                : Constants.mobileFontSize,
+                            color: Colors.white,
                           ),
-                          const SizedBox(width: 10),
-                          // Username (assuming you have a 'username' field)
-                          Text(
-                            username, // Handle missing data
-                            style: TextStyle(
-                              fontSize: Responsive.isDesktop(context)
-                                  ? Constants.desktopFontSize
-                                  : Constants.mobileFontSize,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  )),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/screens/add_weekly_menu_page.dart';
+import 'package:foodryp/screens/weekly_menu_deletion_confirmation_screen.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
@@ -14,13 +15,17 @@ class CustomWeeklyMenuCard extends StatefulWidget {
   final bool isForAll;
   final String publicUserId;
   final String currentUserId;
-  const CustomWeeklyMenuCard(
-      {super.key,
-      required this.meal,
-      required this.currentPage,
-      required this.isForAll,
-      required this.publicUserId,
-      required this.currentUserId});
+  final bool isForDiet;
+
+  const CustomWeeklyMenuCard({
+    super.key,
+    required this.meal,
+    required this.currentPage,
+    required this.isForAll,
+    required this.publicUserId,
+    required this.currentUserId,
+    required this.isForDiet,
+  });
 
   @override
   State<CustomWeeklyMenuCard> createState() => _CustomWeeklyMenuCardState();
@@ -30,10 +35,9 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    double cardWidth = MediaQuery.of(context).size.width < 600
-        ? MediaQuery.of(context).size.width
-        : 300;
+    double cardWidth = screenSize.width < 600 ? screenSize.width : 300;
     final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Center(
       child: Card(
         surfaceTintColor: Colors.white,
@@ -51,17 +55,10 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                   shrinkWrap: true,
                   itemCount: widget.meal.dayOfWeek.length,
                   itemBuilder: (context, index) {
-                  
                     return Container(
-                      width: cardWidth /
-                          widget.meal.dayOfWeek
-                              .length, // Dynamic width based on number of images
+                      width: cardWidth / widget.meal.dayOfWeek.length,
                       margin: const EdgeInsets.symmetric(horizontal: 1),
                       decoration: BoxDecoration(
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: NetworkImage(widget.meal.dayOfWeek[index].recipeImage ?? Constants.emptyField),
-                        ),
                         borderRadius: index == 0
                             ? const BorderRadius.only(
                                 topLeft: Radius.circular(15),
@@ -71,6 +68,23 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                                     topRight: Radius.circular(15),
                                     bottomRight: Radius.circular(0))
                                 : BorderRadius.zero,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: index == 0
+                            ? const BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                bottomLeft: Radius.circular(0))
+                            : index == widget.meal.dayOfWeek.length - 1
+                                ? const BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(0))
+                                : BorderRadius.zero,
+                        child: Image.network(
+                          widget.meal.dayOfWeek[index].recipeImage ??
+                              Constants.emptyField,
+                          fit: BoxFit.cover,
+                          filterQuality: FilterQuality.none,
+                        ),
                       ),
                     );
                   },
@@ -101,7 +115,7 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                             : Colors.black,
                       ),
                     ),
-                    const SizedBox(width: 5), // Adjust the spacing as needed
+                    const SizedBox(width: 5),
                     Text(
                       '•',
                       style: TextStyle(
@@ -114,10 +128,8 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                       ),
                     ),
                     const SizedBox(width: 5),
-
                     Text(
-                      DateFormat('dd MMM yyyy')
-                          .format(widget.meal.dateCreated), // Format the date
+                      DateFormat('dd MMM yyyy').format(widget.meal.dateCreated),
                       style: TextStyle(
                         fontSize: Responsive.isDesktop(context)
                             ? Constants.desktopFontSize
@@ -136,26 +148,36 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                                 MaterialPageRoute(
                                     builder: (context) => AddWeeklyMenuPage(
                                           meal: widget.meal,
-                                          isForEdit: true, isForDiet: false,
+                                          isForEdit: true,
+                                          isForDiet: widget.isForDiet,
                                         )),
                               );
                             },
                             icon: const Icon(Icons.edit))
-                        : Container()
+                        : Container(),
+                   !widget.isForAll &&
+                            widget.publicUserId == widget.currentUserId
+                        ? IconButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              WeeklyMenuDeletionConfirmationScreen(
+                            weeklyMenu: widget.meal,
+                          ),
+                        ));
+                      },
+                      icon: const Icon(Icons.delete),
+                    ):Container(),
                   ],
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(widget.meal.title,
-                            style: Theme.of(context).textTheme.headline6),
-                      ),
-                    ],
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Align(
+                  alignment: Alignment.topLeft, // Align to the start (top-left)
+                  child: Text(
+                    widget.meal.title,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
               ),

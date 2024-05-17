@@ -37,7 +37,7 @@ class _RecipePageState extends State<RecipePage> {
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
     currentPage = 'Recipes';
-    if (recipes.isEmpty) {
+    if (fetchedRecipes.isEmpty) {
       _fetchRecipes();
     }
   }
@@ -185,6 +185,7 @@ class _RecipePageState extends State<RecipePage> {
               : _noResultsFound
                   ? _buildNoResultsWidget() // Display no results message
                   : ListView.builder(
+                    key:  const PageStorageKey<String>('recipes'),
                       controller: _scrollController,
                       itemCount: recipes.length + (_isLoading ? 1 : 0),
                       itemBuilder: (context, index) {
@@ -242,6 +243,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Widget _buildSearchField(bool searchOnEveryKeystroke, bool isDesktop) {
+    
     return Container(
       constraints: BoxConstraints(maxWidth: isDesktop ? 600 : 400),
       decoration: BoxDecoration(

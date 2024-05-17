@@ -5,9 +5,8 @@ class CustomAdminCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-
   const CustomAdminCard({
-    
+    super.key,
     required this.title,
     required this.icon,
     required this.onTap,
@@ -30,7 +29,8 @@ class CustomAdminCard extends StatelessWidget {
               const SizedBox(height: 8.0),
               Text(
                 title,
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 18.0, fontWeight: FontWeight.bold),
               ),
             ],
           ),

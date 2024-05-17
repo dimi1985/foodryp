@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/admin/components/admin_category_page.dart';
+import 'package:foodryp/screens/admin/components/admin_food_wiki_page.dart';
 import 'package:foodryp/screens/admin/components/admin_recipe_page.dart';
 import 'package:foodryp/screens/admin/components/admin_running_event_Page.dart';
 import 'package:foodryp/screens/admin/components/admin_teams_page.dart';
@@ -81,6 +82,17 @@ class AdminPanelScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => const AdminRunningEventPage()),
+              );
+            },
+          ),
+          CustomAdminCard(
+            title: 'Food Wiki',
+            icon: Icons.person,
+            onTap: () {
+              // Navigate to Users screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminFoodWikiPage()),
               );
             },
           ),

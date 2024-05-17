@@ -73,4 +73,16 @@ class Constants {
       return AppLocalizations.of(context).translate('today');
     }
   }
+
+  static TextStyle dynamicStyle = const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              );
+
+               static TextStyle staticStyle = const TextStyle(
+               fontSize: 12,
+                fontWeight: FontWeight.normal,
+                color: Colors.grey,
+              );
 }

@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:ui';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodryp/database/database_helper.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
@@ -102,27 +103,70 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     widget.recipe.recipeImage ?? Constants.emptyField,
                     fit: BoxFit.cover,
                     width: screenSize.width,
+                    filterQuality: FilterQuality.none,
                   ),
                 ),
                 Positioned(
                   bottom: 10,
                   right: 10,
+                  child: Row(
+                    children: [
+                      Icon(
+                        widget.recipe.isForDiet
+                            ? MdiIcons.nutrition
+                            : widget.recipe.isForVegetarians
+                                ? MdiIcons.leaf
+                                : null,
+                        color: widget.recipe.isForDiet
+                            ? Colors.blue
+                            : widget.recipe.isForVegetarians
+                                ? Colors.green
+                                : null,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: HexColor(widget.recipe.categoryColor ??
+                                  Constants.emptyField)
+                              .withOpacity(0.7),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Text(
+                            overflow: TextOverflow.ellipsis,
+                            widget.recipe.categoryName.toUpperCase(),
+                            style: GoogleFonts.getFont(
+                              widget.recipe.categoryFont ??
+                                  Constants.emptyField,
+                              fontSize: Responsive.isDesktop(context)
+                                  ? Constants.desktopFontSize
+                                  : Constants.mobileFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 10,
+                  left: 10,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: HexColor(widget.recipe.categoryColor ??
-                              Constants.emptyField)
-                          .withOpacity(0.7),
+                      color: const Color.fromARGB(255, 221, 221, 221)
+                          .withOpacity(0.5),
+                      borderRadius:
+                          BorderRadius.circular(10), // Add rounded corners
                     ),
-                    child: Text(
-                      overflow: TextOverflow.ellipsis,
-                      widget.recipe.categoryName.toUpperCase(),
-                      style: GoogleFonts.getFont(
-                        widget.recipe.categoryFont ?? Constants.emptyField,
-                        fontSize: Responsive.isDesktop(context)
-                            ? Constants.desktopFontSize
-                            : Constants.mobileFontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Text(
+                        overflow: TextOverflow.ellipsis,
+                        widget.recipe.difficulty ?? Constants.emptyField,
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -165,7 +209,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         fontSize: Responsive.isDesktop(context) ? 16 : 12,
                         color: themeProvider.currentTheme == ThemeType.dark
                             ? Colors.white
-                            : Colors.black,
+                            : const Color.fromARGB(255, 70, 70, 70),
                       ),
                     ),
                     const SizedBox(width: 5), // Adjust the spacing as needed
@@ -177,7 +221,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                             : Constants.mobileFontSize,
                         color: themeProvider.currentTheme == ThemeType.dark
                             ? Colors.white
-                            : Colors.black,
+                            : const Color.fromARGB(255, 70, 70, 70),
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -193,7 +237,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                               : Constants.mobileFontSize,
                           color: themeProvider.currentTheme == ThemeType.dark
                               ? Colors.white
-                              : Colors.black,
+                              : const Color.fromARGB(255, 70, 70, 70),
                         ),
                       ),
                     ),
@@ -268,41 +312,23 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                 ),
                 Row(
                   children: [
-                    if (widget.recipe.isForDiet ||
-                        widget.recipe.isForVegetarians)
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.green.withOpacity(0.5),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Icon(
-                                widget.recipe.isForDiet ? MdiIcons.nutrition:MdiIcons.leaf,
-                                color: Colors.green.withOpacity(0.5),
-                              ),
-                              const SizedBox(width: 8),
-                              _dynamicText(
-                                  widget.recipe.isForDiet,
-                                  widget.recipe.isForVegetarians,
-                                  context,
-                                  widget.internalUse,
-                                  isDesktop),
-                            ],
-                          ),
-                        ),
+                    RatingBarIndicator(
+                      rating: widget.recipe.rating,
+                      itemBuilder: (context, index) => Icon(
+                        MdiIcons.star,
+                        color: Colors.amber,
                       ),
+                      itemCount: 5,
+                      itemSize: 20,
+                      direction: Axis.horizontal,
+                    ),
                     const Spacer(),
                     if (isOwner &&
                         isAuthenticated &&
                         widget.internalUse != 'MainScreen' &&
                         widget.internalUse != 'RecipePage' &&
                         widget.internalUse != 'AddWeeklyMenuPage' &&
+                        widget.internalUse != 'RecipePageByCategory' &&
                         isDesktop)
                       IconButton(
                         onPressed: () {
@@ -323,6 +349,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         isAuthenticated &&
                         widget.internalUse != 'MainScreen' &&
                         widget.internalUse != 'RecipePage' &&
+                        widget.internalUse != 'RecipePageByCategory' &&
                         isDesktop)
                       IconButton(
                         onPressed: () {
@@ -345,16 +372,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       widget.recipe.commentId?.length.toString() ??
                           Constants.emptyField,
                     ),
-                    Icon(
-                      Icons.favorite_border,
-                      color: themeProvider.currentTheme == ThemeType.light
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    Text(
-                      widget.recipe.likedBy?.length.toString() ??
-                          Constants.emptyField,
-                    ),
+                   
                   ],
                 ),
                 if (widget.internalUse == 'RecipePage' &&
@@ -368,54 +386,5 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
         ],
       ),
     );
-  }
-
-  _dynamicText(bool isForDiet, bool isForVegetarians, BuildContext context,
-      String internalUse, bool isDesktop) {
-    if (isForDiet) {
-      return widget.internalUse == 'MainScreen' ||
-              (widget.internalUse == '' && isDesktop)
-          ? Text(
-              AppLocalizations.of(context).translate('For Diet'),
-              style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green.withOpacity(0.5)),
-            )
-          : Container();
-    } else if (isForVegetarians) {
-      return widget.internalUse == 'MainScreen' ||
-              (widget.internalUse == '' && isDesktop)
-          ? Text(
-              AppLocalizations.of(context).translate('For Vegeterians'),
-              style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green.withOpacity(0.5)),
-            )
-          : Container();
-    } else {
-      widget.internalUse == 'MainScreen' ||
-              (widget.internalUse == '' && isDesktop)
-          ? Column(
-              children: [
-                Text(
-                  AppLocalizations.of(context).translate('For Diet'),
-                  style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.withOpacity(0.5)),
-                ),
-                Text(
-                  AppLocalizations.of(context).translate('For Vegeterians'),
-                  style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.withOpacity(0.5)),
-                ),
-              ],
-            )
-          : Container();
-    }
   }
 }

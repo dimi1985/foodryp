@@ -1,12 +1,12 @@
 class CategoryModel {
   final String? id;
-  final String? name;
-  final String? font;
-  final String? color;
+  final String name;
+  final String font;
+  final String color;
   final String? categoryImage;
   final List<String>? recipes;
-  bool isForDiet = false;
-  bool isForVegetarians = false;
+  final bool isForDiet;
+  final bool isForVegetarians;
 
   CategoryModel({
     this.id,
@@ -19,16 +19,20 @@ class CategoryModel {
     required this.isForVegetarians,
   });
 
-  factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
-        id: json['_id'],
-        name: json['name'],
-        font: json['font'],
-        color: json['color'],
-        categoryImage: json['categoryImage'],
-        recipes: json['recipes']?.cast<String>(), // Check for null and cast
-        isForDiet: json['isForDiet'],
-        isForVegetarians: json['isForVegetarians'],
-      );
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
+      id: json['_id'],
+      name: json['name'] ?? '',
+      font: json['font'] ?? '',
+      color: json['color'] ?? '',
+      categoryImage: json['categoryImage'],
+      recipes: (json['recipes'] != null && json['recipes'] != '')
+          ? List<String>.from(json['recipes'])
+          : null,
+      isForDiet: json['isForDiet'] ?? false,
+      isForVegetarians: json['isForVegetarians'] ?? false,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         '_id': id,

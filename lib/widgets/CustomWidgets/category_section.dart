@@ -25,7 +25,7 @@ class _CategorySectionState extends State<CategorySection> {
 
   Future<void> fetchCategories() async {
     try {
-      const int desiredLength = 6;
+      const int desiredLength = 3;
       final categoryService = CategoryService();
       final fetchedCategories =
           await categoryService.getFixedCategories(desiredLength);

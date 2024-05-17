@@ -47,15 +47,21 @@ class WeeklyMenuDetailPage extends StatelessWidget {
                     itemCount: meal.dayOfWeek.length,
                     itemBuilder: (context, index) {
                       final dayOfWeek = meal.dayOfWeek[index];
-                      final recipeImage =
-                          ('${Constants.baseUrl}/${dayOfWeek.recipeImage}')
-                              .replaceAll('\\', '/');
+
                       if (index.isEven) {
                         return _buildRow(
-                            dayOfWeek, recipeImage, isDesktop, index,context);
+                            dayOfWeek,
+                            dayOfWeek.recipeImage ?? Constants.emptyField,
+                            isDesktop,
+                            index,
+                            context);
                       } else {
                         return _buildReversedRow(
-                            dayOfWeek, recipeImage, isDesktop, index,context);
+                            dayOfWeek,
+                            dayOfWeek.recipeImage ?? Constants.emptyField,
+                            isDesktop,
+                            index,
+                            context);
                       }
                     },
                     separatorBuilder: (context, index) =>
@@ -70,30 +76,36 @@ class WeeklyMenuDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(
-      Recipe recipe, String recipeImage, bool isDesktop, int index, BuildContext context) {
+  Widget _buildRow(Recipe recipe, String recipeImage, bool isDesktop, int index,
+      BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _buildColumnWithData(recipe, isDesktop, index,context)),
-        Expanded(child: _buildImageData(recipeImage, isDesktop, index,context)),
+        Expanded(
+            child: _buildColumnWithData(recipe, isDesktop, index, context)),
+        Expanded(
+            child: _buildImageData(recipeImage, isDesktop, index, context)),
       ],
     );
   }
 
-  Widget _buildReversedRow(
-      Recipe recipe, String recipeImage, bool isDesktop, int index, BuildContext context) {
+  Widget _buildReversedRow(Recipe recipe, String recipeImage, bool isDesktop,
+      int index, BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _buildImageData(recipeImage, isDesktop, index,context)),
-        Expanded(child: _buildColumnWithData(recipe, isDesktop, index,context)),
+        Expanded(
+            child: _buildImageData(recipeImage, isDesktop, index, context)),
+        Expanded(
+            child: _buildColumnWithData(recipe, isDesktop, index, context)),
       ],
     );
   }
 
-  Widget _buildColumnWithData(Recipe recipe, bool isDesktop, int index, BuildContext context) {
-    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont ??Constants.emptyField,
+  Widget _buildColumnWithData(
+      Recipe recipe, bool isDesktop, int index, BuildContext context) {
+    TextStyle textStyle = GoogleFonts.getFont(
+        recipe.categoryFont ?? Constants.emptyField,
         color: HexColor(
-          recipe.categoryColor ??Constants.emptyField,
+          recipe.categoryColor ?? Constants.emptyField,
         ).withOpacity(0.7),
         fontSize: isDesktop
             ? Constants.desktopHeadingTitleSize
@@ -104,24 +116,24 @@ class WeeklyMenuDetailPage extends StatelessWidget {
         const SizedBox(
           height: 25,
         ),
-        getWeekdayName(index, recipe, isDesktop,context),
+        getWeekdayName(index, recipe, isDesktop, context),
         const SizedBox(
           height: 50,
         ),
         Text(
-          recipe.recipeTitle ??Constants.emptyField,
+          recipe.recipeTitle ?? Constants.emptyField,
           style: textStyle,
         ),
         Divider(
           endIndent: 50,
           indent: 50,
           color: HexColor(
-            recipe.categoryColor ??Constants.emptyField,
+            recipe.categoryColor ?? Constants.emptyField,
           ),
           thickness: 2,
         ), // Add a Divider
         Text(
-          recipe.description ??Constants.emptyField,
+          recipe.description ?? Constants.emptyField,
           style: textStyle,
         ),
         // Add more data as needed
@@ -129,7 +141,8 @@ class WeeklyMenuDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildImageData(String recipeImage, bool isDesktop, int index, BuildContext context) {
+  Widget _buildImageData(
+      String recipeImage, bool isDesktop, int index, BuildContext context) {
     return Container(
       width: 500, // Adjust width as needed
       height: 350, // Adjust height as needed
@@ -143,10 +156,12 @@ class WeeklyMenuDetailPage extends StatelessWidget {
     );
   }
 
-  Widget getWeekdayName(int index, Recipe recipe, bool isDesktop, BuildContext context) {
-    TextStyle textStyle = GoogleFonts.getFont(recipe.categoryFont ??Constants.emptyField,
+  Widget getWeekdayName(
+      int index, Recipe recipe, bool isDesktop, BuildContext context) {
+    TextStyle textStyle = GoogleFonts.getFont(
+        recipe.categoryFont ?? Constants.emptyField,
         color: HexColor(
-          recipe.categoryColor ??Constants.emptyField,
+          recipe.categoryColor ?? Constants.emptyField,
         ).withOpacity(0.7),
         fontSize: isDesktop
             ? Constants.desktopHeadingTitleSize

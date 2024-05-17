@@ -67,7 +67,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
       }
 
       final fetchedRecipes = await RecipeService().getRecipesByCategory(
-        widget.category.name ?? Constants.emptyField,
+        widget.category.name,
         _page,
         _pageSize,
       );
@@ -95,7 +95,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
       });
       try {
         final fetchedRecipes = await RecipeService().getRecipesByCategory(
-          widget.category.name ?? Constants.emptyField,
+          widget.category.name,
           _page,
           _pageSize,
         );
@@ -122,7 +122,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
      
 
       final fetchedRecipes = await RecipeService().getRecipesByCategoryByLikes(
-        widget.category.name ?? Constants.emptyField,
+        widget.category.name,
         _page,
         _pageSize,
       );
@@ -154,6 +154,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
         child: SizedBox(
           width: 600,
           child: ListView.separated(
+              key:  const PageStorageKey<String>('recipes_by_category'),
             controller: _scrollController,
             itemCount: recipes.length + (_isLoading ? 1 : 0),
             itemBuilder: (context, index) {
@@ -179,7 +180,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
                     },
                     child: CustomRecipeCard(
                       recipe: recipe,
-                      internalUse: '',
+                      internalUse: 'RecipePageByCategory',
                     ),
                   ),
                 );

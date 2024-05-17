@@ -59,7 +59,7 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
             children: [
               Text(
                 AppLocalizations.of(context)
-                    .translate('Top\n Three Recipes \n Of\n The Week'),
+                    .translate('Top\nThree Recipes\nOf\nThe Week'),
                 style: TextStyle(
                   fontSize: screenSize.width <= 1500 ? 30 : 50,
                   fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
                             MaterialPageRoute(
                                 builder: (context) => RecipeDetailPage(
                                       recipe: recipe,
-                                      internalUse: Constants.emptyField,
+                                      internalUse: 'top_three',
                                       missingIngredients: const [],
                                     )),
                           );

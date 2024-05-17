@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
+import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -12,7 +15,6 @@ import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -38,6 +40,8 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   List<Recipe> userRecipes = [];
   bool isLoading = false;
   final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollControllerForSelctedRecipes =
+      ScrollController();
   bool isFetching = false;
   late Map<Recipe, bool> recipeCheckedState = {};
   bool isChecked = false;
@@ -66,7 +70,8 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _scrollControllerForSelctedRecipes.dispose();
+    _scrollControllerForSelctedRecipes.dispose();
     super.dispose();
   }
 
@@ -186,6 +191,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                       },
                     ),
                     child: ListView.builder(
+                      controller: _scrollControllerForSelctedRecipes,
                       scrollDirection: Axis.horizontal,
                       itemCount: 7,
                       itemBuilder: (context, index) {
@@ -214,65 +220,67 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                               AppLocalizations.of(context).translate('Title')),
                     ),
                     TextButton(
-                      onPressed: isLoading
-                          ? null
-                          : () {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              widget.isForEdit
-                                  ? MealService()
-                                      .updateWeeklyMenu(
-                                      widget.meal!.id,
-                                      titleController.text,
-                                      unSelectedRecipes,
-                                      selectedRecipes,
-                                      userProfile.username,
-                                      userProfile.profileImage,
-                                      widget.isForDiet,
-                                    )
-                                      .then((value) {
-                                      if (value) {
-                                        //PUT SNAK
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const EntryWebNavigationPage(),
-                                                maintainState: false),
-                                            (Route<dynamic> route) => false);
-                                        setState(() {
-                                          isLoading = false;
-                                        });
-                                        setState(() {
-                                          isLoading = false;
-                                        });
-                                      }
-                                    })
-                                  : MealService()
-                                      .saveWeeklyMenu(
-                                      titleController.text,
-                                      selectedRecipes,
-                                      userProfile.username,
-                                      userProfile.profileImage,
-                                      widget.isForDiet,
-                                    )
-                                      .then((value) {
-                                      if (value) {
-                                        //PUT SNAKS
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const EntryWebNavigationPage(),
-                                                maintainState: false),
-                                            (Route<dynamic> route) => false);
-                                        setState(() {
-                                          isLoading = false;
-                                        });
-                                      }
-                                    });
-                            },
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          barrierDismissible:
+                              false, // Prevent dismissing the dialog by tapping outside
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: Row(
+                                children: [
+                                  const CircularProgressIndicator(),
+                                  const SizedBox(width: 16),
+                                  Text(AppLocalizations.of(context)
+                                      .translate('Processing...')),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+
+                        Future<void> handleResult(Future<bool> result) async {
+                          await Future.delayed(Duration(
+                              seconds:
+                                  Random().nextInt(3) + 1)); // Add delay here
+                          bool value = await result;
+                          Navigator.pop(context); // Close the alert dialog
+                          if (value) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const EntryWebNavigationPage(),
+                                maintainState: false,
+                              ),
+                              (Route<dynamic> route) => false,
+                            );
+                          }
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+
+                        if (widget.isForEdit) {
+                          handleResult(MealService().updateWeeklyMenu(
+                            widget.meal!.id,
+                            titleController.text,
+                            unSelectedRecipes,
+                            selectedRecipes,
+                            userProfile.username,
+                            userProfile.profileImage,
+                            widget.isForDiet,
+                          ));
+                        } else {
+                          handleResult(MealService().saveWeeklyMenu(
+                            titleController.text,
+                            selectedRecipes,
+                            userProfile.username,
+                            userProfile.profileImage,
+                            widget.isForDiet,
+                          ));
+                        }
+                      },
                       child: Text(AppLocalizations.of(context).translate(
                           widget.isForEdit ? 'Update Menu' : 'Add Menu')),
                     )
@@ -425,7 +433,8 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                                                                       removedIndex = -1;
                                                                                     } else {
                                                                                       // If no item was previously removed, just add the recipe to the end
-                                                                                      selectedRecipes.add(recipe);
+                                                                                      addRecipe(recipe);
+                                                                                   
                                                                                     }
 
                                                                                     unSelectedRecipes.removeWhere((r) => r.id == recipe.id);
@@ -572,7 +581,10 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                               '${AppLocalizations.of(context).translate('Day')} ${index + 1}', // Adjust day text as needed
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black.withOpacity(0.7),
+                                color:
+                                    themeProvider.currentTheme == ThemeType.dark
+                                        ? Colors.white
+                                        : Colors.black.withOpacity(0.7),
                                 fontSize: 18,
                               ),
                             ),
@@ -684,5 +696,25 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       default:
         return Container();
     }
+  }
+
+  void addRecipe(Recipe recipe) {
+    setState(() {
+      selectedRecipes.add(recipe);
+    });
+    _scrollToLastAdded(); // Make sure this is called after the state is updated
+  }
+
+  void _scrollToLastAdded() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollControllerForSelctedRecipes.hasClients &&
+          selectedRecipes.isNotEmpty) {
+        _scrollControllerForSelctedRecipes.animateTo(
+          _scrollControllerForSelctedRecipes.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 }

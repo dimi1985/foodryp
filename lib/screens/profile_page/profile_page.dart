@@ -8,9 +8,11 @@ import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/settings_page/settings_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   User user;
@@ -53,8 +55,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: themeProvider.currentTheme == ThemeType.dark
+            ? const Color.fromARGB(255, 37, 36, 37)
+            : Colors.white,
         actions: [
           if (currentPage == 'ProfilePage')
             IconButton(
@@ -73,64 +79,66 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
         ],
       ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
-        children: [
-          TopProfile(user: widget.user),
-          const SizedBox(height: 10.0),
-          HeadingTitleRow(
-            title: AppLocalizations.of(context).translate('Weekly Menus'),
-            onPressed: () {},
-            showSeeALl: false,
-            isForDiet: false,
-          ),
-          const SizedBox(height: 10.0),
-          WeeklyMenuSection(
-            showAll: false,
-            publicUsername: widget.user.username,
-            publicUserId: widget.user.id,
-            userRecipes: widget.user.recipes,
-            isForDiet: false,
-          ),
-          const SizedBox(height: 25.0),
-          HeadingTitleRow(
-            title: AppLocalizations.of(context).translate('Weekly Diet Menus'),
-            onPressed: () {},
-            showSeeALl: false,
-            isForDiet: true,
-          ),
-          const SizedBox(height: 10.0),
-          WeeklyMenuSection(
-            showAll: false,
-            publicUsername: widget.user.username,
-            publicUserId: widget.user.id,
-            userRecipes: widget.user.recipes,
-            isForDiet: true,
-          ),
-          const SizedBox(height: 25.0),
-          HeadingTitleRow(
-            title: AppLocalizations.of(context).translate('Recipes'),
-            onPressed: () {
-              // Navigate to the corresponding page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => RecipePage(
-                          user: widget.user,
-                          seeAll: false,
-                        )),
-              );
-            },
-            showSeeALl: false,
-            isForDiet: false,
-          ),
-          const SizedBox(height: 10.0),
-          SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: RecipeCardProfileSection(
-                  publicUsername: widget.user.username)),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          
+          children: [
+            TopProfile(user: widget.user),
+            const SizedBox(height: 10.0),
+            HeadingTitleRow(
+              title: AppLocalizations.of(context).translate('Weekly Menus'),
+              onPressed: () {},
+              showSeeALl: false,
+              isForDiet: false,
+            ),
+            const SizedBox(height: 10.0),
+            WeeklyMenuSection(
+              showAll: false,
+              publicUsername: widget.user.username,
+              publicUserId: widget.user.id,
+              userRecipes: widget.user.recipes,
+              isForDiet: false,
+            ),
+            const SizedBox(height: 25.0),
+            HeadingTitleRow(
+              title:
+                  AppLocalizations.of(context).translate('Weekly Diet Menus'),
+              onPressed: () {},
+              showSeeALl: false,
+              isForDiet: true,
+            ),
+            const SizedBox(height: 10.0),
+            WeeklyMenuSection(
+              showAll: false,
+              publicUsername: widget.user.username,
+              publicUserId: widget.user.id,
+              userRecipes: widget.user.recipes,
+              isForDiet: true,
+            ),
+            const SizedBox(height: 25.0),
+            HeadingTitleRow(
+              title: AppLocalizations.of(context).translate('Recipes'),
+              onPressed: () {
+                // Navigate to the corresponding page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RecipePage(
+                            user: widget.user,
+                            seeAll: false,
+                          )),
+                );
+              },
+              showSeeALl: false,
+              isForDiet: false,
+            ),
+            const SizedBox(height: 10.0),
+            SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: RecipeCardProfileSection(
+                    publicUsername: widget.user.username)),
+          ],
+        ),
       ),
     );
   }

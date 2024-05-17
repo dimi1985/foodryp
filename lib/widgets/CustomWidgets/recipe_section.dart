@@ -22,7 +22,6 @@ class _RecipeSectionState extends State<RecipeSection> {
   void initState() {
     super.initState();
     fetchixedRecipes();
-    
   }
 
   Future<void> fetchixedRecipes() async {
@@ -61,8 +60,8 @@ class _RecipeSectionState extends State<RecipeSection> {
                   child: SizedBox(
                     width: 250,
                     child: InkWell(
-                      onTap: () async{
-                       await Navigator.push(
+                      onTap: () async {
+                        var result = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => RecipeDetailPage(
@@ -71,10 +70,12 @@ class _RecipeSectionState extends State<RecipeSection> {
                               missingIngredients: const [],
                             ),
                           ),
-                        ).then((_) {
+                        );
+
+                        if (result == true) {
+                       
                           fetchixedRecipes();
-                          setState(() {});
-                        });
+                        }
                       },
                       child: CustomRecipeCard(
                         recipe: recipe,

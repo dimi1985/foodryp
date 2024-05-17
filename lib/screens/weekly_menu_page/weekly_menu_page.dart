@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/screens/weekly_menu_detail_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -10,7 +10,10 @@ import 'package:foodryp/widgets/CustomWidgets/custom_weekly_menu_card.dart';
 
 class WeeklyMenuPage extends StatefulWidget {
   final User? user;
-  const WeeklyMenuPage({super.key, this.user});
+  final bool isForDiet;
+  final bool showAll;
+
+  const WeeklyMenuPage({super.key, this.user, required this.isForDiet, required this.showAll});
 
   @override
   State<WeeklyMenuPage> createState() => _WeeklyMenuPageState();
@@ -23,6 +26,7 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
   int _currentPage = 1;
   final int _pageSize = 10;
   late String currentPage;
+
 
   @override
   void initState() {
@@ -58,7 +62,7 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
       );
       if (mounted) {
         setState(() {
-          meals = fetchedWeeklyMenu;
+          meals = widget.showAll ? fetchedWeeklyMenu : fetchedWeeklyMenu.where((meal) => meal.isForDiet == widget.isForDiet).toList();
           _isLoading = false;
         });
       }
@@ -85,7 +89,7 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
         );
         if (mounted) {
           setState(() {
-            meals.addAll(fetchedRecipes);
+            meals.addAll(widget.showAll ? fetchedRecipes : fetchedRecipes.where((meal) => meal.isForDiet == widget.isForDiet));
             _currentPage++; // Increment current page
             _isLoading = false;
           });
@@ -104,13 +108,17 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = Responsive.isDesktop(context);
+    
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(AppLocalizations.of(context).translate(widget.showAll ? 'All Menus' : (widget.isForDiet ? 'Diet Menus' : 'Non-Diet Menus'))),
+      ),
       body: _buildWeeklyMenuList(isDesktop),
     );
   }
 
   Widget _buildWeeklyMenuList(bool isDesktop) {
-    //Responsive.isDesktop(context) ? MediaQuery.of(context).size.width / 2 : MediaQuery.of(context).size.width,
     return Padding(
       padding: const EdgeInsets.all(Constants.defaultPadding),
       child: Center(
@@ -118,6 +126,7 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: ListView.builder(
+              key:  const PageStorageKey<String>('weekly_menu_page'),
             shrinkWrap: true,
             controller: _scrollController,
             itemCount: meals.length + (_isLoading ? 1 : 0),
@@ -129,16 +138,19 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
                   child: InkWell(
                     onTap: () {
                       Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  WeeklyMenuDetailPage(meal: meal,)),
-              );
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WeeklyMenuDetailPage(meal: meal),
+                        ),
+                      );
                     },
                     child: CustomWeeklyMenuCard(
                       meal: meal,
                       currentPage: currentPage,
                       isForAll: true,
-                      publicUserId: '',
+                      publicUserId: '', 
                       currentUserId: '',
+                       isForDiet: widget.isForDiet,
                     ),
                   ),
                 );

@@ -22,7 +22,7 @@
     "Already Have an Account?": "Already Have an Account?",
     "Sign Up": "Sign Up",
     "Sign In": "Sign In",
-    "Top\n Three Recipes \n Of\n The Week": "Top\n Three Recipes \n Of\n The Week",
+    "Top\nThree Recipes\nOf\nThe Week": "Top\nThree Recipes\nOf\nThe Week",
     "Close": "Close",
     "Ingredient": "Ingredient",
     "Instruction": "Instruction",
@@ -148,7 +148,15 @@
     "Diet Ready": "Diet Ready",
     "Vegeterians Ready": "Vegeterians Ready",
     "Diet and Vegeterian Ready": "Diet and Vegeterian Ready",
-    "Special Nutritions Recipe:": "Special Nutritions Recipe:",
-    "Latest Recipes": "Latest Recipes"
+    "Special Nutritions Recipe (Optional):": "Special Nutritions Recipe (Optional):",
+    "Latest Recipes": "Latest Recipes",
+    "All Menus": "All Menus",
+    "Diet Menus": "Diet Menus",
+    "Non-Diet Menus": "Non-Diet Menus",
+    "Weekly Diet Menus": "Weekly Diet Menus",
+    "Edit of": "Edit of",
+    "Servings": "Servings",
+    "Prep Time": "Prep Time",
+    "Cook Time": "Cook Time"
   }
   

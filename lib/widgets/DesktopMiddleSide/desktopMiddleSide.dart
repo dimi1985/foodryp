@@ -77,7 +77,7 @@ class DesktopMiddleSide extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const WeeklyMenuPage()),
+                            builder: (context) => const WeeklyMenuPage(isForDiet: false, showAll: false,)),
                       );
                     },
                     showSeeALl: true, isForDiet: false,
@@ -102,7 +102,7 @@ class DesktopMiddleSide extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const WeeklyMenuPage()),
+                            builder: (context) => const WeeklyMenuPage(isForDiet: true, showAll: false,)),
                       );
                     },
                     showSeeALl: true,

@@ -80,7 +80,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
     });
     _pageController.animateToPage(
       index,
-      duration: const Duration(seconds: 1),
+      duration: const Duration(microseconds: 100),
       curve: Curves.fastEaseInToSlowEaseOut,
     );
   }
@@ -88,8 +88,6 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = Responsive.isDesktop(context);
-    final bool isMobile = Responsive.isMobile(context);
-    final isAndroid = Constants.checiIfAndroid(context);
 
     menuItems = [
       'Home',
@@ -106,7 +104,9 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: themeProvider.currentTheme == ThemeType.dark
+            ? const Color.fromARGB(255, 37, 36, 37)
+            : Colors.white,
         elevation: 0,
         title: Row(
           children: [
@@ -265,10 +265,13 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
               user: user,
             ),
           RecipePage(
-            user: user, seeAll: false,
+            user: user,
+            seeAll: false,
           ),
           WeeklyMenuPage(
             user: user,
+            isForDiet: false,
+            showAll: true,
           ),
           if (isAuthenticated)
             MyFridgePage(
