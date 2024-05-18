@@ -119,7 +119,7 @@ class _MyFridgePageState extends State<MyFridgePage>
     }
   }
 
-// Function to normalize text by removing non-alphanumeric characters and converting to lowercase
+
   // Function to normalize text by removing non-alphanumeric characters and converting to lowercase
   String normalizeString(String input) {
     return input.toLowerCase().replaceAll(RegExp(r'[^a-zα-ωάέήίόύώ0-9 ]'),

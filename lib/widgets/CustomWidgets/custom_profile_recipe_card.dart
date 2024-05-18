@@ -79,6 +79,20 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
                   aspectRatio: 16 / 9, // Define an appropriate aspect ratio
                   child: Image.network(
                     recipeImage,
+                        loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child; // image fully loaded, return the image widget
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null, // This will show a determinate progress indicator if size is known, otherwise indeterminate
+                          ),
+                        );
+                      }},
                     fit: BoxFit.cover,
                     width: screenSize.width,
                   ),

@@ -72,25 +72,25 @@ class WikiFoodService {
     }
   }
 
-  Future<Wikifood?> searchWikiFoodByTitle(String ingredient) async {
+Future<Wikifood?> searchWikiFoodByTitle(String ingredient) async {
     log('searchWikiFoodByTitle the ingredient is  : $ingredient');
-    final response = await http.get(Uri.parse(
-        '${Constants.baseUrl}/api/searchWikiFoodByTitle?query=$ingredient'));
+    final queryParameter = Uri.encodeComponent(ingredient);
+    final response = await http.get(Uri.parse('${Constants.baseUrl}/api/searchWikiFoodByTitle?query=$queryParameter'));
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      print(
-          'Response from server: $jsonResponse'); // Print the response from the server
-      if (jsonResponse.containsKey('wikifoods') &&
-          jsonResponse['wikifoods'].isNotEmpty) {
-        return Wikifood.fromJson(jsonResponse['wikifoods'][0]);
-      } else {
-        // No wikifood found for this ingredient
-        return null;
-      }
+        final jsonResponse = json.decode(response.body);
+        print('Response from server: $jsonResponse'); // Print the response from the server
+
+        if (jsonResponse.containsKey('wikifood') && jsonResponse['wikifood'] != null) {
+            return Wikifood.fromJson(jsonResponse['wikifood']);
+        } else {
+            // No wikifood found for this ingredient
+            return null;
+        }
     } else {
-      // Failed to load wiki info
-      throw Exception('Failed to load wiki info');
+        // Failed to load wiki info
+        throw Exception('Failed to load wiki info');
     }
-  }
+}
+
 }

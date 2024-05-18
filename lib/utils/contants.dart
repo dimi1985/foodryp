@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/celebration_day.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/models/wikifood.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 
 class Constants {
@@ -36,6 +37,11 @@ class Constants {
     followRequestsReceived: [],
     followRequestsCanceled: [], 
     commentId: [],
+  );
+
+
+  static Wikifood defaultWikifood = Wikifood(id: '', title: '', text: '', source: ''
+   
   );
   static String emptyField = '';
   static bool defaultBoolValue = false;

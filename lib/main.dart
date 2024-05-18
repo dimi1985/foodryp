@@ -21,8 +21,8 @@ void main() async {
   // Initialize the language provider and load the language
   // Ensure that the necessary bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
-  var db = getDatabase(); // This will fetch the appropriate database instance
-  await db.init(); // Initialize the database
+   initializeAsyncOperations();
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? languageCode = prefs.getString('languageCode');
   String? countryCode = prefs.getString('countryCode');
@@ -45,6 +45,12 @@ void main() async {
       child: Foodryp(initialLocale: initialLocale),
     ),
   );
+}
+
+void initializeAsyncOperations() async {
+  var db = getDatabase();
+  await db.init();  // This now happens in the background
+  // Any other asynchronous initialization can also be done here
 }
 
 class Foodryp extends StatefulWidget {

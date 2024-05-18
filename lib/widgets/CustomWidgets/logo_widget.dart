@@ -10,9 +10,9 @@ class LogoWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(Constants.defaultPadding),
       child: Image.asset(
-        'assets/foodryp_logo.png',
-        width:Responsive.isDesktop(context ) ? 100 :40,
-        height: Responsive.isDesktop(context ) ? 100 :40,
+        'assets/logo.png',
+        width: Responsive.isDesktop(context) ? 100 : 40,
+        height: Responsive.isDesktop(context) ? 100 : 40,
       ),
     );
   }

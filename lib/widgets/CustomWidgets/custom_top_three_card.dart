@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -43,9 +42,23 @@ class CustomCategoryTopThreeCard extends StatelessWidget {
               Stack(
                 fit: StackFit.expand,
                 children: [
-               
                   Image.network(
                     imageUrl,
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child; // image fully loaded, return the image widget
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null, // This will show a determinate progress indicator if size is known, otherwise indeterminate
+                          ),
+                        );
+                      }
+                    },
                     width: double.infinity,
                     height: double.infinity,
                     fit: BoxFit.cover,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/mainScreen/components/logo_widget.dart';
+import 'package:foodryp/widgets/CustomWidgets/logo_widget.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 

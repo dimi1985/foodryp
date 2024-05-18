@@ -82,6 +82,20 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                         child: Image.network(
                           widget.meal.dayOfWeek[index].recipeImage ??
                               Constants.emptyField,
+                               loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child; // image fully loaded, return the image widget
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null, // This will show a determinate progress indicator if size is known, otherwise indeterminate
+                          ),
+                        );
+                      }},
                           fit: BoxFit.cover,
                           filterQuality: FilterQuality.none,
                         ),
