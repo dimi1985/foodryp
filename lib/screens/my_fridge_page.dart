@@ -119,7 +119,6 @@ class _MyFridgePageState extends State<MyFridgePage>
     }
   }
 
-
   // Function to normalize text by removing non-alphanumeric characters and converting to lowercase
   String normalizeString(String input) {
     return input.toLowerCase().replaceAll(RegExp(r'[^a-zα-ωάέήίόύώ0-9 ]'),
@@ -158,7 +157,8 @@ class _MyFridgePageState extends State<MyFridgePage>
       'cup',
       'cups',
       'tbsp',
-      'tsp'
+      'tsp',
+      'φετες'
     ];
 
     // Normalize and split the ingredient into words, filtering out ignored words
@@ -222,23 +222,20 @@ class _MyFridgePageState extends State<MyFridgePage>
           if (missingIngredients.isNotEmpty) {
             recipeMissingIngredients[recipe.id!] = missingIngredients;
           } else {
-            if(missingIngredients.isNotEmpty){
-recipeMissingIngredients[recipe.id!] = [];
-            }
-            
+            recipeMissingIngredients[recipe.id!] = [];
           }
         }
 
-        // // Optionally print missing ingredients for each recipe
-        // recipeMissingIngredients.forEach((id, missing) {
-        //   print(
-        //       'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
-        // });
+        // Print to verify the updated missing ingredients list
+        recipeMissingIngredients.forEach((id, missing) {
+          print(
+              'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
+        });
       }
+
       if (mounted) {
         setState(() {
           recipes = filteredRecipes;
-
           _isLoading = false;
         });
       }
@@ -468,7 +465,7 @@ recipeMissingIngredients[recipe.id!] = [];
   }
 
   void addItemToList(Category category, String item) {
-    switch (category) {   
+    switch (category) {
       case Category.vegetables:
         vegetablesList.add(item);
         break;
@@ -561,30 +558,31 @@ recipeMissingIngredients[recipe.id!] = [];
                       recipeMissingIngredients[recipe.id] ?? [];
 
                   return Padding(
-                      padding: const EdgeInsets.all(Constants.defaultPadding),
-                      child: SizedBox(
-                        height: 400,
-                        width: 400,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RecipeDetailPage(
-                                  recipe: recipe,
-                                  internalUse: 'RecipePage',
-                                  missingIngredients: missingIngredients,
-                                ),
+                    padding: const EdgeInsets.all(Constants.defaultPadding),
+                    child: SizedBox(
+                      height: 400,
+                      width: 400,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RecipeDetailPage(
+                                recipe: recipe,
+                                internalUse: 'RecipePage',
+                                missingIngredients: missingIngredients,
                               ),
-                            );
-                          },
-                          child: CustomRecipeCard(
-                            internalUse: 'RecipePage',
-                            recipe: recipe,
-                            missingIngredients: missingIngredients,
-                          ),
+                            ),
+                          );
+                        },
+                        child: CustomRecipeCard(
+                          internalUse: 'RecipePage',
+                          recipe: recipe,
+                          missingIngredients: missingIngredients,
                         ),
-                      ));
+                      ),
+                    ),
+                  );
                 } else {
                   return _buildLoader();
                 }
@@ -774,32 +772,33 @@ recipeMissingIngredients[recipe.id!] = [];
   }
 
   void deleteFridgeItem(String item, Category category) async {
-    // Logic to remove an item from the fridge list based on category
-    await UserService().deleteFridgeItem(item).then((value) async {
-      if (value) {
-         fetchFridgeItems();
-         _fetchRecipes();
-        updateListUI();
-        print('Fridge item deleted successfully.');
-        // Remove item from the correct list based on category
-        switch (category) {
-          case Category.vegetables:
-            vegetablesList.remove(item);
-            break;
-          case Category.generalItems:
-            generalItemsList.remove(item);
-            break;
-          case Category.meatAndFish:
-            meatAndFishList.remove(item);
-            break;
-        }
-        updateListUI();
-      } else {
-        print('Error deleting fridge item');
-      }
-    }).catchError((error) {
-      print('Error deleting fridge item: $error');
-    });
+    // Remove item from the correct list based on category
+    switch (category) {
+      case Category.vegetables:
+        vegetablesList.remove(item);
+        break;
+      case Category.generalItems:
+        generalItemsList.remove(item);
+        break;
+      case Category.meatAndFish:
+        meatAndFishList.remove(item);
+        break;
+    }
+
+    // Update the UI immediately
+    updateListUI();
+
+    // Call the server to delete the fridge item
+    bool success = await UserService().deleteFridgeItem(item);
+
+    if (success) {
+      await fetchFridgeItems();
+      await _fetchRecipes();
+      updateListUI();
+      print('Fridge item deleted successfully.');
+    } else {
+      print('Error deleting fridge item');
+    }
   }
 
   String categoryToString(Category category) {

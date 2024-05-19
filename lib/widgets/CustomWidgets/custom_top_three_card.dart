@@ -110,7 +110,7 @@ class CustomCategoryTopThreeCard extends StatelessWidget {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        ImagePickerPreviewContainer(
+                       userImageURL.isEmpty ? Container(): ImagePickerPreviewContainer(
                           initialImagePath: userImageURL,
                           containerSize: 30,
                           onImageSelected: (image, bytes) {},

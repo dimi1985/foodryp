@@ -1,6 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/category_page/category_page.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
@@ -14,7 +15,8 @@ import 'package:foodryp/widgets/CustomWidgets/top_three_recipe_card_section.dart
 import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
 
 class DesktopMiddleSide extends StatelessWidget {
-  const DesktopMiddleSide({Key? key});
+
+  const DesktopMiddleSide({Key? key,});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class DesktopMiddleSide extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const SizedBox(
+                   const SizedBox(
                     height: 400,
                     child: TopThreeRecipeCardSection(),
                   ),

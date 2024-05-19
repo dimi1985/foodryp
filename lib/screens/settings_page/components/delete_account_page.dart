@@ -2,7 +2,10 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:foodryp/screens/bottom_nav_screen.dart';
+import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/user_service.dart';
 
@@ -101,7 +104,9 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
     // Navigating to the main screen
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => MainScreen()),
+      MaterialPageRoute(builder: (context) {
+        return kIsWeb ? const EntryWebNavigationPage() : const BottomNavScreen();
+      }),
       (route) => false,
     );
   }

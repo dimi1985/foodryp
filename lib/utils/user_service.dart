@@ -92,7 +92,8 @@ class UserService {
     await _initPrefs();
     final userId =
         _prefs.getString('userId'); // Use 'userId' instead of 'userID'
-        log('This Methos is called from BottomNavigation and profile page');
+
+
 
     try {
       final response = await http.get(
@@ -530,4 +531,33 @@ Future<bool> followBack(String userToFollowBackId) async {
       return false;
     }
   }
+
+Future<bool> acceptFollowRequest(String targetUserId) async {
+    try {
+      final String userId = await getCurrentUserId();
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/api/acceptFollowRequest'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'userId': userId,
+          'targetUserId': targetUserId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Follow request accepted successfully.');
+        return true;
+      } else {
+        print('Failed to accept follow request: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error accepting follow request: $e');
+      return false;
+    }
+  }
+
+  
 }

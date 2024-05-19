@@ -73,7 +73,7 @@ class WikiFoodService {
   }
 
 Future<Wikifood?> searchWikiFoodByTitle(String ingredient) async {
-    log('searchWikiFoodByTitle the ingredient is  : $ingredient');
+
     final queryParameter = Uri.encodeComponent(ingredient);
     final response = await http.get(Uri.parse('${Constants.baseUrl}/api/searchWikiFoodByTitle?query=$queryParameter'));
 

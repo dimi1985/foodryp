@@ -1,6 +1,7 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 import 'dart:async';
 import 'dart:math';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,6 +10,7 @@ import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/wikifood.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/comment_service.dart';
+import 'package:foodryp/utils/connectivity_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
@@ -44,61 +46,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
   bool isAuthenticated = false;
   bool isLoading = false;
   int currentIndex = 0;
-  AnimationController? _slideController;
-  Animation<Offset>? _slideAnimation;
-  bool isExpanded = false;
-  late Timer _timer;
   double _currentRating = 0; // Initial rating
   bool _hasRated = false;
-  String? selectedIngredient;
-  late Wikifood? wikifoodDetails = Constants.defaultWikifood;
-  List<String> searchedWords = [];
-  List<String> foundWords = [];
-  List<String> ignoreWords = [
-    'of',
-    'the',
-    'with',
-    'a',
-    'an',
-    'some',
-    'in',
-    'for',
-    'on',
-    'at',
-    'to',
-    'from',
-    'by',
-    'as',
-    'της',
-    'σου',
-    'κρεας',
-    'κρέας',
-    'κον',
-    'κασσε',
-    'g',
-    'kg',
-    'ml',
-    'l',
-    'cup',
-    'cups',
-    'tbsp',
-    'tsp',
-    'ενα',
-    'κ.σ',
-    'κ.γ',
-    'ή',
-    'κιλο',
-    'μισο',
-    'κιμα',
-    'κσ',
-    'κγ',
-    'γρ',
-    'επιλογης',
-    'σας',
-    'αναμεικτο',
-    'σκελιδα',
-    'εαν'
-  ];
 
   @override
   void initState() {
@@ -106,36 +55,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     _currentRating = widget.recipe.rating; // Set initial rating
     initLikeAndAuthStatus();
     fetchComments();
-    selectRandomIngredient();
-    handleIngredientSearch();
-    _slideController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0), // Start offscreen to the right
-      end: Offset.zero, // End at its natural position
-    ).animate(CurvedAnimation(
-      parent: _slideController!,
-      curve: Curves.easeInOut,
-    ));
-
-    // Automatically start the slide animation if title is not null
-    if (wikifoodDetails?.title != null) {
-      _slideController!.forward().then((_) {
-        // After sliding in, expand, wait, and then collapse
-        setState(() {
-          isExpanded = true;
-        });
-        _timer = Timer(const Duration(seconds: 25), () {
-          setState(() {
-            isExpanded = false;
-          });
-          _slideController!.reverse(); // Reverse the slide after collapsing
-        });
-      });
-    }
   }
 
   @override
@@ -170,13 +89,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     }
   }
 
-  @override
-  void dispose() {
-    _slideController!.dispose();
-    _timer.cancel();
-    super.dispose();
-  }
-
   void _updateRating(double rating) async {
     setState(() {
       _currentRating = rating;
@@ -189,79 +101,13 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     });
   }
 
-  void selectRandomIngredient() {
-    final ingredients = widget.recipe.ingredients ?? [];
-    if (ingredients.isNotEmpty) {
-      final randomIndex = Random().nextInt(ingredients.length);
-      selectedIngredient = ingredients[randomIndex];
-
-      selectedIngredient = normalizeAndSelectOneWord(selectedIngredient!);
-    }
-  }
-
-  String normalizeAndSelectOneWord(String ingredient) {
-    // Normalize by removing unwanted non-letter characters but keeping alphabetic characters and spaces
-    String normalized = ingredient
-        .toLowerCase()
-        .replaceAll(RegExp(r'[^\p{L}\s]', unicode: true), '');
-
-    // Split into words, filter out ignored words
-    List<String> words = normalized
-        .split(' ')
-        .where((word) => !ignoreWords.contains(word) && word.isNotEmpty)
-        .toList();
-
-    // Print the normalized and filtered words joined by commas (for logging)
-
-    // Return only the first word if available, or an empty string if the list is empty
-    return words.isNotEmpty ? words.first : '';
-  }
-
-  void handleIngredientSearch() {
-    String selectedWord = normalizeAndSelectOneWord(selectedIngredient!);
-    if (selectedWord.isNotEmpty) {
-      // Generate a random delay between 5 to 10 seconds
-      int randomDelaySeconds = 5 + Random().nextInt(6); // 5 + 0 to 5
-      Future.delayed(Duration(seconds: randomDelaySeconds), () {
-        searchWikiFood(selectedWord); // Search using the selected word
-      });
-    } else {
-      // Handle the case where no word is selected or is empty
-    }
-  }
-
-  Future<void> searchWikiFood(String ingredient) async {
-    if (ingredient.trim().isEmpty) {
-      return;
-    }
-
-    try {
-      Wikifood? wikifoodResult =
-          await WikiFoodService().searchWikiFoodByTitle(ingredient);
-      if (wikifoodResult != null) {
-        setState(() {
-          wikifoodDetails = wikifoodResult;
-        });
-      } else {
-        return;
-      }
-    } catch (e) {
-      return;
-    }
-  }
-
-  void toggleContainer() {
-    setState(() {
-      isExpanded = !isExpanded;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = Responsive.isDesktop(context);
     final isAndroid = Constants.checiIfAndroid(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final connectionService = Provider.of<ConnectivityService>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -281,58 +127,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (selectedIngredient != null &&
-                    wikifoodDetails!.title.isNotEmpty) ...[
-                  SlideTransition(
-                    position: _slideAnimation!,
-                    child: AnimatedContainer(
-                      duration: const Duration(seconds: 1),
-                      curve: Curves.fastOutSlowIn,
-                      width: double.infinity,
-                      color: themeProvider.currentTheme == ThemeType.dark
-                          ? const Color.fromARGB(255, 119, 119, 119)
-                          : Colors.grey[100],
-                      height: isExpanded
-                          ? isDesktop
-                              ? 550
-                              : 500
-                          : 50,
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: isExpanded
-                          ? Column(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "\n${wikifoodDetails?.text}\n\n ",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                                SelectionArea(
-                                  // contextMenuBuilder: _defaultContextMenuBuilder, //<-- DEFAULT
-                                  child: Text(
-                                      '${AppLocalizations.of(context).translate('Source:')}${wikifoodDetails?.source}'),
-                                ),
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Icon(MdiIcons.informationBoxOutline),
-                                Text(
-                                  "${AppLocalizations.of(context).translate('Did you know that..')}''${wikifoodDetails?.title}",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                )
-                              ],
-                            ),
-                    ),
-                  ),
-                ],
                 if (isDesktop)
                   Column(
                     children: [
@@ -377,7 +171,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                                   alignment: Alignment
                                       .centerRight, // Align the details to the right
                                   child: _buildRecipeDetails(
-                                      context, themeProvider, isDesktop),
+                                      context, themeProvider, isDesktop,connectionService),
                                 ),
                               ),
                             ),
@@ -441,7 +235,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                   ),
                   // Recipe details
                   const SizedBox(height: 20),
-                  _buildRecipeDetails(context, themeProvider, isDesktop),
+                  _buildRecipeDetails(context, themeProvider, isDesktop,connectionService),
                   const SizedBox(height: 20),
                   _displayCommentsSection(themeProvider),
                   const SizedBox(height: 20),
@@ -458,7 +252,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
   }
 
   Widget _buildRecipeDetails(
-      BuildContext context, ThemeProvider themeProvider, bool isDesktop) {
+      BuildContext context, ThemeProvider themeProvider, bool isDesktop, ConnectivityService connectionService) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40.0),
       child: Column(
@@ -466,7 +260,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
         children: [
           Text(
             widget.recipe.recipeTitle ?? Constants.emptyField,
-            style: GoogleFonts.getFont(
+            style:connectionService.connectionStatus.contains(ConnectivityResult.none) ? const TextStyle(
+                              fontFamily: 'Comfortaa'
+                            ):  GoogleFonts.getFont(
               widget.recipe.categoryFont ?? Constants.emptyField,
               fontSize: Responsive.isDesktop(context)
                   ? Constants.desktopHeadingTitleSize
@@ -498,7 +294,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                       },
                       child: Icon(
                         Icons.star,
-                        color: index < _currentRating ? Colors.amber : Colors.grey,
+                        color:
+                            index < _currentRating ? Colors.amber : Colors.grey,
                       ),
                     ),
                   ),
@@ -506,17 +303,17 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                     // This is triggered on drag; you might not need this if you handle updates via onTap
                   },
                 ),
-                 const SizedBox(
-            width: 15,
-          ),
-          if (isAuthenticated)
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.save),
-            ),
+                const SizedBox(
+                  width: 15,
+                ),
+                if (isAuthenticated)
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.save),
+                  ),
               ],
             ),
-         
+
           const SizedBox(height: 10.0),
           Container(
             decoration: BoxDecoration(
@@ -579,23 +376,25 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               SizedBox(
                 width: isDesktop ? 40 : 20,
               ),
-              Column(
-                children: [
-                  Text(
-                    AppLocalizations.of(context).translate('Cook Time'),
-                    style: Constants.staticStyle,
-                  ),
-                  Text(
-                    widget.recipe.cookDuration.toString(),
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: themeProvider.currentTheme == ThemeType.dark
-                          ? Colors.white
-                          : Colors.black,
+              Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).translate('Cook Time'),
+                      style: Constants.staticStyle,
                     ),
-                  ),
-                ],
+                    Text(
+                      widget.recipe.cookDuration.toString(),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: themeProvider.currentTheme == ThemeType.dark
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -612,7 +411,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               bool isMissing = widget.missingIngredients
                   .contains(widget.recipe.ingredients?[index]);
               return Text(
-                widget.recipe.ingredients?[index] ?? Constants.emptyField,
+                '- ${widget.recipe.ingredients?[index] ?? Constants.emptyField}',
                 style: TextStyle(
                   fontSize: 16.0,
                   color: isMissing
@@ -643,7 +442,26 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
             itemCount: widget.recipe.instructions?.length ?? 0,
             itemBuilder: (context, index) =>
                 Text('${AppLocalizations.of(context).translate('Step')}'
-                    '${index + 1}: ${widget.recipe.instructions?[index]}'),
+                    ' ${index + 1}: ${widget.recipe.instructions?[index]}'),
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(
+                height: 5,
+              );
+            },
+          ),
+          const SizedBox(height: 20.0),
+          
+          Text(
+            AppLocalizations.of(context).translate('Cooking Advices'),
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10.0),
+          ListView.separated(
+            shrinkWrap: true,
+            itemCount: widget.recipe.cookingAdvices?.length ?? 0,
+            itemBuilder: (context, index) =>
+                Text('${AppLocalizations.of(context).translate('Advice')}'
+                    '${index + 1}: ${widget.recipe.cookingAdvices?[index]}'),
             separatorBuilder: (BuildContext context, int index) {
               return const SizedBox(
                 height: 5,

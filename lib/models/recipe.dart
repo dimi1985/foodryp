@@ -22,8 +22,9 @@ class Recipe {
   final List<String>? commentId;
   bool isForDiet;
   bool isForVegetarians;
-  double rating; // Added for storing average rating
-  int ratingCount; // Added for storing count of ratings
+  double rating; 
+  int ratingCount;
+    final List<String>? cookingAdvices;
 
   Recipe({
     this.id,
@@ -49,8 +50,9 @@ class Recipe {
     required this.commentId,
     required this.isForDiet,
     required this.isForVegetarians,
-    required this.rating, // Initialize in constructor
-    required this.ratingCount, // Initialize in constructor
+    required this.rating, 
+    required this.ratingCount,
+     required this.cookingAdvices,
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -88,6 +90,9 @@ class Recipe {
       isForVegetarians: json['isForVegetarians'] ?? false,
       rating: json['rating']?.toDouble() ?? 0.0,
       ratingCount: json['ratingCount']?.toInt() ?? 0,
+      cookingAdvices:
+          (json['cookingAdvices'] as List<dynamic>?)?.cast<String>().toList() ??
+              [],
     );
   }
 
@@ -118,6 +123,7 @@ class Recipe {
       'isForVegetarians': isForVegetarians,
       'rating': rating,
       'ratingCount': ratingCount,
+      'cookingAdvices': cookingAdvices,
     };
     return map;
   }

@@ -14,6 +14,7 @@ import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:foodryp/widgets/CustomWidgets/cooking_advices_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
@@ -46,11 +47,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
   late Uint8List uint8list = Uint8List(0);
   List<String> ingredients = [];
   List<String> instructions = [];
+  List<String> cookingAdvices = [];
   late List<String> difficultyLevels = [];
   final List<TextEditingController> ingredientsControllers = [
     TextEditingController()
   ];
   final List<TextEditingController> instructionControllers = [
+    TextEditingController()
+  ];
+  final List<TextEditingController> adviceControllers = [
     TextEditingController()
   ];
 
@@ -133,6 +138,14 @@ class _AddRecipePageState extends State<AddRecipePage> {
             TextEditingController(text: instruction);
         instructionControllers.add(controller);
       }
+
+      // Populate cookingAdvice text controllers
+      adviceControllers.clear(); // Clear existing controllers
+      for (var cookingAdvice in widget.recipe!.cookingAdvices ?? []) {
+        TextEditingController controller =
+            TextEditingController(text: cookingAdvice);
+        adviceControllers.add(controller);
+      }
     }
   }
 
@@ -197,6 +210,22 @@ class _AddRecipePageState extends State<AddRecipePage> {
     if (mounted) {
       setState(() {
         instructionControllers.removeAt(index);
+      });
+    }
+  }
+
+  void _addAdvice() {
+    if (mounted) {
+      setState(() {
+        adviceControllers.add(TextEditingController());
+      });
+    }
+  }
+
+  void _removeAdvice(int index) {
+    if (mounted) {
+      setState(() {
+        adviceControllers.removeAt(index);
       });
     }
   }
@@ -587,6 +616,47 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
                   const SizedBox(height: 20.0),
 
+                  const SizedBox(height: 20.0),
+
+                  CookingAdvicesRow(
+                    adviceControllers: adviceControllers,
+                    isDesktop: isDesktop,
+                  ),
+                  const SizedBox(height: 20.0),
+                  //Instruction section
+                  ListView.builder(
+                    // controller: _scrollController,
+                    shrinkWrap: true,
+                    itemCount: adviceControllers.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index == adviceControllers.length - 1
+                              ? 16.0
+                              : 8.0,
+                        ),
+                        child: CustomTextField(
+                          controller: adviceControllers[index],
+
+                          hintText:
+                              '${AppLocalizations.of(context).translate('Cooking Advices')}'
+                              ' ${index + 1}',
+                          borderColor: selectedCategoryColor.isNotEmpty
+                              ? HexColor(selectedCategoryColor)
+                              : null,
+                          suffixIcon: index == 0 ? Icons.add : Icons.delete,
+                          onSuffixIconPressed: index == 0
+                              ? _addAdvice
+                              : () => _removeAdvice(index),
+                          maxLines:
+                              null, // Allow multiple lines for instructions
+                          keyboardType: TextInputType.multiline, labelText: '',
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20.0),
+
                   ServingRow(
                     servingTextController: servingTextController,
                     isDesktop: isDesktop,
@@ -717,6 +787,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             //  previewIngredientsAndInstructions();
                             ingredients = getIngredients();
                             instructions = getInstructions();
+                            cookingAdvices = getAdvices();
                             recipeTitleValue = recipeTitleTextController.text;
                             descriptionValue = descriptionTextController.text;
                             servingValue = servingTextController.text;
@@ -996,6 +1067,26 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 const SizedBox(height: 8.0),
                                                 Text(
                                                   AppLocalizations.of(context)
+                                                      .translate('Advices:'),
+                                                  style: const TextStyle(
+                                                      fontSize: 16.0,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const SizedBox(height: 8.0),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: cookingAdvices
+                                                      .map((advice) {
+                                                    return Text('- $advice',
+                                                        style: const TextStyle(
+                                                            fontSize: 16.0));
+                                                  }).toList(),
+                                                ),
+                                                const SizedBox(height: 8.0),
+                                                Text(
+                                                  AppLocalizations.of(context)
                                                       .translate('Difficulty:'),
                                                   style: const TextStyle(
                                                       fontSize: 16.0,
@@ -1044,7 +1135,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                   Future<
                                                       bool> recipeOperation = widget
                                                           .isForEdit
-                                                      ? RecipeService().updateRecipe(
+                                                      ? RecipeService()
+                                                          .updateRecipe(
                                                           widget.recipe?.id ??
                                                               '',
                                                           recipeTitleValue,
@@ -1065,9 +1157,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                           selectedCategoryName,
                                                           [],
                                                           isForDiet,
-                                                          isForVegetarians)
-                                                      : RecipeService()
-                                                          .createRecipe(
+                                                          isForVegetarians,
+                                                          cookingAdvices,
+                                                        )
+                                                      : RecipeService().createRecipe(
                                                           recipeTitleValue,
                                                           ingredients,
                                                           instructions,
@@ -1088,7 +1181,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                           [],
                                                           isForDiet,
                                                           isForVegetarians,
-                                                        );
+                                                          cookingAdvices);
 
                                                   // Handle the completion of the recipe operation
                                                   recipeOperation.then((value) {
@@ -1211,5 +1304,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   List<String> getInstructions() {
     return instructionControllers.map((controller) => controller.text).toList();
+  }
+
+  List<String> getAdvices() {
+    return adviceControllers.map((controller) => controller.text).toList();
   }
 }

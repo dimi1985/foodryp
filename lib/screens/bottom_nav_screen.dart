@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/screens/Following_recipes_page.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
 import 'package:foodryp/screens/creators_page/creators_page.dart';
@@ -80,7 +81,9 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
       if (user != null)
       ProfilePage(user: user ?? Constants.defaultUser),
        if (user == null)
-      AuthScreen()
+      const AuthScreen(),
+        if (user == null)
+      const FollowingRecipesPage()
     ];
   }
 
@@ -151,6 +154,11 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                 BottomNavigationBarItem(
               icon: const Icon(Icons.account_circle),
               label: AppLocalizations.of(context).translate('Auth Screen'),
+            ),
+              if (user == null)
+                BottomNavigationBarItem(
+              icon: const Icon(Icons.receipt),
+              label: AppLocalizations.of(context).translate('Following Recipes Page'),
             ),
           ],
           currentIndex: _selectedIndex,

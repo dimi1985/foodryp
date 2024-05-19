@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/screens/Following_recipes_page.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/auth_screen/auth_screen.dart';
 import 'package:foodryp/screens/creators_page/creators_page.dart';
@@ -97,6 +98,8 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       if (isAuthenticated) 'Add Recipe',
       if (!isAuthenticated) 'Sign Up/Sign In',
       if (isForInternalUse) 'ProfilePage',
+      if (isAuthenticated) 'Following Recipes Page',
+      
     ];
 
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -175,6 +178,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
                     },
                     child: Row(
                       children: [
+                        
                         user.gender!.contains('female')
                             ? ImagePickerPreviewContainer(
                                 containerSize: 50.0,
@@ -282,7 +286,8 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
               user: user,
             ),
           if (!isAuthenticated) const AuthScreen(),
-
+          if (isAuthenticated)
+          const FollowingRecipesPage()
           // Add other pages here as needed
         ],
       ),

@@ -84,7 +84,6 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
   @override
   Widget build(BuildContext context) {
     final displayList = widget.isForDiet ? weeklyDietList : weeklyList;
-    log(widget.showAll.toString());
     return displayList.isEmpty
         ? isLoading
             ? const LinearProgressIndicator()

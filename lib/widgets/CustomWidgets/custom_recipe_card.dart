@@ -1,13 +1,11 @@
-import 'dart:developer';
-import 'dart:ui';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:foodryp/database/database_helper.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/add_recipe/add_recipe_page.dart';
 import 'package:foodryp/screens/recipe_deletion_confirmation_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/connectivity_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
@@ -17,7 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
+
 
 class CustomRecipeCard extends StatefulWidget {
   final String internalUse;
@@ -46,6 +44,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
     if (mounted) {
       setState(() {
         updateUniqueIngredients();
+
       });
     }
 
@@ -84,8 +83,9 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
     final screenSize = MediaQuery.of(context).size;
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     bool isDesktop = Responsive.isDesktop(context);
-
+ final connectionService = Provider.of<ConnectivityService>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Card(
       surfaceTintColor: Colors.white70,
       child: Column(
@@ -149,7 +149,9 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                           child: Text(
                             overflow: TextOverflow.ellipsis,
                             widget.recipe.categoryName.toUpperCase(),
-                            style: GoogleFonts.getFont(
+                            style:connectionService.connectionStatus.contains(ConnectivityResult.none) ? const TextStyle(
+                              fontFamily: 'Comfortaa'
+                            ): GoogleFonts.getFont(
                               widget.recipe.categoryFont ??
                                   Constants.emptyField,
                               fontSize: Responsive.isDesktop(context)
@@ -208,7 +210,8 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    ImagePickerPreviewContainer(
+
+                  widget.recipe.useImage?.isEmpty ?? false ? Container():  ImagePickerPreviewContainer(
                       containerSize: 20,
                       onImageSelected: (file, list) {},
                       gender: '',
@@ -268,7 +271,9 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         overflow: TextOverflow.ellipsis,
                         widget.recipe.recipeTitle?.toUpperCase() ??
                             Constants.emptyField,
-                        style: GoogleFonts.getFont(
+                        style:connectionService.connectionStatus.contains(ConnectivityResult.none) ? const TextStyle(
+                              fontFamily: 'Comfortaa'
+                            ): GoogleFonts.getFont(
                           widget.recipe.categoryFont ?? Constants.emptyField,
                           fontSize: Responsive.isDesktop(context)
                               ? Constants.desktopFontSize

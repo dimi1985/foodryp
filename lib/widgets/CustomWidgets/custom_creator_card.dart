@@ -8,8 +8,11 @@ class CustomCreatorCard extends StatefulWidget {
   final User user;
   final String currentLoggedUserId;
 
-  const CustomCreatorCard(
-      {super.key, required this.user, required this.currentLoggedUserId});
+  const CustomCreatorCard({
+    super.key,
+    required this.user,
+    required this.currentLoggedUserId,
+  });
 
   @override
   State<CustomCreatorCard> createState() => _CustomCreatorCardState();
@@ -46,111 +49,114 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        elevation: 4,
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        child: ListTile(
-          leading: ImagePickerPreviewContainer(
-            initialImagePath: widget.user.profileImage,
-            containerSize: 30,
-            onImageSelected: (image, bytes) {},
-            gender: widget.user.gender ?? Constants.emptyField,
-            isFor: Constants.emptyField,
-            isForEdit: Constants.defaultBoolValue,
-            allowSelection: false,
-          ),
-          title: Text(widget.user.username,
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text(
-            widget.user.followRequestsCanceled
-                        ?.contains(widget.currentLoggedUserId) ??
-                    false
-                ? 'User is following you, you can follow back at any time'
-                : widget.user.email,
-            style: TextStyle(color: Colors.grey.shade600),
-          ),
-          trailing: SizedBox(
-            height: 75,
-            width: widget.user.followRequestsSent
-                        ?.contains(widget.currentLoggedUserId) ??
-                    false
-                ? 250
-                : 100,
-            child: widget.user.followRequestsSent
-                        ?.contains(widget.currentLoggedUserId) ??
-                    false
-                ? Row(
-                    children: [
-                      if (!requestRejected)
-                        Flexible(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                buttonText = 'Following Back';
-                                requestAccepted = true;
-                              });
-                              UserService()
-                                  .rejectFollowRequest(widget.user.id)
-                                  .then((success) {
-                                if (success) {
-                                  // Handle success, maybe refresh state or show a message
-                                }
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .primaryColor, // Use the primary theme color
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18)),
-                            ),
-                            child: Text(
-                              buttonText,
-                              style: const TextStyle(
-                                  color: Constants.secondaryColor),
-                            ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: ListTile(
+        leading: ImagePickerPreviewContainer(
+          initialImagePath: widget.user.profileImage,
+          containerSize: 30,
+          onImageSelected: (image, bytes) {},
+          gender: widget.user.gender ?? Constants.emptyField,
+          isFor: Constants.emptyField,
+          isForEdit: Constants.defaultBoolValue,
+          allowSelection: false,
+        ),
+        title: Text(widget.user.username,
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(
+          widget.user.followRequestsCanceled
+                      ?.contains(widget.currentLoggedUserId) ??
+                  false
+              ? 'User is following you, you can follow back at any time'
+              : widget.user.email,
+          style: TextStyle(color: Colors.grey.shade600),
+        ),
+        trailing: SizedBox(
+          height: 75,
+          width: widget.user.followRequestsSent
+                      ?.contains(widget.currentLoggedUserId) ??
+                  false
+              ? 250
+              : 100,
+          child: widget.user.followRequestsSent
+                      ?.contains(widget.currentLoggedUserId) ??
+                  false
+              ? Row(
+                  children: [
+                    if (!requestRejected)
+                      Flexible(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              buttonText = 'Following Back';
+                              requestAccepted = true;
+                            });
+                            UserService()
+                                .acceptFollowRequest(widget.user.id)
+                                .then((success) {
+                              if (success) {
+                                setState(() {
+                                  buttonText = 'Following';
+                                });
+                              }
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context)
+                                .primaryColor, // Use the primary theme color
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18)),
+                          ),
+                          child: Text(
+                            buttonText,
+                            style: const TextStyle(
+                                color: Constants.secondaryColor),
                           ),
                         ),
-                      const SizedBox(width: 10),
-                      if (!requestAccepted)
-                        Flexible(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                buttonText = 'No Thanks';
-                                requestRejected = true;
-                              });
-                              UserService().rejectFollowRequest(widget.user.id);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Colors.red, // Color for rejection
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18)),
-                            ),
-                            child: const Text('No Thanks',
-                                style:
-                                    TextStyle(color: Constants.secondaryColor)),
+                      ),
+                    const SizedBox(width: 10),
+                    if (!requestAccepted)
+                      Flexible(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              buttonText = 'No Thanks';
+                              requestRejected = true;
+                            });
+                            UserService().rejectFollowRequest(widget.user.id);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.red, // Color for rejection
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18)),
                           ),
+                          child: const Text('No Thanks',
+                              style:
+                                  TextStyle(color: Constants.secondaryColor)),
                         ),
-                    ],
-                  )
-                : ElevatedButton(
-                    onPressed: () => buttonPressAction(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context)
-                          .primaryColor, // Use the primary theme color
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18)),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                    ),
-                    child: Text(
-                      buttonText,
-                      style: const TextStyle(color: Constants.secondaryColor),
-                    ),
+                      ),
+                  ],
+                )
+              : ElevatedButton(
+                  onPressed: () => buttonPressAction(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context)
+                        .primaryColor, // Use the primary theme color
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                   ),
-          ),
-        ));
+                  child: Text(
+                    buttonText,
+                    style: const TextStyle(color: Constants.secondaryColor),
+                  ),
+                ),
+        ),
+      ),
+    );
   }
 
   void buttonPressAction() {

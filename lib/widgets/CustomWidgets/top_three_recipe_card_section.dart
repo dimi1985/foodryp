@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -11,7 +12,8 @@ import 'package:foodryp/widgets/CustomWidgets/custom_top_three_card.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class TopThreeRecipeCardSection extends StatefulWidget {
-  const TopThreeRecipeCardSection({super.key});
+
+  const TopThreeRecipeCardSection({super.key,});
 
   @override
   State<TopThreeRecipeCardSection> createState() =>
@@ -102,6 +104,7 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
                         username: recipe.username ?? Constants.emptyField,
                         userImageURL: recipe.useImage ?? Constants.emptyField,
                         date: recipe.dateCreated ?? DateTime.now(),
+
                       ),
                     );
                   },
