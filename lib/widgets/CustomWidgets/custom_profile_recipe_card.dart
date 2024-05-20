@@ -50,7 +50,6 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final recipeImage = '${Constants.imageURL}/${widget.recipe.recipeImage}';
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Constants.defaultPadding),
@@ -78,7 +77,7 @@ class _CustomProfileRecipeCardState extends State<CustomProfileRecipeCard> {
                 child: AspectRatio(
                   aspectRatio: 16 / 9, // Define an appropriate aspect ratio
                   child: Image.network(
-                    recipeImage,
+                    widget.recipe.recipeImage ?? Constants.emptyField,
                         loadingBuilder: (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) {

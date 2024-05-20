@@ -13,6 +13,7 @@ import 'package:foodryp/widgets/CustomWidgets/category_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/recipe_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/top_three_recipe_card_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
+import 'package:path/path.dart';
 
 class DesktopMiddleSide extends StatelessWidget {
 
@@ -98,7 +99,7 @@ class DesktopMiddleSide extends StatelessWidget {
                     const SizedBox(height: 15.0),
                   HeadingTitleRow(
                     title:
-                        AppLocalizations.of(context).translate('Weekly Diet Menus'),
+                        AppLocalizations.of(context).translate('Weekly Diet Menus',),
                     onPressed: () {
                       // Navigate to the corresponding page
                       Navigator.push(

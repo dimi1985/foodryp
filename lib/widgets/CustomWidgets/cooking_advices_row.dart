@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
@@ -7,7 +8,8 @@ class CookingAdvicesRow extends StatefulWidget {
   final List<TextEditingController> adviceControllers;
   final bool isDesktop;
 
-  const CookingAdvicesRow({super.key, 
+  const CookingAdvicesRow({
+    super.key,
     required this.adviceControllers,
     required this.isDesktop,
   });
@@ -48,17 +50,17 @@ class _CookingAdvicesRowState extends State<CookingAdvicesRow> {
 
   @override
   Widget build(BuildContext context) {
+    bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
     return Row(
       children: [
         SectionTitle(
           title:
-              '${AppLocalizations.of(context).translate('Add Cooking Advices')}:',
+              '${AppLocalizations.of(context).translate(isAndroid ? 'Add Cooking\nAdvices' : 'Add Cooking Advices')}:',
           isDesktop: widget.isDesktop,
         ),
         const SizedBox(
           width: 15,
         ),
-        
         _hasNonEmptyAdvice()
             ? Icon(
                 MdiIcons.checkCircleOutline,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
@@ -32,10 +33,11 @@ class _ServingRowState extends State<ServingRow> {
 
   @override
   Widget build(BuildContext context) {
+    bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
     return Row(
       children: [
         SectionTitle(
-          title: AppLocalizations.of(context).translate('How many people is this food for ?:'),
+          title: AppLocalizations.of(context).translate(isAndroid ?'How many people\nis this food for ?:':'How many people is this food for ?:'),
           isDesktop: widget.isDesktop,
         ),
         const SizedBox(

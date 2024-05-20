@@ -59,10 +59,13 @@
     "Add Ingredients:": "Add Ingredients:",
     "Add Instructions:": "Add Instructions:",
     "How many people is this food for ?:": "How many people is this food for ?:",
+    "How many people\nis this food for ?:": "How many people\nis this food for ?:",
     "Serves  2-4": "Serves  2-4",
     "How long does it take to cook ?:": "How long does it take to cook ?:",
+    "How long does\nit take to cook ?:": "How long does\nit take to cook ?:",
     "45 minutes or 1h and 25 minutes e.t.c": "45 minutes or 1h and 25 minutes e.t.c",
     "How long does the total preparation is ?:": "How long does the total preparation is ?:",
+    "How long does the\ntotal preparation is ?:": "How long does the\ntotal preparation is ?:",
     "Difficulty: ": "Difficulty: ",
     "Easy": "Easy",
     "Medium": "Medium",
@@ -149,6 +152,7 @@
     "Vegeterians Ready": "Vegeterians Ready",
     "Diet and Vegeterian Ready": "Diet and Vegeterian Ready",
     "Special Nutritions Recipe (Optional):": "Special Nutritions Recipe (Optional):",
+    "Special Nutritions\nRecipe (Optional):": "Special Nutritions\nRecipe (Optional):",
     "Latest Recipes": "Latest Recipes",
     "All Menus": "All Menus",
     "Diet Menus": "Diet Menus",
@@ -161,12 +165,16 @@
     "Did you know that..": "Did you know that..",
     "Source:": "Source:",
     "Add Cooking Advices": "Add Cooking Advices",
+    "Add Cooking\nAdvices": "Add Cooking\nAdvices",
     "Cooking Advices": "Cooking Advices",
     "Advice": "Advice",
     "Advices:": "Advices:",
     "Search Recipes": "Search Recipes",
     "Recipes by following users": "Recipes by following users",
-    "Following Recipes Page": "Following Recipes Page"
+    "Following Recipes Page": "Following Recipes Page",
+    "Auth Screen": "Auth Screen",
+    "No results found.": "No results found.",
+    "Categories": "Categories"
 
     
   }

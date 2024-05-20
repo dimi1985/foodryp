@@ -91,4 +91,8 @@ class Constants {
                 fontWeight: FontWeight.normal,
                 color: Colors.grey,
               );
+
+  static bool checkIfAndroid() {
+return defaultTargetPlatform == TargetPlatform.android;
+  }
 }

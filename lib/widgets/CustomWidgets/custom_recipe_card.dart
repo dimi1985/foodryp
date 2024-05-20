@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -85,7 +87,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
     bool isDesktop = Responsive.isDesktop(context);
  final connectionService = Provider.of<ConnectivityService>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
-
+log(widget.recipe.recipeImage ?? '');
     return Card(
       surfaceTintColor: Colors.white70,
       child: Column(
@@ -284,7 +286,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         ),
                       ),
                     ),
-                    if (!isDesktop && widget.internalUse != 'MainScreen')
+                    if (!isDesktop && widget.internalUse != 'MainScreen'&& widget.internalUse != 'RecipePage')
                       PopupMenuButton<String>(
                         onSelected: (String result) {
                           if (result == 'edit') {

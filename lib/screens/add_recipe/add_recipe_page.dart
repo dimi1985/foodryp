@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
@@ -295,6 +296,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
     Size screenSize = MediaQuery.of(context).size;
     bool isDesktop = Responsive.isDesktop(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
+   bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
     difficultyLevels = [
       AppLocalizations.of(context).translate('Easy'),
       AppLocalizations.of(context).translate('Medium'),
@@ -302,7 +304,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
       AppLocalizations.of(context).translate('Chef'),
       AppLocalizations.of(context).translate('Michelin'),
     ];
+
     return Scaffold(
+      
       appBar: widget.isForEdit
           ? AppBar(
               surfaceTintColor: themeProvider.currentTheme == ThemeType.dark
@@ -413,11 +417,12 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             ),
                           )),
                   const SizedBox(height: 20.0),
+             
                   Row(
                     children: [
                       SectionTitle(
                         title: AppLocalizations.of(context)
-                            .translate('Special Nutritions Recipe (Optional):'),
+                            .translate(isAndroid ? 'Special Nutritions\nRecipe (Optional):':'Special Nutritions Recipe (Optional):'),
                         isDesktop: isDesktop,
                       ),
                       const SizedBox(
@@ -848,7 +853,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                     .height /
                                                                 4,
                                                           )
-                                                        : Container(),
+                                                        : Container(child: Text('No Image'),),
                                                   ),
                                                 )
                                               : Center(
@@ -1234,7 +1239,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                const EntryWebNavigationPage()),
+                                                                 isAndroid ?const BottomNavScreen(): const EntryWebNavigationPage()),
                                                         (Route<dynamic>
                                                                 route) =>
                                                             false,

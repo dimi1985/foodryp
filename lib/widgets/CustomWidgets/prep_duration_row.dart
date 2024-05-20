@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
@@ -32,10 +33,11 @@ class _PrepDurationRowState extends State<PrepDurationRow> {
 
   @override
   Widget build(BuildContext context) {
+    bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
     return Row(
       children: [
         SectionTitle(
-          title: AppLocalizations.of(context).translate('How long does the total preparation is ?:'),
+          title: AppLocalizations.of(context).translate(isAndroid ?'How long does the\ntotal preparation is ?:':'How long does the total preparation is ?:'),
           isDesktop: widget.isDesktop,
         ),
         const SizedBox(

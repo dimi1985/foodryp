@@ -166,7 +166,14 @@ class _RecipePageState extends State<RecipePage> {
         children: [
           Container(
               constraints: const BoxConstraints(maxWidth: 600),
-              child: _buildSearchField(searchOnEveryKeystroke, isDesktop)),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: Constants.checiIfAndroid(context) ? 50 : 0,
+                  left: Constants.checiIfAndroid(context) ? 30 : 0,
+                  right: Constants.checiIfAndroid(context) ? 30 : 0,
+                ),
+                child: _buildSearchField(searchOnEveryKeystroke, isDesktop),
+              )),
           Expanded(
             child: _buildRecipeList(),
           ),
@@ -304,9 +311,9 @@ class _RecipePageState extends State<RecipePage> {
   Widget _buildNoResultsWidget() {
     return Container(
       padding: const EdgeInsets.all(20.0),
-      child: const Text(
-        'No results found.',
-        style: TextStyle(
+      child: Text(
+        AppLocalizations.of(context).translate('No results found.'),
+        style: const TextStyle(
           fontSize: 18.0,
           fontWeight: FontWeight.bold,
         ),

@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/app_localizations.dart';
+import 'package:foodryp/utils/responsive.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class HeadingTitleRow extends StatelessWidget {
@@ -22,18 +24,23 @@ class HeadingTitleRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           if(isForDiet)
-          Row(
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 17.0,
-                  fontWeight: FontWeight.bold,
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    overflow: TextOverflow.ellipsis,
+                    title,
+                    style: const TextStyle(
+                      fontSize: 17.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10,),
-              Icon(MdiIcons.leaf,color: Colors.green,)
-            ],
+                const SizedBox(width: 10,),
+                Icon(MdiIcons.leaf,color: Colors.green,)
+              ],
+            ),
           ),
            if(!isForDiet)
           Text(

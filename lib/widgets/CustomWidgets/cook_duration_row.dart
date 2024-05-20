@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/widgets/CustomWidgets/section_title.dart';
@@ -33,12 +34,13 @@ class _CookDurationRowState extends State<CookDurationRow> {
 
   @override
   Widget build(BuildContext context) {
+    bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
     return Row(
       children: [
 
         SectionTitle(
           title:
-              AppLocalizations.of(context).translate('How long does it take to cook ?:'),
+              AppLocalizations.of(context).translate(isAndroid ?'How long does\nit take to cook ?:':'How long does it take to cook ?:'),
           isDesktop: widget.isDesktop,
         ),
         const SizedBox(
