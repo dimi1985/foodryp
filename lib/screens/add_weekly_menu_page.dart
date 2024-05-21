@@ -49,7 +49,9 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   List<Recipe> unSelectedRecipes = [];
   TextEditingController titleController = TextEditingController();
   int removedIndex = -1;
-
+  bool isMultipleDays = false;
+  Map<Recipe, int> recipeCount =
+      {}; // Map to hold the count of each recipe added
   @override
   void initState() {
     super.initState();
@@ -70,7 +72,6 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
 
   @override
   void dispose() {
-    _scrollControllerForSelctedRecipes.dispose();
     _scrollControllerForSelctedRecipes.dispose();
     super.dispose();
   }
@@ -208,7 +209,26 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
+                      textAlign: TextAlign.center,
                       '${userProfile.username.toUpperCase()} ${AppLocalizations.of(context).translate(widget.isForDiet ? 'Here you can check and put the diet meals of the Week' : 'Here you can check and put the normal meals of the Week')}',
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Single Day'),
+                          Switch(
+                            value: isMultipleDays,
+                            onChanged: (value) {
+                              setState(() {
+                                isMultipleDays = value;
+                              });
+                            },
+                          ),
+                          Text('Multiple Days'),
+                        ],
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(Constants.defaultPadding),
@@ -409,54 +429,74 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                                                           height:
                                                                               10),
                                                                       Expanded(
-                                                                        child:
-                                                                            Checkbox(
-                                                                          value:
-                                                                              recipeCheckedState[recipe] ?? false,
-                                                                          onChanged:
-                                                                              (isChecked) {
-                                                                            setState(() {
-                                                                              if (isChecked != null) {
-                                                                                if (!isChecked!) {
-                                                                                  removedIndex = selectedRecipes.indexWhere((r) => r.id == recipe.id);
-
-                                                                                  selectedRecipes.removeWhere((r) => r.id == recipe.id);
-                                                                                  unSelectedRecipes.add(recipe);
-                                                                                } else {
-                                                                                  if (selectedRecipes.length < 7) {
-                                                                                    // Check if there was a previously removed item
-                                                                                    if (removedIndex != -1) {
-                                                                                      // Insert the new recipe at the previously removed index
-                                                                                      selectedRecipes.insert(removedIndex, recipe);
-
-                                                                                      // Reset removedIndex to indicate that it has been used
-                                                                                      removedIndex = -1;
-                                                                                    } else {
-                                                                                      // If no item was previously removed, just add the recipe to the end
-                                                                                      addRecipe(recipe);
-                                                                                   
+                                                                        child: isMultipleDays
+                                                                            ? Row(
+                                                                                children: [
+                                                                                  IconButton(
+                                                                                    icon: const Icon(Icons.add),
+                                                                                    onPressed: () {
+                                                                                      // Add recipe logic for multiple days
+                                                                                      setState(() {
+                                                                                        if (selectedRecipes.length < 7) {
+                                                                                          addRecipeByIcon(recipe);
+                                                                                        } else {
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                            SnackBar(
+                                                                                              content: Text(
+                                                                                                AppLocalizations.of(context).translate('You have reached the maximum number of selected recipes.'),
+                                                                                              ),
+                                                                                            ),
+                                                                                          );
+                                                                                        }
+                                                                                      });
+                                                                                    },
+                                                                                  ),
+                                                                                  IconButton(
+                                                                                    icon: const Icon(Icons.remove),
+                                                                                    onPressed: () {
+                                                                                      // Remove recipe logic for multiple days
+                                                                                      setState(() {
+                                                                                        removeRecipeByIcon(recipe);
+                                                                                      });
+                                                                                    },
+                                                                                  ),
+                                                                                ],
+                                                                              )
+                                                                            : Checkbox(
+                                                                                value: recipeCheckedState[recipe] ?? false,
+                                                                                onChanged: (isChecked) {
+                                                                                  setState(() {
+                                                                                    if (isChecked != null) {
+                                                                                      if (!isChecked!) {
+                                                                                        removedIndex = selectedRecipes.indexWhere((r) => r.id == recipe.id);
+                                                                                        selectedRecipes.removeWhere((r) => r.id == recipe.id);
+                                                                                        unSelectedRecipes.add(recipe);
+                                                                                      } else {
+                                                                                        if (selectedRecipes.length < 7) {
+                                                                                          if (removedIndex != -1) {
+                                                                                            selectedRecipes.insert(removedIndex, recipe);
+                                                                                            removedIndex = -1;
+                                                                                          } else {
+                                                                                            addRecipe(recipe);
+                                                                                          }
+                                                                                          unSelectedRecipes.removeWhere((r) => r.id == recipe.id);
+                                                                                        } else {
+                                                                                          isChecked = false;
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                            SnackBar(
+                                                                                              content: Text(
+                                                                                                AppLocalizations.of(context).translate('You have reached the maximum number of selected recipes.'),
+                                                                                              ),
+                                                                                            ),
+                                                                                          );
+                                                                                        }
+                                                                                      }
+                                                                                      recipeCheckedState[recipe] = isChecked!;
                                                                                     }
-
-                                                                                    unSelectedRecipes.removeWhere((r) => r.id == recipe.id);
-                                                                                  } else {
-                                                                                    // If the maximum limit of selected recipes is reached, keep the checkbox unchecked
-                                                                                    isChecked = false;
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(
-                                                                                        content: Text(
-                                                                                          AppLocalizations.of(context).translate('You have reached the maximum number of selected recipes.'),
-                                                                                        ),
-                                                                                      ),
-                                                                                    );
-                                                                                  }
-                                                                                }
-                                                                                // Update the checkbox states
-                                                                                recipeCheckedState[recipe] = isChecked!;
-                                                                              }
-                                                                            });
-                                                                          },
-                                                                        ),
-                                                                      )
+                                                                                  });
+                                                                                },
+                                                                              ),
+                                                                      ),
                                                                     ],
                                                                   ),
                                                                 ),
@@ -518,7 +558,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
                                           ),
                                         ),
                                       ),
-                                    ),
+                                    )
                                   ],
                                 ),
                               );
@@ -704,6 +744,35 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
     });
     _scrollToLastAdded(); // Make sure this is called after the state is updated
   }
+
+  void addRecipeByIcon(Recipe recipe) {
+  setState(() {
+    if (recipeCount.containsKey(recipe)) {
+      recipeCount[recipe] = recipeCount[recipe]! + 1;
+    } else {
+      recipeCount[recipe] = 1;
+    }
+    selectedRecipes.add(recipe);
+    unSelectedRecipes.remove(recipe);
+    _scrollToLastAdded(); // Make sure this is called after the state is updated
+  });
+  print('Added recipe: ${recipe.recipeTitle}, count: ${recipeCount[recipe]}');
+}
+
+void removeRecipeByIcon(Recipe recipe) {
+  setState(() {
+    if (recipeCount.containsKey(recipe) && recipeCount[recipe]! > 1) {
+      recipeCount[recipe] = recipeCount[recipe]! - 1;
+      // Remove one instance of the recipe from selectedRecipes
+      selectedRecipes.removeAt(selectedRecipes.indexOf(recipe));
+    } else {
+      recipeCount.remove(recipe);
+      selectedRecipes.removeWhere((r) => r.id == recipe.id);
+    }
+    unSelectedRecipes.add(recipe);
+  });
+  print('Removed recipe: ${recipe.recipeTitle}, count: ${recipeCount[recipe]}');
+}
 
   void _scrollToLastAdded() {
     Future.delayed(const Duration(milliseconds: 100), () {

@@ -81,7 +81,8 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          
+          mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start, // Ensure alignment to the left
           children: [
             TopProfile(user: widget.user),
             const SizedBox(height: 10.0),
@@ -92,12 +93,18 @@ class _ProfilePageState extends State<ProfilePage> {
               isForDiet: false,
             ),
             const SizedBox(height: 10.0),
-            WeeklyMenuSection(
-              showAll: false,
-              publicUsername: widget.user.username,
-              publicUserId: widget.user.id,
-              userRecipes: widget.user.recipes,
-              isForDiet: false,
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: WeeklyMenuSection(
+                  showAll: false,
+                  publicUsername: widget.user.username,
+                  publicUserId: widget.user.id,
+                  userRecipes: widget.user.recipes,
+                  isForDiet: false,
+                ),
+              ),
             ),
             const SizedBox(height: 25.0),
             HeadingTitleRow(

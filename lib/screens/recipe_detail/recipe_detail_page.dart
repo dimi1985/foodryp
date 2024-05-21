@@ -108,10 +108,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     final isAndroid = Constants.checiIfAndroid(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final connectionService = Provider.of<ConnectivityService>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            '${AppLocalizations.of(context).translate('Details for')} ${widget.recipe.recipeTitle}'),
+            AppLocalizations.of(context).translate('Details')),
       ),
       body: PopScope(
         canPop: false,
@@ -171,7 +172,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                                   alignment: Alignment
                                       .centerRight, // Align the details to the right
                                   child: _buildRecipeDetails(
-                                      context, themeProvider, isDesktop,connectionService),
+                                      context,
+                                      themeProvider,
+                                      isDesktop,
+                                      connectionService),
                                 ),
                               ),
                             ),
@@ -235,7 +239,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                   ),
                   // Recipe details
                   const SizedBox(height: 20),
-                  _buildRecipeDetails(context, themeProvider, isDesktop,connectionService),
+                  _buildRecipeDetails(
+                      context, themeProvider, isDesktop, connectionService),
                   const SizedBox(height: 20),
                   _displayCommentsSection(themeProvider),
                   const SizedBox(height: 20),
@@ -251,8 +256,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     );
   }
 
-  Widget _buildRecipeDetails(
-      BuildContext context, ThemeProvider themeProvider, bool isDesktop, ConnectivityService connectionService) {
+  Widget _buildRecipeDetails(BuildContext context, ThemeProvider themeProvider,
+      bool isDesktop, ConnectivityService connectionService) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40.0),
       child: Column(
@@ -260,18 +265,19 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
         children: [
           Text(
             widget.recipe.recipeTitle ?? Constants.emptyField,
-            style:connectionService.connectionStatus.contains(ConnectivityResult.none) ? const TextStyle(
-                              fontFamily: 'Comfortaa'
-                            ):  GoogleFonts.getFont(
-              widget.recipe.categoryFont ?? Constants.emptyField,
-              fontSize: Responsive.isDesktop(context)
-                  ? Constants.desktopHeadingTitleSize
-                  : Constants.mobileHeadingTitleSize,
-              fontWeight: FontWeight.bold,
-              color:
-                  HexColor(widget.recipe.categoryColor ?? Constants.emptyField)
-                      .withOpacity(0.7),
-            ),
+            style: connectionService.connectionStatus
+                    .contains(ConnectivityResult.none)
+                ? const TextStyle(fontFamily: 'Comfortaa')
+                : GoogleFonts.getFont(
+                    widget.recipe.categoryFont ?? Constants.emptyField,
+                    fontSize: Responsive.isDesktop(context)
+                        ? Constants.desktopHeadingTitleSize
+                        : Constants.mobileHeadingTitleSize,
+                    fontWeight: FontWeight.bold,
+                    color: HexColor(
+                            widget.recipe.categoryColor ?? Constants.emptyField)
+                        .withOpacity(0.7),
+                  ),
           ),
           const SizedBox(height: 10.0),
           if (isAuthenticated && kIsWeb && widget.internalUse != 'top_three')
@@ -450,7 +456,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
             },
           ),
           const SizedBox(height: 20.0),
-          
+
           Text(
             AppLocalizations.of(context).translate('Cooking Advices'),
             style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
@@ -511,9 +517,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                     children: [
                       Text(
                         comment.username,
-                        style: const TextStyle(
-                            color: Colors
-                                .black54), // Lighter color for less emphasis
+                        style: TextStyle(
+                            color: themeProvider.currentTheme == ThemeType.dark
+                                ? Colors.grey
+                                : Colors
+                                    .black54), // Lighter color for less emphasis
                       ),
                       const SizedBox(
                         width: 10,

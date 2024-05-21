@@ -87,7 +87,6 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
     bool isDesktop = Responsive.isDesktop(context);
  final connectionService = Provider.of<ConnectivityService>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
-log(widget.recipe.recipeImage ?? '');
     return Card(
       surfaceTintColor: Colors.white70,
       child: Column(
@@ -286,7 +285,7 @@ log(widget.recipe.recipeImage ?? '');
                         ),
                       ),
                     ),
-                    if (!isDesktop && widget.internalUse != 'MainScreen'&& widget.internalUse != 'RecipePage')
+                    if (!isDesktop && widget.internalUse != 'MainScreen'&& widget.internalUse != 'RecipePage' && isAndroid)
                       PopupMenuButton<String>(
                         onSelected: (String result) {
                           if (result == 'edit') {

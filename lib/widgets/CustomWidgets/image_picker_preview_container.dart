@@ -47,7 +47,6 @@ class _ImagePickerPreviewContainerState
             _imageIsPicked = true;
           });
           widget.onImageSelected(File(''), _imageBytes!);
-          log('Image picked for web: ${result.files.first.name}');
         }
       } else {
         final pickedFile = await ImagePicker().pickImage(source: source);
@@ -57,7 +56,6 @@ class _ImagePickerPreviewContainerState
             _imageIsPicked = true;
           });
           widget.onImageSelected(_imageFile!, []);
-          log('Image picked for mobile: ${pickedFile.path}');
         }
       }
     } catch (e) {
@@ -68,7 +66,6 @@ class _ImagePickerPreviewContainerState
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    log('Initial image path: ${widget.initialImagePath}');
 
     Widget buildPlaceholder() {
       if (widget.isFor.contains('Other')) {

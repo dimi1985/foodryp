@@ -296,7 +296,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
     Size screenSize = MediaQuery.of(context).size;
     bool isDesktop = Responsive.isDesktop(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
-   bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
+    bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
     difficultyLevels = [
       AppLocalizations.of(context).translate('Easy'),
       AppLocalizations.of(context).translate('Medium'),
@@ -306,14 +306,14 @@ class _AddRecipePageState extends State<AddRecipePage> {
     ];
 
     return Scaffold(
-      
       appBar: widget.isForEdit
           ? AppBar(
               surfaceTintColor: themeProvider.currentTheme == ThemeType.dark
                   ? const Color.fromARGB(255, 37, 36, 37)
                   : Colors.white,
-              title: Text('${AppLocalizations.of(context).translate('Edit of')}'
-                  '${widget.recipe?.recipeTitle ?? Constants.emptyField}'),
+              title: Text(
+                AppLocalizations.of(context).translate('Edit'),
+              ),
             )
           : null,
       body: SingleChildScrollView(
@@ -417,12 +417,13 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             ),
                           )),
                   const SizedBox(height: 20.0),
-             
+
                   Row(
                     children: [
                       SectionTitle(
-                        title: AppLocalizations.of(context)
-                            .translate(isAndroid ? 'Special Nutritions\nRecipe (Optional):':'Special Nutritions Recipe (Optional):'),
+                        title: AppLocalizations.of(context).translate(isAndroid
+                            ? 'Special Nutritions\nRecipe (Optional):'
+                            : 'Special Nutritions Recipe (Optional):'),
                         isDesktop: isDesktop,
                       ),
                       const SizedBox(
@@ -853,7 +854,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                     .height /
                                                                 4,
                                                           )
-                                                        : Container(child: Text('No Image'),),
+                                                        : Container(
+                                                            child: Text(
+                                                                'No Image'),
+                                                          ),
                                                   ),
                                                 )
                                               : Center(
@@ -1239,7 +1243,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                 isAndroid ?const BottomNavScreen(): const EntryWebNavigationPage()),
+                                                                isAndroid
+                                                                    ? const BottomNavScreen()
+                                                                    : const EntryWebNavigationPage()),
                                                         (Route<dynamic>
                                                                 route) =>
                                                             false,

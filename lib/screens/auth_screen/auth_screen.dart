@@ -5,7 +5,9 @@ import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:provider/provider.dart';
 
 // Define the Gender enum
 enum Gender {
@@ -33,6 +35,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
 final isAndroid =  Constants.checiIfAndroid(context);
+  final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -50,8 +53,8 @@ final isAndroid =  Constants.checiIfAndroid(context);
                     // Logo or App Name
                     Image.asset(
                       'assets/logo.png',
-                      height: 300,
-                      width: 300,
+                      height:isAndroid ? 200: 300,
+                      width:isAndroid ? 200: 300,
                     ),
                     const SizedBox(height: 30.0),
                     ReusableTextField(
@@ -90,21 +93,27 @@ final isAndroid =  Constants.checiIfAndroid(context);
                             flex: 1,
                             child: Text(
                               AppLocalizations.of(context)
-                                  .translate('Pick Gender: '),
+                                  .translate('Pick Gender: '),style: TextStyle(color: themeProvider.currentTheme == ThemeType.dark ? Colors.white:Colors.black),
                             ),
                           ),
+                          if(!isAndroid)
                           const Spacer(),
-                          Expanded(
-                            flex: 3,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                    10.0), // Adjust the radius as needed
-                                color: Colors
-                                    .grey[200], // Adjust the color as needed
-                              ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+                              color: Colors.grey[200], // Adjust the color as needed
+                            ),
+                            child: DropdownButtonHideUnderline(
                               child: DropdownButton<Gender>(
                                 value: _selectedGender,
+                                icon: Icon(Icons.arrow_drop_down, color:  themeProvider.currentTheme == ThemeType.dark ? Colors.black:Colors.white),
+                                iconSize: 24,
+                                elevation: 0,
+                                style: TextStyle(
+                                  color:  themeProvider.currentTheme == ThemeType.dark ? Colors.black:Colors.white,
+                                  fontSize: 16.0,
+                                ),
                                 onChanged: (Gender? newValue) {
                                   setState(() {
                                     _selectedGender = newValue;
@@ -117,14 +126,15 @@ final isAndroid =  Constants.checiIfAndroid(context);
                                   return DropdownMenuItem<Gender>(
                                     value: value,
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16.0),
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                       child: Text(
                                         value == Gender.male
-                                            ? AppLocalizations.of(context)
-                                                .translate('Male')
-                                            : AppLocalizations.of(context)
-                                                .translate('Female'),
+                                            ? AppLocalizations.of(context).translate('Male')
+                                            : AppLocalizations.of(context).translate('Female'),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color:  themeProvider.currentTheme == ThemeType.dark ? Colors.white:Colors.black,
+                                        ),
                                       ),
                                     ),
                                   );
@@ -132,6 +142,7 @@ final isAndroid =  Constants.checiIfAndroid(context);
                               ),
                             ),
                           ),
+
                         ],
                       ),
 
@@ -164,7 +175,7 @@ final isAndroid =  Constants.checiIfAndroid(context);
                           .translate('Forgot Password?')),
                     ),
 
-                    const SizedBox(height: 75.0),
+                     SizedBox(height:isAndroid ? 20 : 75.0),
 
                     // Optional: Sign up/in toggle
                     Row(

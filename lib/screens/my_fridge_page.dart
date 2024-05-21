@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
@@ -14,6 +15,7 @@ import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/widgets/animated_arrow.dart';
 
 enum Category { vegetables, generalItems, meatAndFish }
 
@@ -293,105 +295,140 @@ class _MyFridgePageState extends State<MyFridgePage>
 
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                SizedBox(
-                  height: 800,
-                  child: isDesktop
-                      ? Row(
-                          children: [
-                            Expanded(
-                                child: _buildColumn(
-                                    Category.vegetables,
-                                    categoryNames[Category.vegetables]!,
-                                    isDesktop)),
-                            Expanded(
-                                child: _buildColumn(
-                                    Category.generalItems,
-                                    categoryNames[Category.generalItems]!,
-                                    isDesktop)),
-                            Expanded(
-                                child: _buildColumn(
-                                    Category.meatAndFish,
-                                    categoryNames[Category.meatAndFish]!,
-                                    isDesktop)),
-                          ],
-                        )
-                      : Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              child: _buildColumn(
-                                  Category.vegetables,
-                                  categoryNames[Category.vegetables]!,
-                                  isDesktop),
-                            ),
-                            Expanded(
-                              child: _buildColumn(
-                                  Category.generalItems,
-                                  categoryNames[Category.generalItems]!,
-                                  isDesktop),
-                            ),
-                            Expanded(
-                              child: _buildColumn(
-                                  Category.meatAndFish,
-                                  categoryNames[Category.meatAndFish]!,
-                                  isDesktop),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        ),
-                ),
-                const SizedBox(height: 20),
-                AnimatedBuilder(
-                  animation: _animation,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                        -MediaQuery.of(context).size.width * _animation.value,
-                        0,
-                      ),
-                      child: _buildFridgeVisualization(),
-                    );
-                  },
-                ),
-                AnimatedBuilder(
-                  animation: _animation,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                        MediaQuery.of(context).size.width * _animation.value,
-                        0,
-                      ),
-                      child: _buildFridgeVisualization(),
-                    );
-                  },
-                ),
-              ],
+          child: Column(
+        children: [
+          if (!isDesktop) const SizedBox(height: 25),
+          if (!isDesktop && doorsOpened)
+            Text(
+              AppLocalizations.of(context)
+                  .translate('What do you have in your Fridge?'),
+              style: const TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 20),
-            doorsOpened ? _buildRecipeList() : Container(),
-            const SizedBox(height: 20),
-            doorsOpened
-                ? ElevatedButton(
-                    onPressed: _toggleFridge,
-                    child: Text(AppLocalizations.of(context).translate(
-                        doorsOpened ? 'Close Fridge' : 'Open Fridge')),
-                  )
-                : Container(),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+          const SizedBox(height: 25),
+          Stack(
+            children: [
+              if (isDesktop && doorsOpened)
+                Positioned(
+                  top: 50,
+                  left: 100,
+                  child: Text(
+                    AppLocalizations.of(context)
+                        .translate('What do you have in your Fridge?'),
+                    style: const TextStyle(fontSize: 30),
+                  ),
+                ),
+              SizedBox(
+                height: 800,
+                child: isDesktop
+                    ? Row(
+                        children: [
+                          Expanded(
+                            child: _buildColumn(
+                              Category.vegetables,
+                              categoryNames[Category.vegetables]!,
+                              isDesktop,
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildColumn(
+                              Category.generalItems,
+                              categoryNames[Category.generalItems]!,
+                              isDesktop,
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildColumn(
+                              Category.meatAndFish,
+                              categoryNames[Category.meatAndFish]!,
+                              isDesktop,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: _buildColumn(
+                              Category.vegetables,
+                              categoryNames[Category.vegetables]!,
+                              isDesktop,
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildColumn(
+                              Category.generalItems,
+                              categoryNames[Category.generalItems]!,
+                              isDesktop,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: _buildColumn(
+                              Category.meatAndFish,
+                              categoryNames[Category.meatAndFish]!,
+                              isDesktop,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+              const SizedBox(height: 20),
+              if((!isDesktop || Constants.checiIfAndroid(context)) && filteredRecipes.isNotEmpty && doorsOpened)
+                  Positioned(
+              bottom: 50,
+              left: MediaQuery.of(context).size.width / 2 - 15, // Center the arrow
+              child: AnimatedArrow(),
+            ),
+              AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(
+                      -MediaQuery.of(context).size.width * _animation.value,
+                      0,
+                    ),
+                    child: _buildFridgeVisualization(),
+                  );
+                },
+              ),
+              AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(
+                      MediaQuery.of(context).size.width * _animation.value,
+                      0,
+                    ),
+                    child: _buildFridgeVisualization(),
+                  );
+                },
+              ),
+            ],
+          ),
+        
+         if(isDesktop  && filteredRecipes.isNotEmpty && doorsOpened)
+                  AnimatedArrow(),
+          const SizedBox(height: 20),
+          doorsOpened ? _buildRecipeList() : Container(),
+          const SizedBox(height: 20),
+          doorsOpened
+              ? ElevatedButton(
+                  onPressed: _toggleFridge,
+                  child: Text(AppLocalizations.of(context)
+                      .translate(doorsOpened ? 'Close Fridge' : 'Open Fridge')),
+                )
+              : Container(),
+          const SizedBox(height: 20),
+        ],
+      )),
     );
   }
 
   Widget _buildColumn(Category category, String categoryName, bool isDesktop) {
     generalListItems = getCategoryItems(category);
     return SizedBox(
-      height: isDesktop ? 500 : 200,
+      height: isDesktop ? 500 : 300,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -539,7 +576,7 @@ class _MyFridgePageState extends State<MyFridgePage>
       child: Center(
         child: SizedBox(
           height: 300,
-          width: 1200,
+          width: double.infinity,
           child: ScrollConfiguration(
             behavior: ScrollConfiguration.of(context).copyWith(
               dragDevices: {
@@ -642,7 +679,7 @@ class _MyFridgePageState extends State<MyFridgePage>
                     TextField(
                       controller: controller,
                       decoration: InputDecoration(
-                        hintText: 'dasdasdasd',
+                        hintText: 'Add your fridge items here',
                         enabledBorder: const OutlineInputBorder(
                           // width: 0.0 produces a thin "hairline" border
                           borderSide:
@@ -704,7 +741,7 @@ class _MyFridgePageState extends State<MyFridgePage>
                           showDialog(
                             context: context,
                             barrierDismissible:
-                                false, // Prevent dismissing the dialog by tapping outside
+                                false,
                             builder: (BuildContext context) {
                               return const AlertDialog(
                                 content: Row(

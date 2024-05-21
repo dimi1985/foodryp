@@ -71,7 +71,7 @@ class Foodryp extends StatefulWidget {
 }
 
 class _FoodrypState extends State<Foodryp> {
-  late Locale _locale = const Locale('el');
+  late Locale _locale = widget.initialLocale;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription _streamSubscription;
@@ -80,6 +80,7 @@ class _FoodrypState extends State<Foodryp> {
   @override
   void initState() {
     super.initState();
+    _locale = widget.initialLocale;
     _streamSubscription = _connectivity.onConnectivityChanged.listen((result) {
       if (result.contains(ConnectivityResult.none)) {
         isOffline = true;
@@ -112,6 +113,7 @@ class _FoodrypState extends State<Foodryp> {
                 debugShowCheckedModeBanner: false,
                 title: 'Foodryp',
                 theme: themeProvider.themeData,
+                locale: _locale,
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,

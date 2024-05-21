@@ -21,6 +21,7 @@ import 'package:foodryp/widgets/CustomWidgets/celebration_input.dart';
 import 'package:foodryp/widgets/CustomWidgets/changeFieldDialog.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/language_settings_tile.dart';
+import 'package:foodryp/widgets/measurement_conversion_table.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -105,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _sectionTitle(AppLocalizations.of(context).translate('Account')),
 
           userImageSection(context, isDesktop),
-          
+
           _settingTile(
             context,
             'Change Email Address',
@@ -117,7 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   return ChangeFieldDialog(
                     context: context,
                     title:
-                        'Change Email(${widget.user.email})\n(Signout is automatic after change)',
+                        '${AppLocalizations.of(context).translate('Change Email')}\n(${widget.user.email})\n${AppLocalizations.of(context).translate('(Signout is automatic after change)')}',
                     hintText: 'Enter new email',
                     newHintText: '',
                     onSave: (String newEmail, String nullValue) async {
@@ -133,9 +134,10 @@ class _SettingsPageState extends State<SettingsPage> {
                           // Email changed successfully
                           // Show success snackbar
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Email changed successfully'),
-                              duration: Duration(
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)
+                                  .translate('Email changed successfully')),
+                              duration: const Duration(
                                   seconds: 2), // Adjust duration as needed
                             ),
                           );
@@ -145,10 +147,10 @@ class _SettingsPageState extends State<SettingsPage> {
                           // Failed to change email
                           // Show error snackbar
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Failed to change email. Please try again.'),
-                              duration: Duration(
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context).translate(
+                                  AppLocalizations.of(context).translate('Failed to change email, Please try again.'))),
+                              duration: const Duration(
                                   seconds: 2), // Adjust duration as needed
                             ),
                           );
@@ -158,7 +160,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                                'Failed to change email($error). Please try again.'),
+                                AppLocalizations.of(context).translate('Failed to change email, Please try again.')),
                             duration: const Duration(
                                 seconds: 2), // Adjust duration as needed
                           ),
@@ -180,11 +182,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 context: _scaffoldKey.currentContext!,
                 builder: (BuildContext context) {
                   return ChangeFieldDialog(
-                    context: context,
+                    context: context, 
                     title:
-                        'Change Password\n(Signout is automatic after change)',
-                    hintText: 'Enter old Password',
-                    newHintText: 'Enter new Password',
+                        '${ AppLocalizations.of(context).translate('Change Password')}\n${AppLocalizations.of(context).translate('(Signout is automatic after change)')}',
+                    hintText: AppLocalizations.of(context).translate('Enter old Password'),
+                    newHintText: AppLocalizations.of(context).translate('Enter new Password'),
                     onSave: (String oldPassword, String newPassword) async {
                       UserService()
                           .changeCredentials(
@@ -198,9 +200,10 @@ class _SettingsPageState extends State<SettingsPage> {
                           // Password changed successfully
                           // Show success snackbar
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Password changed successfully'),
-                              duration: Duration(
+                             SnackBar(
+                              
+                              content: Text(AppLocalizations.of(context).translate('Password changed successfully')),
+                              duration:const Duration(
                                   seconds: 2), // Adjust duration as needed
                             ),
                           );
@@ -223,7 +226,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                                'Failed to change password($error). Please try again.'),
+                                AppLocalizations.of(context).translate('Password changed successfully')),
                             duration: const Duration(
                                 seconds: 2), // Adjust duration as needed
                           ),
@@ -312,33 +315,33 @@ class _SettingsPageState extends State<SettingsPage> {
           _sectionTitle(AppLocalizations.of(context).translate('Language')),
           LanguageSettingsTile(
             title: AppLocalizations.of(context).translate('English'),
-            isSelected: _selectedLanguageIndex ==
-                0, // Assuming English is the first language in the supportedLanguages list
+            isSelected: _selectedLanguageIndex == 0,
             onTap: () {
               setState(() {
-                _selectedLanguageIndex =
-                    0; // Set the selected language index to English
+                _selectedLanguageIndex = 0;
               });
-              final locale = supportedLanguages[0].locale;
+              const locale = Locale('en', 'US');
               Foodryp.setLocale(context, locale);
             },
           ),
           LanguageSettingsTile(
             title: AppLocalizations.of(context).translate('Greek'),
-            isSelected: _selectedLanguageIndex ==
-                1, // Assuming Greek is the second language in the supportedLanguages list
+            isSelected: _selectedLanguageIndex == 1,
             onTap: () {
               setState(() {
-                _selectedLanguageIndex =
-                    1; // Set the selected language index to Greek
+                _selectedLanguageIndex = 1;
               });
-              final locale = supportedLanguages[1].locale;
+              const locale = Locale('el', 'GR');
               Foodryp.setLocale(context, locale);
             },
           ),
 
           _sectionTitle(
               AppLocalizations.of(context).translate('Units and Measurements')),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: MeasurementConversionTable(),
+          ),
 
           _sectionTitle(AppLocalizations.of(context).translate(
               AppLocalizations.of(context).translate('Search Settings'))),
@@ -376,7 +379,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
           ),
-     
           // Add units and measurements settings tiles here
         ],
       ),

@@ -89,25 +89,30 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
             ? const LinearProgressIndicator()
             : widget.showAll
                 ? Container()
-                : Center(
-                    child: widget.userRecipes!.length < 7
-                        ? null
-                        : MaterialButton(
-                            onPressed: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AddWeeklyMenuPage(
-                                        meal: null,
-                                        isForEdit: false,
-                                        isForDiet: widget.isForDiet)),
-                              );
-                            },
-                            child: Text(AppLocalizations.of(context).translate(
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: MaterialButton(
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AddWeeklyMenuPage(
+                                      meal: null,
+                                      isForEdit: false,
+                                      isForDiet: widget.isForDiet)),
+                            );
+                          },
+                          child: Text(
+                            AppLocalizations.of(context).translate(
                                 widget.isForDiet
                                     ? 'Add Weekly Diet Menu'
-                                    : 'Add Weekly Menu')),
+                                    : 'Add Weekly Menu'),
                           ),
+                        ),
+                      ),
+                    ],
                   )
         : ScrollConfiguration(
             behavior: ScrollConfiguration.of(context).copyWith(
@@ -117,8 +122,9 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
               },
             ),
             child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Align to the start (left)
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 if (!widget.showAll && widget.publicUserId == currentUserId)
                   Center(
@@ -134,10 +140,11 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                                   )),
                         );
                       },
-                      child: Text(AppLocalizations.of(context).translate(
-                          widget.isForDiet
-                              ? 'Add Weekly Diet Menu'
-                              : 'Add Weekly Menu')),
+                      child: Text(
+                        AppLocalizations.of(context).translate(widget.isForDiet
+                            ? 'Add Weekly Diet Menu'
+                            : 'Add Weekly Menu'),
+                      ),
                     ),
                   ),
                 SizedBox(
