@@ -192,5 +192,8 @@
   "Enter new Password": "Enter new Password",
   "Enter old Password": "Enter old Password",
   "Failed to change password. Please try again.": "Failed to change password. Please try again.",
-  "What do you have in your Fridge?": "What do you have in your Fridge?"
+  "What do you have in your Fridge?": "What do you have in your Fridge?",
+  "Drag and drop recipes to build your weekly menu, reorder them as needed, and use the arrows to scroll through your selections; you can add up to 7 recipes.": "Drag and drop recipes to build your weekly menu, reorder them as needed, and use the arrows to scroll through your selections; you can add up to 7 recipes.",
+  "Your session and NOT credentials is saved automaticly for a one-time login": "Your session and NOT credentials is saved automaticly for a one-time login",
+  "Thanks": "Thanks"
 }

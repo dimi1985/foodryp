@@ -12,10 +12,12 @@ import 'package:foodryp/screens/offline_recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/connectivity_service.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
+import 'package:foodryp/utils/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -40,8 +42,8 @@ void main() async {
           create: (_) => LanguageProvider(),
         ),
         ChangeNotifierProvider(create: (_) => RecipeProvider()),
-         ChangeNotifierProvider(create: (_) => SearchSettingsProvider()),
-         ChangeNotifierProvider(create: (_) => CelebrationSettingsProvider()),
+        ChangeNotifierProvider(create: (_) => SearchSettingsProvider()),
+        ChangeNotifierProvider(create: (_) => CelebrationSettingsProvider()),
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),
@@ -80,6 +82,7 @@ class _FoodrypState extends State<Foodryp> {
   @override
   void initState() {
     super.initState();
+
     _locale = widget.initialLocale;
     _streamSubscription = _connectivity.onConnectivityChanged.listen((result) {
       if (result.contains(ConnectivityResult.none)) {

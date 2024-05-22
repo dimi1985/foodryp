@@ -28,7 +28,7 @@ class ReusableTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         prefixIcon: getIcon(hintText),
-        suffixIcon: hintText == 'Password'
+        suffixIcon: hintText.toLowerCase() == 'password'
             ? IconButton(
                 icon: Icon(
                   obscureText ? Icons.visibility_off : Icons.visibility,

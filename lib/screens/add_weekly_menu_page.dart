@@ -1,9 +1,11 @@
 import 'dart:developer';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
+import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -14,6 +16,7 @@ import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 class AddWeeklyMenuPage extends StatefulWidget {
@@ -36,6 +39,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   List<Recipe> userRecipes = [];
   bool isLoading = false;
   final ScrollController _scrollController = ScrollController();
+  final ScrollController _selectedScrollController = ScrollController();
   bool isFetching = false;
   List<Recipe> selectedRecipes = [];
   TextEditingController titleController = TextEditingController();
@@ -48,6 +52,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       initializeEditState();
     }
     _scrollController.addListener(_scrollListener);
+    _selectedScrollController.addListener(selectedSListener);
   }
 
   void initializeEditState() {
@@ -61,6 +66,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _selectedScrollController.dispose();
     super.dispose();
   }
 
@@ -71,6 +77,13 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
         !isFetching) {
       fetchMoreRecipes();
     }
+  }
+
+  void selectedSListener() {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange &&
+        !isFetching) {}
   }
 
   Future<void> fetchUserProfileAndRecipes() async {
@@ -164,45 +177,93 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: DragTarget<Recipe>(
-        onWillAccept: (recipe) => selectedRecipes.length < 7,
-        onAccept: (recipe) {
+        onWillAcceptWithDetails: (details) => selectedRecipes.length < 7,
+        onAcceptWithDetails: (details) {
           setState(() {
             if (selectedRecipes.length < 7) {
-              selectedRecipes.add(recipe);
+              selectedRecipes.add(details.data);
+              _scrollToEnd();
             }
           });
         },
         builder: (context, candidateData, rejectedData) {
           return Container(
-            height: 300,
+            height: Constants.checiIfAndroid(context) ? 300 : 300,
             color: Colors.grey.shade200,
-            child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(
-                dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                },
-              ),
-              child: ReorderableListView(
-                scrollDirection: Axis.horizontal,
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) {
-                      newIndex -= 1;
-                    }
-                    final item = selectedRecipes.removeAt(oldIndex);
-                    selectedRecipes.insert(newIndex, item);
-                  });
-                },
-                children: [
-                  for (int index = 0; index < selectedRecipes.length; index++)
-                    _buildSelectedRecipeCard(index, themeProvider),
-                ],
-              ),
+            child: Stack(
+              children: [
+                ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    },
+                  ),
+                  child: ReorderableListView(
+                    scrollController: _selectedScrollController,
+                    scrollDirection: Axis.horizontal,
+                    onReorder: (oldIndex, newIndex) {
+                      setState(() {
+                        if (newIndex > oldIndex) {
+                          newIndex -= 1;
+                        }
+                        final item = selectedRecipes.removeAt(oldIndex);
+                        selectedRecipes.insert(newIndex, item);
+                      });
+                    },
+                    children: [
+                      for (int index = 0;
+                          index < selectedRecipes.length;
+                          index++)
+                        _buildSelectedRecipeCard(index, themeProvider),
+                    ],
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: Icon(
+                      MdiIcons.arrowLeftBoldBox,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      _selectedScrollController.animateTo(
+                        _selectedScrollController.offset - 300,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                    },
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: Icon(
+                      MdiIcons.arrowRightBoldBox,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      _selectedScrollController.animateTo(
+                        _selectedScrollController.offset + 300,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           );
         },
       ),
+    );
+  }
+
+  void _scrollToEnd() {
+    _selectedScrollController.animateTo(
+      _selectedScrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
     );
   }
 
@@ -312,14 +373,14 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   }
 
   String _getDayOfWeek(int index) {
-    const daysOfWeek = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
+    List daysOfWeek = [
+      AppLocalizations.of(context).translate('Monday'),
+      AppLocalizations.of(context).translate('Tuesday'),
+      AppLocalizations.of(context).translate('Wednesday'),
+      AppLocalizations.of(context).translate('Thursday'),
+      AppLocalizations.of(context).translate('Friday'),
+      AppLocalizations.of(context).translate('Saturday'),
+      AppLocalizations.of(context).translate('Sunday'),
     ];
     return daysOfWeek[index % 7];
   }
@@ -329,7 +390,7 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       children: [
         Text(
           textAlign: TextAlign.center,
-          '${userProfile.username.toUpperCase()} ${AppLocalizations.of(context).translate(widget.isForDiet ? 'Here you can check and put the diet meals of the Week' : 'Here you can check and put the normal meals of the Week')}',
+          '${userProfile.username.toUpperCase()} ${AppLocalizations.of(context).translate('Drag and drop recipes to build your weekly menu, reorder them as needed, and use the arrows to scroll through your selections; you can add up to 7 recipes.')}',
         ),
       ],
     );
@@ -392,7 +453,9 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (context) => const EntryWebNavigationPage(),
+              builder: (context) => kIsWeb
+                  ? const EntryWebNavigationPage()
+                  : const BottomNavScreen(),
             ),
             (Route<dynamic> route) => false,
           );

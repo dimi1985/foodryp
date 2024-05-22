@@ -59,6 +59,10 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
   }
 
   Future<void> _fetchUserProfile() async {
+    bool oneTimeSave = await UserService().getsaveOneTimeSheetShow();
+    if (!oneTimeSave) {
+      _showSaveCredentialsBottomSheet();
+    }
     final userService = UserService();
     final userProfile = await userService.getUserProfile();
     userId = await userService.getCurrentUserId();
@@ -317,6 +321,41 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
           ),
         ),
       ),
+    );
+  }
+  void _showSaveCredentialsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context).translate(
+                    'Your session and NOT credentials is saved automaticly for a one-time login'),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      await UserService().saveOneTimeSheetShow();
+                      Navigator.pop(context);
+                    },
+                    child:
+                        Text(AppLocalizations.of(context).translate('Thanks')),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

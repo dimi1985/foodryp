@@ -54,7 +54,7 @@ class UserService {
         final responseData = jsonDecode(response.body);
         final userID = responseData['userId'];
 
-        await _saveUserIDLocally(userID);
+        await saveUserIDLocally(userID);
         _user = Constants.defaultUser;
 
         return true;
@@ -80,7 +80,7 @@ class UserService {
       final responseData = jsonDecode(response.body);
       final userID = responseData['userId'];
 
-      await _saveUserIDLocally(userID);
+      await saveUserIDLocally(userID);
       return response.statusCode == 200;
     } catch (e) {
       print('Error logging in user: $e');
@@ -92,8 +92,6 @@ class UserService {
     await _initPrefs();
     final userId =
         _prefs.getString('userId'); // Use 'userId' instead of 'userID'
-
-
 
     try {
       final response = await http.get(
@@ -259,80 +257,77 @@ class UserService {
     }
   }
 
-
-
-Future<void> followUser(String userToFollowId) async {
-  await _initPrefs();
-  final userId = _prefs.getString('userId');
-  try {
-    final response = await http.post(
-      Uri.parse('${Constants.baseUrl}/api/sendFollowRequest'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
-        'userId': userId,
-        'userToFollowId': userToFollowId,
-      }),
-    );
-    if (response.statusCode == 200) {
-      // Successfully followed user
-      // You can update the UI or perform any other necessary actions
-          print('Following Use Sent!!');
-    } else {
-      // Handle non-200 status code
+  Future<void> followUser(String userToFollowId) async {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/api/sendFollowRequest'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'userId': userId,
+          'userToFollowId': userToFollowId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        // Successfully followed user
+        // You can update the UI or perform any other necessary actions
+        print('Following Use Sent!!');
+      } else {
+        // Handle non-200 status code
+        // You can show an error message to the user
+        print('Following Not Sent!!');
+      }
+    } catch (e) {
+      print('Error following user: $e');
+      // Handle error
       // You can show an error message to the user
-       print('Following Not Sent!!');
     }
-  } catch (e) {
-    print('Error following user: $e');
-    // Handle error
-    // You can show an error message to the user
   }
-}
 
-Future<bool> rejectFollowRequest(String userToRejectId) async {
-   await _initPrefs();
-  final userId = _prefs.getString('userId');
-  try {
-    final response = await http.post(
-      Uri.parse('${Constants.baseUrl}/api/rejectFollowRequest'),
-      body: {
-        'userId': userId, // The ID of the current user
-        'userToRejectId': userToRejectId, // The ID of the user whose follow request is being rejected
-      },
-    );
-    if (response.statusCode == 200) {
-      // Request rejected successfully
-      // You can update the UI or perform any other necessary actions
+  Future<bool> rejectFollowRequest(String userToRejectId) async {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/api/rejectFollowRequest'),
+        body: {
+          'userId': userId, // The ID of the current user
+          'userToRejectId':
+              userToRejectId, // The ID of the user whose follow request is being rejected
+        },
+      );
+      if (response.statusCode == 200) {
+        // Request rejected successfully
+        // You can update the UI or perform any other necessary actions
+        return true;
+      } else {
+        // Handle non-200 status code
+        // You can show an error message to the user
+        return false;
+      }
+    } catch (e) {
+      print('Error rejecting follow request: $e');
+      // Handle error
+      // You can show a
+      //n error message to the user
       return true;
-    } else {
-      // Handle non-200 status code
-      // You can show an error message to the user
-      return false;
     }
-  } catch (e) {
-    print('Error rejecting follow request: $e');
-    // Handle error
-    // You can show a
-    //n error message to the user
-    return true;
   }
-}
 
-
-
-
-   Future<bool> unFollow(String userToUnfollowId) async {
-  await _initPrefs();
-  final userId = _prefs.getString('userId');
+  Future<bool> unFollow(String userToUnfollowId) async {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/unfollowUser'),
         body: {
-        'userId': userId, // The ID of the current user
-        'userToUnfollowId': userToUnfollowId, // The ID of the user whose follow request is being rejected
-      },
+          'userId': userId, // The ID of the current user
+          'userToUnfollowId':
+              userToUnfollowId, // The ID of the user whose follow request is being rejected
+        },
         // Add any necessary headers, such as authorization token
       );
       if (response.statusCode == 200) {
@@ -350,20 +345,18 @@ Future<bool> rejectFollowRequest(String userToRejectId) async {
       // You can show an error message to the user
       return false;
     }
-    
   }
 
-
-Future<bool> followBack(String userToFollowBackId) async {
-  await _initPrefs();
-  final userId = _prefs.getString('userId');
+  Future<bool> followBack(String userToFollowBackId) async {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/followUserBack'),
         body: {
-        'userId': userId, // The ID of the current user
-        'userToFollowBackId': userToFollowBackId, 
-      },
+          'userId': userId, // The ID of the current user
+          'userToFollowBackId': userToFollowBackId,
+        },
         // Add any necessary headers, such as authorization token
       );
       if (response.statusCode == 200) {
@@ -381,13 +374,14 @@ Future<bool> followBack(String userToFollowBackId) async {
       // You can show an error message to the user
       return false;
     }
-    
   }
 
-  Future<void> _saveUserIDLocally(String userId) async {
+  Future<void> saveUserIDLocally(String userId) async {
     await _initPrefs(); // Initialize SharedPreferences
     await _prefs.setString('userId', userId); // Save userID locally
   }
+
+  
 
   Future<void> clearUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -395,10 +389,23 @@ Future<bool> followBack(String userToFollowBackId) async {
   }
 
   Future<String> getCurrentUserId() async {
-    await _initPrefs(); // Initialize SharedPreferences
+    await _initPrefs(); 
     String? userId =
-        _prefs.getString('userId'); // Retrieve user ID from SharedPreferences
-    return userId ?? ''; // Return user ID, or an empty string if not found
+        _prefs.getString('userId'); 
+    return userId ?? ''; 
+  }
+
+  
+  Future<void> saveOneTimeSheetShow() async {
+    await _initPrefs(); 
+    await _prefs.setBool('OneTimeSheetShow', true); 
+  }
+
+   Future<bool> getsaveOneTimeSheetShow() async {
+    await _initPrefs(); 
+    bool? oneTimeShow =
+        _prefs.getBool('OneTimeSheetShow');
+    return oneTimeShow ?? false; 
   }
 
   Future<bool> changeCredentials({
@@ -532,7 +539,7 @@ Future<bool> followBack(String userToFollowBackId) async {
     }
   }
 
-Future<bool> acceptFollowRequest(String targetUserId) async {
+  Future<bool> acceptFollowRequest(String targetUserId) async {
     try {
       final String userId = await getCurrentUserId();
       final response = await http.post(
@@ -558,6 +565,4 @@ Future<bool> acceptFollowRequest(String targetUserId) async {
       return false;
     }
   }
-
-  
 }

@@ -194,6 +194,9 @@
     "Enter new Password": "Εισάγετε νέο κωδικό",
     "Enter old Password": "Εισαγάγετε τον παλιό κωδικό πρόσβαση",
     "Failed to change password. Please try again.": "Αποτυχία αλλαγής κωδικού πρόσβασης. Παρακαλώ προσπαθήστε ξανά.",
-    "What do you have in your Fridge?": "Τι έχετε μεσα στο ψυγείο σας;"
+    "What do you have in your Fridge?": "Τι έχετε μεσα στο ψυγείο σας;",
+    "Drag and drop recipes to build your weekly menu, reorder them as needed, and use the arrows to scroll through your selections; you can add up to 7 recipes.": "Σύρετε και αποθέστε συνταγές για να δημιουργήσετε το εβδομαδιαίο μενού σας, αναδιατάξτε τις όπως απαιτείται και χρησιμοποιήστε τα βέλη για να μετακινηθείτε στις επιλογές σας. μπορείτε να προσθέσετε έως και 7 συνταγές.",
+    "Your session and NOT credentials is saved automaticly for a one-time login": "Η συνεδρία σας αποθηκεύετυαι αυτόματα για να μια φορα Eίσοδο.Ο κωδικός πρόσβασης δεν αποθηκεύεται σε καμμία περίπτωση.",
+    "Thanks": "Ευχαριστώ"
   }
   

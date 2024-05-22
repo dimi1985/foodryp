@@ -1,4 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/auth_screen/components/reusable_textfield.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
@@ -34,8 +36,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-final isAndroid =  Constants.checiIfAndroid(context);
-  final themeProvider = Provider.of<ThemeProvider>(context);
+    final isAndroid = Constants.checiIfAndroid(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -53,12 +55,13 @@ final isAndroid =  Constants.checiIfAndroid(context);
                     // Logo or App Name
                     Image.asset(
                       'assets/logo.png',
-                      height:isAndroid ? 200: 300,
-                      width:isAndroid ? 200: 300,
+                      height: isAndroid ? 200 : 300,
+                      width: isAndroid ? 200 : 300,
                     ),
                     const SizedBox(height: 30.0),
                     ReusableTextField(
-                      hintText: AppLocalizations.of(context).translate('Email'),
+                      hintText:
+                          'Email', // Ensure this matches the case in getIcon
                       controller: emailController,
                       togglePasswordVisibility: (isVisible) {},
                     ),
@@ -66,14 +69,14 @@ final isAndroid =  Constants.checiIfAndroid(context);
                     if (!isLogin)
                       ReusableTextField(
                         hintText:
-                            AppLocalizations.of(context).translate('Username'),
+                            'Username', // Ensure this matches the case in getIcon
                         controller: userNameController,
                         togglePasswordVisibility: (isVisible) {},
                       ),
                     const SizedBox(height: 15.0),
                     ReusableTextField(
                       hintText:
-                          AppLocalizations.of(context).translate('Password'),
+                          'Password', // Ensure this matches the case in getIcon
                       controller: passwordController,
                       obscureText: obscureText,
                       togglePasswordVisibility: (isVisible) {
@@ -82,9 +85,7 @@ final isAndroid =  Constants.checiIfAndroid(context);
                         });
                       },
                     ),
-
                     const SizedBox(height: 20.0),
-
                     if (!isLogin)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -93,25 +94,40 @@ final isAndroid =  Constants.checiIfAndroid(context);
                             flex: 1,
                             child: Text(
                               AppLocalizations.of(context)
-                                  .translate('Pick Gender: '),style: TextStyle(color: themeProvider.currentTheme == ThemeType.dark ? Colors.white:Colors.black),
+                                  .translate('Pick Gender: '),
+                              style: TextStyle(
+                                color:
+                                    themeProvider.currentTheme == ThemeType.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                              ),
                             ),
                           ),
-                          if(!isAndroid)
-                          const Spacer(),
+                          if (!isAndroid) const Spacer(),
                           Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 16.0),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
-                              color: Colors.grey[200], // Adjust the color as needed
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.grey[200],
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<Gender>(
                                 value: _selectedGender,
-                                icon: Icon(Icons.arrow_drop_down, color:  themeProvider.currentTheme == ThemeType.dark ? Colors.black:Colors.white),
+                                icon: Icon(
+                                  Icons.arrow_drop_down,
+                                  color: themeProvider.currentTheme ==
+                                          ThemeType.dark
+                                      ? Colors.black
+                                      : Colors.white,
+                                ),
                                 iconSize: 24,
                                 elevation: 0,
                                 style: TextStyle(
-                                  color:  themeProvider.currentTheme == ThemeType.dark ? Colors.black:Colors.white,
+                                  color: themeProvider.currentTheme ==
+                                          ThemeType.dark
+                                      ? Colors.black
+                                      : Colors.white,
                                   fontSize: 16.0,
                                 ),
                                 onChanged: (Gender? newValue) {
@@ -126,14 +142,20 @@ final isAndroid =  Constants.checiIfAndroid(context);
                                   return DropdownMenuItem<Gender>(
                                     value: value,
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0),
                                       child: Text(
                                         value == Gender.male
-                                            ? AppLocalizations.of(context).translate('Male')
-                                            : AppLocalizations.of(context).translate('Female'),
+                                            ? AppLocalizations.of(context)
+                                                .translate('Male')
+                                            : AppLocalizations.of(context)
+                                                .translate('Female'),
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color:  themeProvider.currentTheme == ThemeType.dark ? Colors.white:Colors.black,
+                                          color: themeProvider.currentTheme ==
+                                                  ThemeType.dark
+                                              ? Colors.white
+                                              : Colors.black,
                                         ),
                                       ),
                                     ),
@@ -142,18 +164,15 @@ final isAndroid =  Constants.checiIfAndroid(context);
                               ),
                             ),
                           ),
-
                         ],
                       ),
-
                     const SizedBox(height: 20.0),
                     // Login/Register Button
                     SizedBox(
                       width: 500,
                       child: ElevatedButton(
-                        onPressed: isLoading // Disable button when loading
-                            ? null
-                            : () => _handleAuth(isAndroid),
+                        onPressed:
+                            isLoading ? null : () => _handleAuth(isAndroid),
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
@@ -174,9 +193,7 @@ final isAndroid =  Constants.checiIfAndroid(context);
                       child: Text(AppLocalizations.of(context)
                           .translate('Forgot Password?')),
                     ),
-
-                     SizedBox(height:isAndroid ? 20 : 75.0),
-
+                    SizedBox(height: isAndroid ? 20 : 75.0),
                     // Optional: Sign up/in toggle
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -203,8 +220,7 @@ final isAndroid =  Constants.checiIfAndroid(context);
                   ],
                 ),
               ),
-              if (isLoading) // Loading indicator
-                const CircularProgressIndicator(),
+              if (isLoading) const CircularProgressIndicator(),
             ],
           ),
         ),
@@ -239,7 +255,7 @@ final isAndroid =  Constants.checiIfAndroid(context);
         if (success) {
           // Registration successful
 
-          await navigateToHomeScreen(context,isAndroid);
+          await navigateToHomeScreen(context, isAndroid);
         } else {
           // Registration failed
         }
@@ -253,7 +269,7 @@ final isAndroid =  Constants.checiIfAndroid(context);
 
         if (success) {
           // Login successful
-          await navigateToHomeScreen(context,isAndroid);
+          await navigateToHomeScreen(context, isAndroid);
         } else {
           // Login failed
         }
@@ -265,11 +281,19 @@ final isAndroid =  Constants.checiIfAndroid(context);
     }
   }
 
-  Future<void> navigateToHomeScreen(BuildContext context, bool isAndroid) async {
+  Future<void> navigateToHomeScreen(
+      BuildContext context, bool isAndroid) async {
+    
+
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) =>isAndroid ? const BottomNavScreen(): const EntryWebNavigationPage()),
+      MaterialPageRoute(
+          builder: (context) => isAndroid
+              ? const BottomNavScreen()
+              : const EntryWebNavigationPage()),
       (Route<dynamic> route) => false,
     );
   }
+
+  
 }

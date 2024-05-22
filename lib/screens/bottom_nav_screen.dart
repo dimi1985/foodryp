@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -43,14 +45,20 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   }
 
   Future<void> fetchUserProfile() async {
+    bool oneTimeSave = await UserService().getsaveOneTimeSheetShow();
+    if (!oneTimeSave) {
+      _showSaveCredentialsBottomSheet();
+    }
     try {
       final userService = UserService();
       User? userProfile;
 
       if ((user?.username.isEmpty ?? true)) {
-        userProfile = await userService.getUserProfile() ?? Constants.defaultUser;
+        userProfile =
+            await userService.getUserProfile() ?? Constants.defaultUser;
       } else {
-        userProfile = await userService.getPublicUserProfile(user!.username) ?? Constants.defaultUser;
+        userProfile = await userService.getPublicUserProfile(user!.username) ??
+            Constants.defaultUser;
       }
 
       setState(() {
@@ -89,7 +97,8 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   @override
   Widget build(BuildContext context) {
     final primaryItemsCount = user != null ? 4 : 3; // Number of primary items
-    final contextMenuItemsStartIndex = primaryItemsCount; // Start index for context menu items
+    final contextMenuItemsStartIndex =
+        primaryItemsCount; // Start index for context menu items
 
     return Scaffold(
       body: IndexedStack(
@@ -127,7 +136,9 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
               label: AppLocalizations.of(context).translate('Auth Screen'),
             ),
         ],
-        currentIndex: _selectedIndex < primaryItemsCount ? _selectedIndex : contextMenuItemsStartIndex,
+        currentIndex: _selectedIndex < primaryItemsCount
+            ? _selectedIndex
+            : contextMenuItemsStartIndex,
         selectedItemColor: Colors.amber[800],
         unselectedItemColor: Colors.grey,
         selectedLabelStyle: TextStyle(
@@ -144,7 +155,8 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.people_alt),
-                    title: Text(AppLocalizations.of(context).translate('Creators')),
+                    title: Text(
+                        AppLocalizations.of(context).translate('Creators')),
                     onTap: () {
                       Navigator.pop(context);
                       _onContextMenuItemTapped(4); // Set to corresponding index
@@ -152,7 +164,8 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.check_box_outline_blank_outlined),
-                    title: Text(AppLocalizations.of(context).translate('My Fridge')),
+                    title: Text(
+                        AppLocalizations.of(context).translate('My Fridge')),
                     onTap: () {
                       Navigator.pop(context);
                       _onContextMenuItemTapped(5); // Set to corresponding index
@@ -160,7 +173,8 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.receipt),
-                    title: Text(AppLocalizations.of(context).translate('Following Recipes Page')),
+                    title: Text(AppLocalizations.of(context)
+                        .translate('Following Recipes Page')),
                     onTap: () {
                       Navigator.pop(context);
                       _onContextMenuItemTapped(6); // Set to corresponding index
@@ -174,6 +188,42 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
           }
         },
       ),
+    );
+  }
+
+  void _showSaveCredentialsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context).translate(
+                    'Your session and NOT credentials is saved automaticly for a one-time login'),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      await UserService().saveOneTimeSheetShow();
+                      Navigator.pop(context);
+                    },
+                    child:
+                        Text(AppLocalizations.of(context).translate('Thanks')),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
