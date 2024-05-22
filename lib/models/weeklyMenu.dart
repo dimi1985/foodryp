@@ -10,6 +10,7 @@ class WeeklyMenu {
   final String userProfileImage;
   final DateTime dateCreated;
     bool isForDiet = false;
+        bool isMultipleDays = false;
 
   WeeklyMenu({
     required this.id,
@@ -20,6 +21,7 @@ class WeeklyMenu {
     required this.userProfileImage,
     required this.dateCreated,
     required this.isForDiet,
+    required this.isMultipleDays,
   });
 
   factory WeeklyMenu.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,7 @@ class WeeklyMenu {
           ? DateTime.parse(json['dateCreated'])
           : DateTime.now(),
            isForDiet: json['isForDiet'],
+             isMultipleDays: json['isMultipleDays'],
     );
   }
 
@@ -52,6 +55,7 @@ class WeeklyMenu {
       'userProfileImage': userProfileImage,
       'dateCreated': dateCreated.toIso8601String(),
       'isForDiet': isForDiet,
+       'isMultipleDays': isMultipleDays,
     };
   }
 }

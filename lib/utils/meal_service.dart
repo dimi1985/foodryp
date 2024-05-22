@@ -12,8 +12,13 @@ class MealService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<bool> saveWeeklyMenu(String title, List<Recipe> selectedRecipes,
-      String username, String userProfileImage, bool isForDiet) async {
+  Future<bool> saveWeeklyMenu(
+      String title,
+      List<Recipe> selectedRecipes,
+      String username,
+      String userProfileImage,
+      bool isForDiet,
+      bool isMultipleDays) async {
     // Extract recipe IDs from selected recipes
     List<String?> recipeIds =
         selectedRecipes.map((recipe) => recipe.id).toList();
@@ -31,6 +36,7 @@ class MealService {
           'username': username,
           'userProfileImage': userProfileImage,
           'isForDiet': isForDiet,
+          'isMultipleDays': isMultipleDays,
         }),
       );
 
@@ -200,7 +206,8 @@ class MealService {
       List<Recipe> newRecipes,
       String username,
       String userProfileImage,
-      bool isForDiet) async {
+      bool isForDiet,
+      bool isMultipleDays) async {
     // Extract recipe IDs from old and new recipes
     List<String?> oldRecipeIds = oldRecipes.map((recipe) => recipe.id).toList();
     List<String?> newRecipeIds = newRecipes.map((recipe) => recipe.id).toList();
@@ -222,6 +229,7 @@ class MealService {
           'username': username,
           'userProfileImage': userProfileImage,
           'isForDiet': isForDiet,
+          'isMultipleDays': isMultipleDays,
         }),
       );
 
