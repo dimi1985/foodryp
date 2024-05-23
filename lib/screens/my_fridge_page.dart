@@ -121,10 +121,51 @@ class _MyFridgePageState extends State<MyFridgePage>
     }
   }
 
-  // Function to normalize text by removing non-alphanumeric characters and converting to lowercase
+  String removeGreekDiacritics(String input) {
+    const Map<String, String> diacriticMap = {
+      'Ά': 'Α',
+      'Έ': 'Ε',
+      'Ή': 'Η',
+      'Ί': 'Ι',
+      'Ό': 'Ο',
+      'Ύ': 'Υ',
+      'Ώ': 'Ω',
+      'ά': 'α',
+      'έ': 'ε',
+      'ή': 'η',
+      'ί': 'ι',
+      'ό': 'ο',
+      'ύ': 'υ',
+      'ώ': 'ω',
+      'ϊ': 'ι',
+      'ϋ': 'υ',
+      'ΐ': 'ι',
+      'ΰ': 'υ',
+    };
+
+    final buffer = StringBuffer();
+    for (int i = 0; i < input.length; i++) {
+      final char = input[i];
+      buffer.write(diacriticMap[char] ?? char);
+    }
+    return buffer.toString();
+  }
+
   String normalizeString(String input) {
-    return input.toLowerCase().replaceAll(RegExp(r'[^a-zα-ωάέήίόύώ0-9 ]'),
-        ''); // Includes space and Greek characters
+    return removeGreekDiacritics(input.toLowerCase().replaceAll(
+          RegExp(r'[^a-zα-ωάέήίόύώ0-9 ]'),
+          '',
+        ));
+  }
+
+  String toSingular(String word) {
+    if (word.endsWith('ες')) {
+      return '${word.substring(0, word.length - 2)}α';
+    }
+    if (word.endsWith('οι')) {
+      return '${word.substring(0, word.length - 2)}ος';
+    }
+    return word;
   }
 
 // Function to check if any fridge item matches any recipe ingredient
@@ -160,29 +201,50 @@ class _MyFridgePageState extends State<MyFridgePage>
       'cups',
       'tbsp',
       'tsp',
-      'φετες'
     ];
 
     // Normalize and split the ingredient into words, filtering out ignored words
     List<String> wordsInIngredient = normalizeString(recipeIngredient)
         .split(' ')
-        .where((word) =>
-            !ignoreWords.contains(word) &&
-            word.length > 2) // Ignore common or short words
+        .where((word) => !ignoreWords.contains(word) && word.length > 2)
         .toList();
+
+    // Check if any normalized fridge item exactly matches the normalized ingredient
+    String normalizedRecipeIngredient = normalizeString(recipeIngredient);
+    if (fridgeItemsNormalized.contains(normalizedRecipeIngredient)) {
+      print('Exact match found: $normalizedRecipeIngredient');
+      return true;
+    }
 
     // Normalize each fridge item into words
     List<List<String>> fridgeItemWordsList = fridgeItemsNormalized.map((item) {
       return normalizeString(item).split(' ');
     }).toList();
 
-    // Check if any word in the recipe ingredient partially matches any word in any fridge item
-    return wordsInIngredient.any((word) {
-      return fridgeItemWordsList.any((fridgeItemWords) {
+    // Check if any fridge item matches the recipe ingredient meaningfully
+    return fridgeItemWordsList.any((fridgeItemWords) {
+      if (fridgeItemWords.length > 1) {
+        // For multi-word fridge items, check if all words are in the recipe ingredient
+        bool allWordsMatch = fridgeItemWords.every((fridgeWord) =>
+            wordsInIngredient.contains(fridgeWord) ||
+            wordsInIngredient.any((word) =>
+                word.contains(fridgeWord) || fridgeWord.contains(word)));
+        if (allWordsMatch) {
+          print(
+              'Partial match found for multi-word fridge item: ${fridgeItemWords.join(', ')}');
+          return true;
+        }
+      } else {
+        // For single-word fridge items, check for exact matches only
         return fridgeItemWords.any((fridgeWord) {
-          return fridgeWord.contains(word) || word.contains(fridgeWord);
+          if (wordsInIngredient.contains(fridgeWord)) {
+            print('Exact match found for single-word fridge item: $fridgeWord');
+            return true;
+          }
+          return false;
         });
-      });
+      }
+      return false;
     });
   }
 
@@ -207,10 +269,12 @@ class _MyFridgePageState extends State<MyFridgePage>
         for (var recipe in fetchedRecipes) {
           bool hasMatchingIngredient = false;
           List<String> missingIngredients = [];
+          List<String> matchedIngredients = [];
 
           for (var ingredient in recipe.ingredients ?? []) {
             if (ingredientMatches(ingredient, fridgeItemsNormalized)) {
               hasMatchingIngredient = true; // At least one ingredient matches
+              matchedIngredients.add(ingredient);
             } else {
               missingIngredients.add(ingredient); // Collect missing ingredients
             }
@@ -219,6 +283,8 @@ class _MyFridgePageState extends State<MyFridgePage>
           if (hasMatchingIngredient) {
             filteredRecipes.add(
                 recipe); // Add the recipe if at least one ingredient matches
+            print(
+                'Recipe ${recipe.id} matched ingredients: ${matchedIngredients.join(', ')}');
           }
 
           if (missingIngredients.isNotEmpty) {
@@ -374,12 +440,15 @@ class _MyFridgePageState extends State<MyFridgePage>
                       ),
               ),
               const SizedBox(height: 20),
-              if((!isDesktop || Constants.checiIfAndroid(context)) && filteredRecipes.isNotEmpty && doorsOpened)
-                  Positioned(
-              bottom: 50,
-              left: MediaQuery.of(context).size.width / 2 - 15, // Center the arrow
-              child: AnimatedArrow(),
-            ),
+              if ((!isDesktop || Constants.checiIfAndroid(context)) &&
+                  filteredRecipes.isNotEmpty &&
+                  doorsOpened)
+                Positioned(
+                  bottom: 50,
+                  left: MediaQuery.of(context).size.width / 2 -
+                      15, // Center the arrow
+                  child: AnimatedArrow(),
+                ),
               AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
@@ -406,9 +475,8 @@ class _MyFridgePageState extends State<MyFridgePage>
               ),
             ],
           ),
-        
-         if(isDesktop  && filteredRecipes.isNotEmpty && doorsOpened)
-                  AnimatedArrow(),
+          if (isDesktop && filteredRecipes.isNotEmpty && doorsOpened)
+            AnimatedArrow(),
           const SizedBox(height: 20),
           doorsOpened ? _buildRecipeList() : Container(),
           const SizedBox(height: 20),
@@ -740,8 +808,7 @@ class _MyFridgePageState extends State<MyFridgePage>
                         onPressed: () {
                           showDialog(
                             context: context,
-                            barrierDismissible:
-                                false,
+                            barrierDismissible: false,
                             builder: (BuildContext context) {
                               return const AlertDialog(
                                 content: Row(

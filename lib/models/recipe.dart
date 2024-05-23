@@ -22,10 +22,10 @@ class Recipe {
   final List<String>? commentId;
   bool isForDiet;
   bool isForVegetarians;
-  double rating; 
+  double rating;
   int ratingCount;
-    final List<String>? cookingAdvices;
-    bool checked;
+  final List<String>? cookingAdvices;
+  bool checked;
 
   Recipe({
     this.id,
@@ -51,10 +51,10 @@ class Recipe {
     required this.commentId,
     required this.isForDiet,
     required this.isForVegetarians,
-    required this.rating, 
+    required this.rating,
     required this.ratingCount,
-     required this.cookingAdvices,
-     this.checked = false,
+    required this.cookingAdvices,
+    this.checked = false,
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -84,7 +84,8 @@ class Recipe {
       categoryFont: json['categoryFont'] ?? '',
       categoryName: json['categoryName'] ?? '',
       recomendedBy:
-          (json['recomendedBy'] as List<dynamic>?)?.cast<String>().toList() ?? [],
+          (json['recomendedBy'] as List<dynamic>?)?.cast<String>().toList() ??
+              [],
       meal: (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
       commentId:
           (json['commentId'] as List<dynamic>?)?.cast<String>().toList() ?? [],
@@ -98,7 +99,7 @@ class Recipe {
     );
   }
 
-  Map<String, Object?> toJson() {
+  Map<String, dynamic> toJson() {
     var map = {
       '_id': id,
       'recipeTitle': recipeTitle,
