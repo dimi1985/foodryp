@@ -65,6 +65,7 @@ class _CategorySectionState extends State<CategorySection> {
                   return const SizedBox.shrink();
                 }
                 return InkWell(
+                  hoverColor: Colors.transparent,
                   onTap: () async{
                    await Navigator.push(
                       context,

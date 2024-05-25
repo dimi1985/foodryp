@@ -1,7 +1,6 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
-import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/category_page/category_page.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
@@ -13,7 +12,6 @@ import 'package:foodryp/widgets/CustomWidgets/category_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/recipe_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/top_three_recipe_card_section.dart';
 import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
-import 'package:path/path.dart';
 
 class DesktopMiddleSide extends StatelessWidget {
 
@@ -22,7 +20,6 @@ class DesktopMiddleSide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
-    Size size = MediaQuery.of(context).size;
     return LayoutBuilder(
       builder: (context, constraints) {
         return SafeArea(

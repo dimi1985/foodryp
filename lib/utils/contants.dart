@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/celebration_day.dart';
+import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/wikifood.dart';
 import 'package:foodryp/utils/app_localizations.dart';
@@ -35,29 +37,56 @@ class Constants {
     following: [],
     followRequestsSent: [],
     followRequestsReceived: [],
-    followRequestsCanceled: [], 
+    followRequestsCanceled: [],
     commentId: [],
   );
 
+  static Wikifood defaultWikifood =
+      Wikifood(id: '', title: '', text: '', source: '');
 
-  static Wikifood defaultWikifood = Wikifood(id: '', title: '', text: '', source: ''
-   
+  static Recipe defaultRecipe = Recipe(
+    recipeTitle: '',
+    recipeImage: '',
+    ingredients: [],
+    instructions: [],
+    prepDuration: '',
+    cookDuration: '',
+    servingNumber: '',
+    difficulty: '',
+    username: '',
+    useImage: '',
+    userId: '',
+    dateCreated: DateTime.now(),
+    description: '',
+    categoryId: '',
+    categoryColor: '',
+    categoryFont: '',
+    categoryName: '',
+    recomendedBy: [],
+    meal: [],
+    commentId: [],
+    isForDiet: false,
+    isForVegetarians: false,
+    rating: 0,
+    ratingCount: 0,
+    cookingAdvices: [],
+    calories: '',
   );
   static String emptyField = '';
   static bool defaultBoolValue = false;
   static List<User> defaultEmptyList = [];
   static List<CelebrationDay> defaultCelebEmptyList = [];
-   static TextStyle globalTextStyle = const TextStyle(color: Colors.black);
+  static TextStyle globalTextStyle = const TextStyle(color: Colors.black);
   static const imageURL =
       kIsWeb ? 'http://localhost:3000' : 'http://192.168.84.229:3000';
 
   static const baseUrl =
       kIsWeb ? 'http://localhost:3000' : 'http://192.168.84.229:3000';
 
-  static    bool checiIfAndroid(BuildContext context){
-        bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
-        return isAndroid;
-      }
+  static bool checiIfAndroid(BuildContext context) {
+    bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    return isAndroid;
+  }
 
   static String calculateMembershipDuration(
       BuildContext context, DateTime? memberSince) {
@@ -81,18 +110,18 @@ class Constants {
   }
 
   static TextStyle dynamicStyle = const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              );
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    color: Colors.black,
+  );
 
-               static TextStyle staticStyle = const TextStyle(
-               fontSize: 12,
-                fontWeight: FontWeight.normal,
-                color: Colors.grey,
-              );
+  static TextStyle staticStyle = const TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    color: Colors.grey,
+  );
 
   static bool checkIfAndroid() {
-return defaultTargetPlatform == TargetPlatform.android;
+    return defaultTargetPlatform == TargetPlatform.android;
   }
 }

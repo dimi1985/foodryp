@@ -195,5 +195,16 @@
   "What do you have in your Fridge?": "What do you have in your Fridge?",
   "Drag and drop recipes to build your weekly menu, reorder them as needed, and use the arrows to scroll through your selections; you can add up to 7 recipes.": "Drag and drop recipes to build your weekly menu, reorder them as needed, and use the arrows to scroll through your selections; you can add up to 7 recipes.",
   "Your session and NOT credentials is saved automaticly for a one-time login": "Your session and NOT credentials is saved automaticly for a one-time login",
-  "Thanks": "Thanks"
+  "Thanks": "Thanks",
+  "Calories": "Calories",
+  "Enter the total calories": "Enter the total calories",
+  "More": "More",
+  "Fridge Items": "Fridge Items",
+  "Preparation Time": "Preparation Time",
+  "Cooking Time": "Cooking Time",
+  "Filter the recipes once more": "Filter the recipes once more",
+  "Prep: 0-15 mins": "Prep: 0-15 mins",
+  "Prep: 15-30 mins": "Prep: 15-30 mins",
+  "Cook: 0-30 mins": "Cook: 0-30 mins",
+  "Cook: 30-60 mins": "Cook: 30-60 mins"
 }

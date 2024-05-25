@@ -25,7 +25,7 @@ class Recipe {
   double rating;
   int ratingCount;
   final List<String>? cookingAdvices;
-  bool checked;
+  String? calories;
 
   Recipe({
     this.id,
@@ -54,7 +54,7 @@ class Recipe {
     required this.rating,
     required this.ratingCount,
     required this.cookingAdvices,
-    this.checked = false,
+    required this.calories,
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -96,6 +96,7 @@ class Recipe {
       cookingAdvices:
           (json['cookingAdvices'] as List<dynamic>?)?.cast<String>().toList() ??
               [],
+      calories: json['calories'] ?? '',
     );
   }
 
@@ -127,6 +128,7 @@ class Recipe {
       'rating': rating,
       'ratingCount': ratingCount,
       'cookingAdvices': cookingAdvices,
+      'calories': calories,
     };
     return map;
   }

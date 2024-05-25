@@ -111,8 +111,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            AppLocalizations.of(context).translate('Details')),
+        title: Text(AppLocalizations.of(context).translate('Details')),
       ),
       body: PopScope(
         canPop: false,
@@ -172,10 +171,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                                   alignment: Alignment
                                       .centerRight, // Align the details to the right
                                   child: _buildRecipeDetails(
-                                      context,
-                                      themeProvider,
-                                      isDesktop,
-                                      connectionService),
+                                    context,
+                                    themeProvider,
+                                    isDesktop,
+                                    connectionService,
+                                    isAndroid,
+                                  ),
                                 ),
                               ),
                             ),
@@ -223,24 +224,13 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                             fit: BoxFit.cover,
                           ),
                         ),
-                        // Back button positioned on top-left
-                        if (isAndroid)
-                          Positioned(
-                            top: 16.0, // Adjust padding from top
-                            left: 16.0, // Adjust padding from left
-                            child: IconButton(
-                              icon: const Icon(Icons.arrow_back),
-                              onPressed: () => Navigator.pop(
-                                  context), // Handle back button press
-                            ),
-                          ),
                       ],
                     ),
                   ),
                   // Recipe details
                   const SizedBox(height: 20),
-                  _buildRecipeDetails(
-                      context, themeProvider, isDesktop, connectionService),
+                  _buildRecipeDetails(context, themeProvider, isDesktop,
+                      connectionService, isAndroid),
                   const SizedBox(height: 20),
                   _displayCommentsSection(themeProvider),
                   const SizedBox(height: 20),
@@ -257,7 +247,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
   }
 
   Widget _buildRecipeDetails(BuildContext context, ThemeProvider themeProvider,
-      bool isDesktop, ConnectivityService connectionService) {
+      bool isDesktop, ConnectivityService connectionService, bool isAndroid) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40.0),
       child: Column(
@@ -280,45 +270,58 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                   ),
           ),
           const SizedBox(height: 10.0),
-          if (isAuthenticated && kIsWeb && widget.internalUse != 'top_three')
-            Row(
-              children: [
-                RatingBar.builder(
-                  initialRating: _currentRating,
-                  minRating: 1,
-                  direction: Axis.horizontal,
-                  allowHalfRating: true,
-                  itemCount: 5,
-                  itemSize: 20,
-                  itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  itemBuilder: (context, index) => MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: InkWell(
-                      onTap: () {
-                        //method
-                        _updateRating(index + 1.0);
-                      },
-                      child: Icon(
-                        Icons.star,
-                        color:
-                            index < _currentRating ? Colors.amber : Colors.grey,
+
+          Row(
+            children: [
+              isAuthenticated && kIsWeb && widget.internalUse != 'top_three' ||
+                      isAndroid
+                  ? RatingBar.builder(
+                      initialRating: _currentRating,
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemSize: 20,
+                      itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      itemBuilder: (context, index) => MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: InkWell(
+                          onTap: () {
+                            //method
+                            _updateRating(index + 1.0);
+                          },
+                          child: Icon(
+                            Icons.star,
+                            color: index < _currentRating
+                                ? Colors.amber
+                                : Colors.grey,
+                          ),
+                        ),
                       ),
+                      onRatingUpdate: (rating) {
+                        // This is triggered on drag; you might not need this if you handle updates via onTap
+                      },
+                    )
+                  : RatingBarIndicator(
+                      rating: widget.recipe.rating,
+                      itemBuilder: (context, index) => Icon(
+                        MdiIcons.star,
+                        color: Colors.amber,
+                      ),
+                      itemCount: 5,
+                      itemSize: 20,
+                      direction: Axis.horizontal,
                     ),
-                  ),
-                  onRatingUpdate: (rating) {
-                    // This is triggered on drag; you might not need this if you handle updates via onTap
-                  },
+              const SizedBox(
+                width: 15,
+              ),
+              if (isAuthenticated)
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.save),
                 ),
-                const SizedBox(
-                  width: 15,
-                ),
-                if (isAuthenticated)
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.save),
-                  ),
-              ],
-            ),
+            ],
+          ),
 
           const SizedBox(height: 10.0),
           Container(
@@ -343,13 +346,15 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               Column(
                 children: [
                   Text(
+                    overflow: TextOverflow.ellipsis,
                     AppLocalizations.of(context).translate('Servings'),
                     style: Constants.staticStyle,
                   ),
                   Text(
+                    overflow: TextOverflow.ellipsis,
                     widget.recipe.servingNumber.toString(),
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: isAndroid ? 14 : 20,
                       fontWeight: FontWeight.bold,
                       color: themeProvider.currentTheme == ThemeType.dark
                           ? Colors.white
@@ -364,13 +369,15 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               Column(
                 children: [
                   Text(
+                    overflow: TextOverflow.ellipsis,
                     AppLocalizations.of(context).translate('Prep Time'),
                     style: Constants.staticStyle,
                   ),
                   Text(
+                    overflow: TextOverflow.ellipsis,
                     widget.recipe.prepDuration.toString(),
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: isAndroid ? 14 : 20,
                       fontWeight: FontWeight.bold,
                       color: themeProvider.currentTheme == ThemeType.dark
                           ? Colors.white
@@ -392,7 +399,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                     Text(
                       widget.recipe.cookDuration.toString(),
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: isAndroid ? 14 : 20,
                         fontWeight: FontWeight.bold,
                         color: themeProvider.currentTheme == ThemeType.dark
                             ? Colors.white
@@ -444,6 +451,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
           ),
           const SizedBox(height: 10.0),
           ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: widget.recipe.instructions?.length ?? 0,
             itemBuilder: (context, index) =>
@@ -463,6 +471,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
           ),
           const SizedBox(height: 10.0),
           ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: widget.recipe.cookingAdvices?.length ?? 0,
             itemBuilder: (context, index) =>
@@ -474,6 +483,19 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               );
             },
           ),
+          const SizedBox(height: 10.0),
+          Text(
+            AppLocalizations.of(context).translate('Calories'),
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10.0),
+          Text(
+            widget.recipe.calories ?? Constants.emptyField,
+            style: const TextStyle(
+              fontSize: 18.0,
+            ),
+          ),
+          const SizedBox(height: 10.0),
         ],
       ),
     );

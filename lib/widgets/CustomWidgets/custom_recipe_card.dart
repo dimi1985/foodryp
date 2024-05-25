@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -17,7 +18,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
-
 
 class CustomRecipeCard extends StatefulWidget {
   final String internalUse;
@@ -46,7 +46,6 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
     if (mounted) {
       setState(() {
         updateUniqueIngredients();
-
       });
     }
 
@@ -79,13 +78,12 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
     bool isDesktop = Responsive.isDesktop(context);
- final connectionService = Provider.of<ConnectivityService>(context);
+    final connectionService = Provider.of<ConnectivityService>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Card(
       surfaceTintColor: Colors.white70,
@@ -100,26 +98,22 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     topLeft: Radius.circular(Constants.defaultPadding),
                     topRight: Radius.circular(Constants.defaultPadding),
                   ),
-                  child: Image.network(
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child; // image fully loaded, return the image widget
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null, // This will show a determinate progress indicator if size is known, otherwise indeterminate
-                          ),
-                        );
-                      }
-                    },
-                    widget.recipe.recipeImage ?? Constants.emptyField,
+                  child: CachedNetworkImage(
+                    memCacheHeight:screenSize.height.toInt() ,
+                    memCacheWidth:screenSize.width.toInt() ,
+                    imageUrl: widget.recipe.recipeImage ?? Constants.emptyField,
                     fit: BoxFit.cover,
                     width: screenSize.width,
                     filterQuality: FilterQuality.none,
+                    progressIndicatorBuilder:
+                        (context, url, downloadProgress) => Center(
+                      child: CircularProgressIndicator(
+                        value: downloadProgress.progress,
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => const Center(
+                      child: Icon(Icons.error),
+                    ),
                   ),
                 ),
                 Positioned(
@@ -150,17 +144,18 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                           child: Text(
                             overflow: TextOverflow.ellipsis,
                             widget.recipe.categoryName.toUpperCase(),
-                            style:connectionService.connectionStatus.contains(ConnectivityResult.none) ? const TextStyle(
-                              fontFamily: 'Comfortaa'
-                            ): GoogleFonts.getFont(
-                              widget.recipe.categoryFont ??
-                                  Constants.emptyField,
-                              fontSize: Responsive.isDesktop(context)
-                                  ? Constants.desktopFontSize
-                                  : Constants.mobileFontSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                            style: connectionService.connectionStatus
+                                    .contains(ConnectivityResult.none)
+                                ? const TextStyle(fontFamily: 'Comfortaa')
+                                : GoogleFonts.getFont(
+                                    widget.recipe.categoryFont ??
+                                        Constants.emptyField,
+                                    fontSize: Responsive.isDesktop(context)
+                                        ? Constants.desktopFontSize
+                                        : Constants.mobileFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                           ),
                         ),
                       ),
@@ -211,16 +206,17 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-
-                  widget.recipe.useImage?.isEmpty ?? false ? Container():  ImagePickerPreviewContainer(
-                      containerSize: 20,
-                      onImageSelected: (file, list) {},
-                      gender: '',
-                      isFor: '',
-                      initialImagePath: widget.recipe.useImage!,
-                      isForEdit: false,
-                      allowSelection: false,
-                    ),
+                    widget.recipe.useImage?.isEmpty ?? false
+                        ? Container()
+                        : ImagePickerPreviewContainer(
+                            containerSize: 20,
+                            onImageSelected: (file, list) {},
+                            gender: '',
+                            isFor: '',
+                            initialImagePath: widget.recipe.useImage!,
+                            isForEdit: false,
+                            allowSelection: false,
+                          ),
                     const SizedBox(width: 10),
                     Text(
                       widget.recipe.username ?? Constants.emptyField,
@@ -272,20 +268,25 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         overflow: TextOverflow.ellipsis,
                         widget.recipe.recipeTitle?.toUpperCase() ??
                             Constants.emptyField,
-                        style:connectionService.connectionStatus.contains(ConnectivityResult.none) ? const TextStyle(
-                              fontFamily: 'Comfortaa'
-                            ): GoogleFonts.getFont(
-                          widget.recipe.categoryFont ?? Constants.emptyField,
-                          fontSize: Responsive.isDesktop(context)
-                              ? Constants.desktopFontSize
-                              : Constants.mobileFontSize,
-                          fontWeight: FontWeight.bold,
-                          color: HexColor(widget.recipe.categoryColor ??
-                              Constants.emptyField),
-                        ),
+                        style: connectionService.connectionStatus
+                                .contains(ConnectivityResult.none)
+                            ? const TextStyle(fontFamily: 'Comfortaa')
+                            : GoogleFonts.getFont(
+                                widget.recipe.categoryFont ??
+                                    Constants.emptyField,
+                                fontSize: Responsive.isDesktop(context)
+                                    ? Constants.desktopFontSize
+                                    : Constants.mobileFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: HexColor(widget.recipe.categoryColor ??
+                                    Constants.emptyField),
+                              ),
                       ),
                     ),
-                    if (!isDesktop && widget.internalUse != 'MainScreen'&& widget.internalUse != 'RecipePage' && isAndroid)
+                    if (!isDesktop &&
+                        widget.internalUse != 'MainScreen' &&
+                        widget.internalUse != 'RecipePage' &&
+                        isAndroid)
                       PopupMenuButton<String>(
                         onSelected: (String result) {
                           if (result == 'edit') {

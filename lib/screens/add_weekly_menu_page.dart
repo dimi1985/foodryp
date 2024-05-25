@@ -471,52 +471,79 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   }
 
   Widget _buildUserRecipesList(ThemeProvider themeProvider) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(Constants.defaultPadding),
-        child: ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
+  return Expanded(
+    child: Padding(
+      padding: const EdgeInsets.all(Constants.defaultPadding),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_left),
+            onPressed: () {
+              _scrollController.animateTo(
+                _scrollController.offset - 200, // Adjust the scroll amount as needed
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
             },
           ),
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            controller: _scrollController,
-            itemCount: userRecipes.length + (isFetching ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index < userRecipes.length) {
-                final recipe = userRecipes[index];
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: LongPressDraggable<Recipe>(
-                    data: recipe,
-                    feedback: Material(
-                      elevation: 6.0,
-                      child: _buildRecipeCard(recipe, themeProvider),
-                    ),
-                    childWhenDragging: Opacity(
-                      opacity: 0.4,
-                      child: _buildRecipeCard(recipe, themeProvider),
-                    ),
-                    onDragCompleted: () {
-                      setState(() {
-                        // Allow multiple instances of a recipe, so don't remove it from the list.
-                      });
-                    },
-                    child: _buildRecipeCard(recipe, themeProvider),
-                  ),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
+          Expanded(
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                },
+              ),
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                controller: _scrollController,
+                itemCount: userRecipes.length + (isFetching ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index < userRecipes.length) {
+                    final recipe = userRecipes[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: LongPressDraggable<Recipe>(
+                        data: recipe,
+                        feedback: Material(
+                          elevation: 6.0,
+                          child: _buildRecipeCard(recipe, themeProvider),
+                        ),
+                        childWhenDragging: Opacity(
+                          opacity: 0.4,
+                          child: _buildRecipeCard(recipe, themeProvider),
+                        ),
+                        onDragCompleted: () {
+                          setState(() {
+                            // Allow multiple instances of a recipe, so don't remove it from the list.
+                          });
+                        },
+                        child: _buildRecipeCard(recipe, themeProvider),
+                      ),
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_right),
+            onPressed: () {
+              _scrollController.animateTo(
+                _scrollController.offset + 200, // Adjust the scroll amount as needed
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
             },
           ),
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildRecipeCard(Recipe recipe, ThemeProvider themeProvider,
       {bool isSelected = false}) {

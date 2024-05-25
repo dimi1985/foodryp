@@ -26,7 +26,10 @@ class _RecipeSectionState extends State<RecipeSection> {
   @override
   void initState() {
     super.initState();
-    fetchixedRecipes();
+    if(recipes.isEmpty){
+  fetchixedRecipes();
+    }
+  
   }
 
   Future<void> fetchixedRecipes() async {

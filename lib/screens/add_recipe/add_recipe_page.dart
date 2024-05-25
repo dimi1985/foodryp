@@ -15,6 +15,7 @@ import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:foodryp/widgets/CustomWidgets/calories_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/cooking_advices_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
@@ -65,6 +66,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   TextEditingController servingTextController = TextEditingController();
   TextEditingController prepDurationTextController = TextEditingController();
   TextEditingController cookDurationTextController = TextEditingController();
+  TextEditingController caloriesTextController = TextEditingController();
 
   late int tappedCategoryIndex = -1;
 
@@ -80,6 +82,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   late String servingValue;
   late String prepDurationValue;
   late String cookDurationValue;
+  late String caloriesValue;
 
   bool imageIsPicked = false;
   late String currentPage;
@@ -122,10 +125,13 @@ class _AddRecipePageState extends State<AddRecipePage> {
       cookDurationTextController.text =
           widget.recipe!.cookDuration ?? Constants.emptyField;
 
+      caloriesTextController.text =
+          widget.recipe!.calories ?? Constants.emptyField;
+
       _selectedDifficulty = widget.recipe!.difficulty!;
 
       // Populate ingredients text controllers
-      ingredientsControllers.clear(); // Clear existing controllers
+      ingredientsControllers.clear();
       for (var ingredient in widget.recipe!.ingredients ?? []) {
         TextEditingController controller =
             TextEditingController(text: ingredient);
@@ -133,7 +139,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
       }
 
       // Populate instructions text controllers
-      instructionControllers.clear(); // Clear existing controllers
+      instructionControllers.clear();
       for (var instruction in widget.recipe!.instructions ?? []) {
         TextEditingController controller =
             TextEditingController(text: instruction);
@@ -141,7 +147,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
       }
 
       // Populate cookingAdvice text controllers
-      adviceControllers.clear(); // Clear existing controllers
+      adviceControllers.clear();
       for (var cookingAdvice in widget.recipe!.cookingAdvices ?? []) {
         TextEditingController controller =
             TextEditingController(text: cookingAdvice);
@@ -170,7 +176,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
               selectedCategoryId = categories[categoryIndex].id!;
               selectedCategoryFont = categories[categoryIndex].font;
               selectedCategoryName = categories[categoryIndex].name;
-
               // Set booleans for the chips
               isForDiet = widget.recipe!.isForDiet;
               isForVegetarians = widget.recipe!.isForVegetarians;
@@ -278,6 +283,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
     return _selectedDifficulty != null;
   }
 
+  bool _isCaloriesValid() {
+    return caloriesTextController.text.isNotEmpty;
+  }
+
   bool _allItemsValid() {
     return tappedCategoryIndex >= 0 &&
         _isRecipeTitleValid() &&
@@ -288,7 +297,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
         _isServingValid() &&
         _isCookDurationValid() &&
         _isPrepDurationValid() &&
-        _isDifficultySelected();
+        _isDifficultySelected() &&
+        _isCaloriesValid();
   }
 
   @override
@@ -622,8 +632,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
                   const SizedBox(height: 20.0),
 
-                  const SizedBox(height: 20.0),
-
                   CookingAdvicesRow(
                     adviceControllers: adviceControllers,
                     isDesktop: isDesktop,
@@ -713,76 +721,86 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         : null,
                   ),
                   const SizedBox(height: 20.0),
+                  CaloriesRow(
+                    caloriesTextController: caloriesTextController,
+                    isDesktop: isDesktop,
+                  ),
+
+                  //Calories section
+                  const SizedBox(height: 20.0),
+                  CustomTextField(
+                    controller: caloriesTextController,
+                    hintText: AppLocalizations.of(context)
+                        .translate('Enter the total calories'),
+                    labelText: '',
+                    borderColor: selectedCategoryColor.isNotEmpty
+                        ? HexColor(selectedCategoryColor)
+                        : null,
+                  ),
+                  const SizedBox(height: 20.0),
                   SectionTitle(
                     title:
                         AppLocalizations.of(context).translate('Difficulty:'),
                     isDesktop: isDesktop,
                   ),
                   const SizedBox(height: 20.0),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.grey[200],
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: SizedBox(
-                      height: 50, // Adjust height as needed
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          for (String value in difficultyLevels)
-                            Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (widget.isForEdit) {
-                                        widget.recipe!.difficulty =
-                                            value; // Update the model
-                                      } else {
-                                        _selectedDifficulty =
-                                            value; // Update local state
-                                      }
-                                    });
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: (widget.isForEdit
-                                                ? widget.recipe?.difficulty ==
-                                                    value
-                                                : _selectedDifficulty == value)
-                                            ? Colors
-                                                .blue // Change color if selected
-                                            : Colors
-                                                .grey, // Default color if not selected
-                                      ),
+                  SizedBox(
+                    height: 50, // Adjust height as needed
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        for (String value in difficultyLevels)
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    if (widget.isForEdit) {
+                                      widget.recipe!.difficulty =
+                                          value; // Update the model
+                                    } else {
+                                      _selectedDifficulty =
+                                          value; // Update local state
+                                    }
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: (widget.isForEdit
+                                              ? widget.recipe?.difficulty ==
+                                                  value
+                                              : _selectedDifficulty == value)
+                                          ? Colors
+                                              .orange 
+                                          : Colors
+                                              .grey,
                                     ),
-                                    child: Text(
-                                      value,
-                                      style: TextStyle(
-                                        color: (widget.isForEdit
-                                                ? widget.recipe?.difficulty ==
-                                                    value
-                                                : _selectedDifficulty == value)
-                                            ? Colors
-                                                .blue // Change color if selected
-                                            : Colors
-                                                .black, // Default color if not selected
-                                      ),
+                                  ),
+                                  child: Text(
+                                    value,
+                                    style: TextStyle(
+                                      color: (widget.isForEdit
+                                              ? widget.recipe?.difficulty ==
+                                                  value
+                                              : _selectedDifficulty == value)
+                                          ? Colors
+                                              .orange  // Change color if selected
+                                          :themeProvider.currentTheme == ThemeType.dark ? Colors.white: Colors
+                                              .black, // Default color if not selected
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 8,
-                                ), // Add space between the text items
-                              ],
-                            ),
-                        ],
-                      ),
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ), // Add space between the text items
+                            ],
+                          ),
+                      ],
                     ),
                   ),
 
@@ -799,6 +817,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             servingValue = servingTextController.text;
                             prepDurationValue = prepDurationTextController.text;
                             cookDurationValue = cookDurationTextController.text;
+                            caloriesValue = caloriesTextController.text;
                             // Use the values as needed
 
                             showDialog(
@@ -1093,6 +1112,21 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                             fontSize: 16.0));
                                                   }).toList(),
                                                 ),
+                                                const SizedBox(height: 16.0),
+                                                Text(
+                                                  AppLocalizations.of(context)
+                                                      .translate('Calories'),
+                                                  style: const TextStyle(
+                                                      fontSize: 16.0,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const SizedBox(height: 8.0),
+                                                Text(
+                                                  caloriesValue,
+                                                  style: const TextStyle(
+                                                      fontSize: 16.0),
+                                                ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
                                                   AppLocalizations.of(context)
@@ -1144,8 +1178,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                   Future<
                                                       bool> recipeOperation = widget
                                                           .isForEdit
-                                                      ? RecipeService()
-                                                          .updateRecipe(
+                                                      ? RecipeService().updateRecipe(
                                                           widget.recipe?.id ??
                                                               '',
                                                           recipeTitleValue,
@@ -1168,8 +1201,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                           isForDiet,
                                                           isForVegetarians,
                                                           cookingAdvices,
-                                                        )
-                                                      : RecipeService().createRecipe(
+                                                          caloriesValue)
+                                                      : RecipeService()
+                                                          .createRecipe(
                                                           recipeTitleValue,
                                                           ingredients,
                                                           instructions,
@@ -1190,7 +1224,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                           [],
                                                           isForDiet,
                                                           isForVegetarians,
-                                                          cookingAdvices);
+                                                          cookingAdvices,
+                                                          caloriesValue,
+                                                        );
 
                                                   // Handle the completion of the recipe operation
                                                   recipeOperation.then((value) {

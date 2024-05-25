@@ -74,6 +74,7 @@ class RecipeService {
     bool isForDiet,
     bool isForVegetarians,
     List<String> cookingAdvices,
+     String calories
   ) async {
     try {
       final response = await http.post(
@@ -100,6 +101,7 @@ class RecipeService {
           'isForDiet': isForDiet,
           'isForVegetarians': isForVegetarians,
           'cookingAdvices': cookingAdvices,
+            'calories': calories,
         }),
       );
       if (response.statusCode == 201) {
@@ -140,6 +142,7 @@ class RecipeService {
     bool isForDiet,
     bool isForVegetarians,
     List<String> cookingAdvices,
+     String calories
   ) async {
     print(recipeId);
     try {
@@ -167,6 +170,7 @@ class RecipeService {
           'isForDiet': isForDiet,
           'isForVegetarians': isForVegetarians,
           'cookingAdvices': cookingAdvices,
+          'calories': calories,
         }),
       );
       if (response.statusCode == 200) {

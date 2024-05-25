@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
@@ -22,6 +23,7 @@ class CustomCategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final screenSize = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Stack(
@@ -110,26 +112,24 @@ class CustomCategoryCard extends StatelessWidget {
                         ),
                         child: Stack(
                           children: [
-                            Image.network(
-                              category.categoryImage ?? Constants.emptyField,
-                                  loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child; // image fully loaded, return the image widget
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null, // This will show a determinate progress indicator if size is known, otherwise indeterminate
-                          ),
-                        );
-                      }},
+                            CachedNetworkImage(
+                              memCacheHeight: screenSize.height.toInt(),
+                              memCacheWidth: screenSize.width.toInt(),
+                              imageUrl: category.categoryImage ??
+                                  Constants.emptyField,
                               fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
+                              width: screenSize.width,
                               filterQuality: FilterQuality.none,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) => Center(
+                                child: CircularProgressIndicator(
+                                  value: downloadProgress.progress,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Center(
+                                child: Icon(Icons.error),
+                              ),
                             ),
                             category.isForDiet || category.isForVegetarians
                                 ? Positioned(

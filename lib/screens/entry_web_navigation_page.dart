@@ -38,6 +38,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
   late User user = Constants.defaultUser;
   List<String> menuItems = [];
   bool isForInternalUse = true;
+  bool userIsBeingFetched =false;
 
   @override
   void initState() {
@@ -64,6 +65,9 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       _showSaveCredentialsBottomSheet();
     }
     final userService = UserService();
+    setState(() {
+      userIsBeingFetched = true;
+    });
     final userProfile = await userService.getUserProfile();
     userId = await userService.getCurrentUserId();
     setState(() {
@@ -72,8 +76,14 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       }
       if (userProfile != null) {
         user = userProfile;
+         setState(() {
+      userIsBeingFetched = false;
+    });
       } else {
         user = Constants.defaultUser;
+         setState(() {
+      userIsBeingFetched = false;
+    });
       }
     });
   }
@@ -103,7 +113,6 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       if (!isAuthenticated) 'Sign Up/Sign In',
       if (isForInternalUse) 'ProfilePage',
       if (isAuthenticated) 'Following Recipes Page',
-      
     ];
 
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -154,15 +163,15 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
                 child: SizedBox(
                   height: 100,
                   child: ListView(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: menuItems
-                        .where((item) =>
-                            item !=
-                            'ProfilePage') // Exclude 'ProfilePage' from view
-                        .map((item) => _buildMenuItem(item))
-                        .toList(),
-                  ),
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          children: menuItems
+                              .where((item) =>
+                                  item !=
+                                  'ProfilePage') // Exclude 'ProfilePage' from view
+                              .map((item) => _buildMenuItem(item))
+                              .toList(),
+                        ),
                 ),
               ),
           ],
@@ -182,7 +191,6 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
                     },
                     child: Row(
                       children: [
-                        
                         user.gender!.contains('female')
                             ? ImagePickerPreviewContainer(
                                 containerSize: 50.0,
@@ -290,8 +298,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
               user: user,
             ),
           if (!isAuthenticated) const AuthScreen(),
-          if (isAuthenticated)
-          const FollowingRecipesPage()
+          if (isAuthenticated) const FollowingRecipesPage()
           // Add other pages here as needed
         ],
       ),
@@ -323,6 +330,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       ),
     );
   }
+
   void _showSaveCredentialsBottomSheet() {
     showModalBottomSheet(
       context: context,

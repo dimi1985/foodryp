@@ -15,6 +15,7 @@ import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/user_service.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BottomNavScreen extends StatefulWidget {
   const BottomNavScreen({super.key});
@@ -96,7 +97,13 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryItemsCount = user != null ? 4 : 3; // Number of primary items
+    final primaryItemsCount = user != null
+        ? user == null
+            ? 0
+            : 4
+        : user == null
+            ? 3
+            : 0; // Number of primary items
     final contextMenuItemsStartIndex =
         primaryItemsCount; // Start index for context menu items
 
@@ -105,89 +112,100 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
         index: _selectedIndex,
         children: _widgetOptions(context),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: AppLocalizations.of(context).translate('Home'),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.food_bank),
-            label: AppLocalizations.of(context).translate('Recipes'),
-          ),
-          if (user != null)
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.add),
-              label: AppLocalizations.of(context).translate('Add Recipes'),
-            ),
-          if (user != null)
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.account_box_rounded),
-              label: user?.username ?? Constants.emptyField,
-            ),
-          if (user != null)
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.more_horiz),
-              label: AppLocalizations.of(context).translate('More'),
-            ),
-          if (user == null)
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.account_circle),
-              label: AppLocalizations.of(context).translate('Auth Screen'),
-            ),
-        ],
-        currentIndex: _selectedIndex < primaryItemsCount
-            ? _selectedIndex
-            : contextMenuItemsStartIndex,
-        selectedItemColor: Colors.amber[800],
-        unselectedItemColor: Colors.grey,
-        selectedLabelStyle: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Colors.amber[800], // Use any color that fits your design
-        ),
-        unselectedLabelStyle: Constants.globalTextStyle,
-        onTap: (index) {
-          if (index == contextMenuItemsStartIndex && user != null) {
-            showModalBottomSheet(
-              context: context,
-              builder: (context) => ListView(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.people_alt),
-                    title: Text(
-                        AppLocalizations.of(context).translate('Creators')),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _onContextMenuItemTapped(4); // Set to corresponding index
-                    },
+      bottomNavigationBar: user == null
+          ? Container()
+          : BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon:  Icon(MdiIcons.homeCircle),
+                  label: AppLocalizations.of(context).translate('Home'),
+                ),
+                BottomNavigationBarItem(
+                  icon:  Icon(MdiIcons.food),
+                  label: AppLocalizations.of(context).translate('Recipes'),
+                ),
+                if (user != null)
+                  BottomNavigationBarItem(
+                    icon:  Icon(MdiIcons.plusBox),
+                    label: AppLocalizations.of(context).translate('Add Recipe'),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.check_box_outline_blank_outlined),
-                    title: Text(
-                        AppLocalizations.of(context).translate('My Fridge')),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _onContextMenuItemTapped(5); // Set to corresponding index
-                    },
+                if (user != null)
+                  BottomNavigationBarItem(
+                    icon:  Icon(MdiIcons.account),
+                    label: user?.username ?? Constants.emptyField,
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.receipt),
-                    title: Text(AppLocalizations.of(context)
-                        .translate('Following Recipes Page')),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _onContextMenuItemTapped(6); // Set to corresponding index
-                    },
+                if (user != null)
+                  BottomNavigationBarItem(
+                    icon:  Icon(MdiIcons.menuOpen),
+                    label: AppLocalizations.of(context).translate('More'),
                   ),
-                ],
+                if (user == null)
+                  BottomNavigationBarItem(
+                    icon:  Icon(MdiIcons.twoFactorAuthentication),
+                    label:
+                        AppLocalizations.of(context).translate('Auth Screen'),
+                  ),
+              ],
+              currentIndex: _selectedIndex < primaryItemsCount
+                  ? _selectedIndex
+                  : contextMenuItemsStartIndex,
+              selectedItemColor: Colors.amber[800],
+              unselectedItemColor: Colors.grey,
+              selectedLabelStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.amber[800], // Use any color that fits your design
               ),
-            );
-          } else {
-            _onItemTapped(index);
-          }
-        },
-      ),
+              unselectedLabelStyle: Constants.globalTextStyle,
+              onTap: (index) {
+                if (index == contextMenuItemsStartIndex && user != null) {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView(
+                        children: [
+                          ListTile(
+                            leading:  Icon(MdiIcons.creation),
+                            title: Text(AppLocalizations.of(context)
+                                .translate('Creators')),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _onContextMenuItemTapped(
+                                  4); // Set to corresponding index
+                            },
+                          ),
+                          ListTile(
+                            leading:  Icon(
+                                MdiIcons.fridge),
+                            title: Text(AppLocalizations.of(context)
+                                .translate('My Fridge')),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _onContextMenuItemTapped(
+                                  5); // Set to corresponding index
+                            },
+                          ),
+                          ListTile(
+                            leading:  Icon(MdiIcons.naturePeople),
+                            title: Text(AppLocalizations.of(context)
+                                .translate('Following Recipes Page')),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _onContextMenuItemTapped(
+                                  6); // Set to corresponding index
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  _onItemTapped(index);
+                }
+              },
+            ),
     );
   }
 

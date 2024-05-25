@@ -197,6 +197,17 @@
     "What do you have in your Fridge?": "Τι έχετε μεσα στο ψυγείο σας;",
     "Drag and drop recipes to build your weekly menu, reorder them as needed, and use the arrows to scroll through your selections; you can add up to 7 recipes.": "Σύρετε και αποθέστε συνταγές για να δημιουργήσετε το εβδομαδιαίο μενού σας, αναδιατάξτε τις όπως απαιτείται και χρησιμοποιήστε τα βέλη για να μετακινηθείτε στις επιλογές σας. μπορείτε να προσθέσετε έως και 7 συνταγές.",
     "Your session and NOT credentials is saved automaticly for a one-time login": "Η συνεδρία σας αποθηκεύετυαι αυτόματα για να μια φορα Eίσοδο.Ο κωδικός πρόσβασης δεν αποθηκεύεται σε καμμία περίπτωση.",
-    "Thanks": "Ευχαριστώ"
+    "Thanks": "Ευχαριστώ",
+    "Calories:": "Θερμίδες:",
+  "Enter the total calories": "Εισαγάγετε τις συνολικές θερμίδες",
+  "More": "Περισσότερα",
+  "Fridge Items": "Είδη Ψυγείου",
+  "Preparation Time": "Ωρα προετοιμασίας",
+  "Cooking Time": "Χρόνος μαγειρέματος",
+  "Filter the recipes once more": "Φιλτράρετε τις συνταγές για άλλη μια φορά",
+  "Prep: 0-15 mins": "Προετοιμασία: 0-15 λεπτά",
+  "Prep: 15-30 mins": "Προετοιμασία: 15-30 λεπτά",
+  "Cook: 0-30 mins": "Μαγείρεμα: 0-30 λεπτά",
+  "Cook: 30-60 mins": "Μαγείρεμα: 30-60 λεπτά"
   }
   

@@ -1,11 +1,7 @@
-import 'dart:developer';
 import 'dart:math';
 import 'dart:ui';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/recipe.dart';
-import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -13,9 +9,9 @@ import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_textField.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/widgets/animated_arrow.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 enum Category { vegetables, generalItems, meatAndFish }
 
@@ -212,7 +208,6 @@ class _MyFridgePageState extends State<MyFridgePage>
     // Check if any normalized fridge item exactly matches the normalized ingredient
     String normalizedRecipeIngredient = normalizeString(recipeIngredient);
     if (fridgeItemsNormalized.contains(normalizedRecipeIngredient)) {
-      print('Exact match found: $normalizedRecipeIngredient');
       return true;
     }
 
@@ -230,15 +225,12 @@ class _MyFridgePageState extends State<MyFridgePage>
             wordsInIngredient.any((word) =>
                 word.contains(fridgeWord) || fridgeWord.contains(word)));
         if (allWordsMatch) {
-          print(
-              'Partial match found for multi-word fridge item: ${fridgeItemWords.join(', ')}');
           return true;
         }
       } else {
         // For single-word fridge items, check for exact matches only
         return fridgeItemWords.any((fridgeWord) {
           if (wordsInIngredient.contains(fridgeWord)) {
-            print('Exact match found for single-word fridge item: $fridgeWord');
             return true;
           }
           return false;
@@ -283,8 +275,8 @@ class _MyFridgePageState extends State<MyFridgePage>
           if (hasMatchingIngredient) {
             filteredRecipes.add(
                 recipe); // Add the recipe if at least one ingredient matches
-            print(
-                'Recipe ${recipe.id} matched ingredients: ${matchedIngredients.join(', ')}');
+            // print(
+            //     'Recipe ${recipe.id} matched ingredients: ${matchedIngredients.join(', ')}');
           }
 
           if (missingIngredients.isNotEmpty) {
@@ -296,8 +288,8 @@ class _MyFridgePageState extends State<MyFridgePage>
 
         // Print to verify the updated missing ingredients list
         recipeMissingIngredients.forEach((id, missing) {
-          print(
-              'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
+          // print(
+          //     'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
         });
       }
 
@@ -517,7 +509,7 @@ class _MyFridgePageState extends State<MyFridgePage>
                       existingItem: categoryName,
                       isForEdit: false);
                 },
-                icon: const Icon(Icons.add),
+                icon: Icon(MdiIcons.plusCircle),
               ),
             ],
           ),
@@ -645,54 +637,90 @@ class _MyFridgePageState extends State<MyFridgePage>
         child: SizedBox(
           height: 300,
           width: double.infinity,
-          child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(
-              dragDevices: {
-                PointerDeviceKind.touch,
-                PointerDeviceKind.mouse,
-              },
-            ),
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              controller: _scrollController,
-              itemCount: recipes.length + (_isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index < recipes.length) {
-                  final recipe = recipes[index];
-                  final missingIngredients =
-                      recipeMissingIngredients[recipe.id] ?? [];
+          child: Stack(
+            children: [
+              ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse,
+                  },
+                ),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  controller: _scrollController,
+                  itemCount: recipes.length + (_isLoading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index < recipes.length) {
+                      final recipe = recipes[index];
+                      final missingIngredients =
+                          recipeMissingIngredients[recipe.id] ?? [];
 
-                  return Padding(
-                    padding: const EdgeInsets.all(Constants.defaultPadding),
-                    child: SizedBox(
-                      height: 400,
-                      width: 400,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RecipeDetailPage(
-                                recipe: recipe,
-                                internalUse: 'RecipePage',
-                                missingIngredients: missingIngredients,
-                              ),
+                      return Padding(
+                        padding: const EdgeInsets.all(Constants.defaultPadding),
+                        child: SizedBox(
+                          height: 400,
+                          width: 400,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RecipeDetailPage(
+                                    recipe: recipe,
+                                    internalUse: 'RecipePage',
+                                    missingIngredients: missingIngredients,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: CustomRecipeCard(
+                              internalUse: 'RecipePage',
+                              recipe: recipe,
+                              missingIngredients: missingIngredients,
                             ),
-                          );
-                        },
-                        child: CustomRecipeCard(
-                          internalUse: 'RecipePage',
-                          recipe: recipe,
-                          missingIngredients: missingIngredients,
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                } else {
-                  return _buildLoader();
-                }
-              },
-            ),
+                      );
+                    } else {
+                      return _buildLoader();
+                    }
+                  },
+                ),
+              ),
+              if (recipes.length > 1)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: IconButton(
+                    icon: Icon(MdiIcons.arrowLeft),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        _scrollController.position.pixels - 400,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                ),
+              if (recipes.length > 1)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: IconButton(
+                    icon: Icon(MdiIcons.arrowRight),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        _scrollController.position.pixels + 400,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -712,7 +740,7 @@ class _MyFridgePageState extends State<MyFridgePage>
     bool isForEdit = false,
   }) {
     TextEditingController controller =
-        TextEditingController(text: existingItem);
+        TextEditingController(text:isForEdit ? existingItem :null);
 
     showModalBottomSheet(
       context: context,
@@ -734,81 +762,46 @@ class _MyFridgePageState extends State<MyFridgePage>
                   right: 16.0,
                   top: 16.0,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate(getCategoryName(category)),
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                        hintText: 'Add your fridge items here',
-                        enabledBorder: const OutlineInputBorder(
-                          // width: 0.0 produces a thin "hairline" border
-                          borderSide:
-                              BorderSide(color: Colors.green, width: 0.0),
-                        ),
-                        border: const OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(
-                            color: Colors.blueGrey
-                                .withOpacity(0.5), // Set border color here
-                            width: 1, // Set border width here
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context).translate('Fridge Items'),
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(height: 16.0),
+                      TextField(
+                        controller: controller,
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)
+                              .translate('Add your fridge items here'),
+                          enabledBorder: const OutlineInputBorder(
+                            // width: 0.0 produces a thin "hairline" border
+                            borderSide:
+                                BorderSide(color: Colors.green, width: 0.0),
+                          ),
+                          border: const OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide(
+                              color: Colors.blueGrey
+                                  .withOpacity(0.5), // Set border color here
+                              width: 1, // Set border width here
+                            ),
                           ),
                         ),
+                        keyboardType: TextInputType.text,
                       ),
-                      keyboardType: TextInputType.text,
-                    ),
-                    const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          barrierDismissible:
-                              false, // Prevent dismissing the dialog by tapping outside
-                          builder: (BuildContext context) {
-                            return const AlertDialog(
-                              content: Row(
-                                children: [
-                                  CircularProgressIndicator(),
-                                  SizedBox(width: 16),
-                                  Text("Processing..."),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-
-                        Future.delayed(
-                            Duration(seconds: Random().nextInt(3) + 1), () {
-                          if (isForEdit) {
-                            updateFridgeItem(context, category, existingItem,
-                                controller.text.trim());
-                          } else {
-                            addItemToList(category, controller.text.trim());
-                            _onAddFridgeItem(category, controller.text.trim());
-                          }
-                          Navigator.pop(
-                              context); // Dismiss the dialog after operation is initiated
-                          Navigator.pop(context);
-                        });
-                      },
-                      child: Text(AppLocalizations.of(context)
-                          .translate(isForEdit ? 'Update' : 'Add')),
-                    ),
-                    if (isForEdit) ...[
                       const SizedBox(height: 16.0),
                       ElevatedButton(
                         onPressed: () {
                           showDialog(
                             context: context,
-                            barrierDismissible: false,
+                            barrierDismissible:
+                                false, // Prevent dismissing the dialog by tapping outside
                             builder: (BuildContext context) {
                               return const AlertDialog(
                                 content: Row(
@@ -824,16 +817,55 @@ class _MyFridgePageState extends State<MyFridgePage>
 
                           Future.delayed(
                               Duration(seconds: Random().nextInt(3) + 1), () {
-                            deleteFridgeItem(existingItem, category);
-                            Navigator.pop(context);
+                            if (isForEdit) {
+                              updateFridgeItem(context, category, existingItem,
+                                  controller.text.trim());
+                            } else {
+                              addItemToList(category, controller.text.trim());
+                              _onAddFridgeItem(
+                                  category, controller.text.trim());
+                            }
+                            Navigator.pop(
+                                context); // Dismiss the dialog after operation is initiated
                             Navigator.pop(context);
                           });
                         },
-                        child: Text(
-                            AppLocalizations.of(context).translate('Delete')),
+                        child: Text(AppLocalizations.of(context)
+                            .translate(isForEdit ? 'Update' : 'Add')),
                       ),
+                      if (isForEdit) ...[
+                        const SizedBox(height: 16.0),
+                        ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return const AlertDialog(
+                                  content: Row(
+                                    children: [
+                                      CircularProgressIndicator(),
+                                      SizedBox(width: 16),
+                                      Text("Processing..."),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+
+                            Future.delayed(
+                                Duration(seconds: Random().nextInt(3) + 1), () {
+                              deleteFridgeItem(existingItem, category);
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            });
+                          },
+                          child: Text(
+                              AppLocalizations.of(context).translate('Delete')),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             );
