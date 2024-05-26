@@ -18,6 +18,7 @@ import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/utils/wiki_food_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:foodryp/widgets/CustomWidgets/recipe_save_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -315,11 +316,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               const SizedBox(
                 width: 15,
               ),
-              if (isAuthenticated)
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.save),
-                ),
+              RecipSaveWidget(
+                recipeId: widget.recipe.id ?? Constants.emptyField,
+                recipeName: widget.recipe.recipeTitle ?? Constants.emptyField,
+                userId: widget.recipe.userId ?? Constants.emptyField,
+              )
             ],
           ),
 

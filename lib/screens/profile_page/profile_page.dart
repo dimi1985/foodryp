@@ -1,14 +1,18 @@
+// profilePage.dart
 // ignore_for_file: library_private_types_in_public_api, must_be_immutable
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/screens/saved_recipes_page.dart';
+import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/theme_provider.dart';
+import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/screens/profile_page/components/recipe_card_profile_section.dart';
-import 'package:foodryp/screens/profile_page/components/top_profile.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/settings_page/settings_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/heading_title_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
@@ -31,6 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late String currentPage;
   final userService = UserService();
   User? userProfile;
+
   @override
   void initState() {
     super.initState();
@@ -82,9 +87,83 @@ class _ProfilePageState extends State<ProfilePage> {
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start, // Ensure alignment to the left
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Ensure alignment to the left
           children: [
-            TopProfile(user: widget.user),
+            // Integrated TopProfile content
+            SizedBox(
+              height: Responsive.isDesktop(context) ? 350 : 250,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        widget.user.gender == 'female' ||
+                                widget.user.gender == 'male'
+                            ? ImagePickerPreviewContainer(
+                                containerSize: 75.0,
+                                initialImagePath: widget.user.profileImage,
+                                onImageSelected:
+                                    (File imageFile, List<int> bytes) {},
+                                allowSelection: false,
+                                gender: widget.user.gender!,
+                                isFor: '',
+                                isForEdit: false,
+                              )
+                            : Container(),
+                        Text(
+                          widget.user.username,
+                          style: TextStyle(
+                            color: themeProvider.currentTheme == ThemeType.dark
+                                ? Colors.white
+                                : const Color.fromARGB(255, 37, 36, 37),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 17.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.bookmark, size: 30),
+                          onPressed: () {
+                            // Navigation logic to saved recipes page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SavedRecipesPage(
+                                  userId: widget.user.id,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        
+                        Text(
+                          AppLocalizations.of(context).translate('View Saved Recipes'),
+                          style: TextStyle(
+                            color: themeProvider.currentTheme == ThemeType.dark
+                                ? Colors.white
+                                : const Color.fromARGB(255, 37, 36, 37),
+                            fontSize: 14.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             const SizedBox(height: 10.0),
             HeadingTitleRow(
               title: AppLocalizations.of(context).translate('Weekly Menus'),

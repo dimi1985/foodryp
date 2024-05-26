@@ -283,9 +283,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
     return _selectedDifficulty != null;
   }
 
-  bool _isCaloriesValid() {
-    return caloriesTextController.text.isNotEmpty;
-  }
 
   bool _allItemsValid() {
     return tappedCategoryIndex >= 0 &&
@@ -297,8 +294,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
         _isServingValid() &&
         _isCookDurationValid() &&
         _isPrepDurationValid() &&
-        _isDifficultySelected() &&
-        _isCaloriesValid();
+        _isDifficultySelected();
   }
 
   @override

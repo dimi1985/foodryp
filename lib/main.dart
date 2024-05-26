@@ -1,5 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -44,6 +42,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => RecipeProvider()),
         ChangeNotifierProvider(create: (_) => SearchSettingsProvider()),
         ChangeNotifierProvider(create: (_) => CelebrationSettingsProvider()),
+        ChangeNotifierProvider(create: (_) => ConnectivityService()),
       ],
       child: Foodryp(initialLocale: initialLocale),
     ),
@@ -75,64 +74,33 @@ class Foodryp extends StatefulWidget {
 class _FoodrypState extends State<Foodryp> {
   late Locale _locale = widget.initialLocale;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  final Connectivity _connectivity = Connectivity();
-  late StreamSubscription _streamSubscription;
-  bool isOffline = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _locale = widget.initialLocale;
-    _streamSubscription = _connectivity.onConnectivityChanged.listen((result) {
-      if (result.contains(ConnectivityResult.none)) {
-        isOffline = true;
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _streamSubscription.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => ThemeProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => ConnectivityService(),
-        ),
-      ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
-          return Consumer<ConnectivityService>(
-            builder: (context, connectivityService, _) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                title: 'Foodryp',
-                theme: themeProvider.themeData,
-                locale: _locale,
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('en', 'US'),
-                  Locale('el', 'GR'),
-                ],
-                home: determineMobileLayout(connectivityService),
-              );
-            },
-          );
-        },
-      ),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        return Consumer<ConnectivityService>(
+          builder: (context, connectivityService, _) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Foodryp',
+              theme: themeProvider.themeData,
+              locale: _locale,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en', 'US'),
+                Locale('el', 'GR'),
+              ],
+              home: determineMobileLayout(connectivityService.connectionStatus),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -145,19 +113,14 @@ class _FoodrypState extends State<Foodryp> {
     });
   }
 
-  Widget determineMobileLayout(ConnectivityService connectivityService) {
-    // Check if the platform is Web
+  Widget determineMobileLayout(List<ConnectivityResult> connectionStatus) {
+    bool isOffline = connectionStatus.contains(ConnectivityResult.none);
+    
     if (kIsWeb) {
-      return connectivityService.connectionStatus
-              .contains(ConnectivityResult.none)
-          ? const OfflineRecipePage()
-          : const EntryWebNavigationPage();
+      return isOffline ? const OfflineRecipePage() : const EntryWebNavigationPage();
     } else if (defaultTargetPlatform == TargetPlatform.android ||
-        defaultTargetPlatform == TargetPlatform.iOS) {
-      return connectivityService.connectionStatus
-              .contains(ConnectivityResult.none)
-          ? const OfflineRecipePage()
-          : const BottomNavScreen();
+               defaultTargetPlatform == TargetPlatform.iOS) {
+      return isOffline ? const OfflineRecipePage() : const BottomNavScreen();
     } else {
       return const BottomNavScreen(); // Default to BottomNavScreen for other platforms
     }

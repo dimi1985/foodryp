@@ -1,14 +1,10 @@
 // ignore_for_file: use_build_context_synchronously, must_be_immutable
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
-import 'package:foodryp/widgets/CustomWidgets/celebration_meal_suggester.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:provider/provider.dart';
 

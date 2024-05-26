@@ -38,7 +38,7 @@ class Constants {
     followRequestsSent: [],
     followRequestsReceived: [],
     followRequestsCanceled: [],
-    commentId: [],
+    commentId: [], savedRecipes: [],
   );
 
   static Wikifood defaultWikifood =

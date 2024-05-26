@@ -137,6 +137,7 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: InkWell(
+                        hoverColor: Colors.transparent,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -149,9 +150,13 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                             ),
                           );
                         },
-                        child: CustomProfileRecipeCard(
-                          internalUse: '',
-                          recipe: recipe,
+                        child: SizedBox(
+                          height: 350,
+                          width: 350,
+                          child: CustomProfileRecipeCard(
+                            internalUse: '',
+                            recipe: recipe,
+                          ),
                         ),
                       ),
                     );
@@ -162,56 +167,59 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
               ),
             ),
             if (Responsive.isDesktop(context))
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 10.0,
-                    childAspectRatio: 1.0,
+  SliverPadding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    sliver: SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 10.0,
+        mainAxisSpacing: 10.0,
+        childAspectRatio: 1.0,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final recipe = recipes[index];
+          return Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                hoverColor: Colors.transparent,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RecipeDetailPage(
+                        recipe: recipe,
+                        internalUse: '',
+                        missingIngredients: const [],
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(Constants.defaultPadding),
+                    color: Colors.transparent,
                   ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final recipe = recipes[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            hoverColor: Colors.transparent,
-                           
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RecipeDetailPage(
-                                    recipe: recipe,
-                                    internalUse: '',
-                                    missingIngredients: const [],
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                    Constants.defaultPadding),
-                                color: Colors.transparent,
-                              ),
-                              child: CustomProfileRecipeCard(
-                                internalUse: '',
-                                recipe: recipe,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: recipes.length,
+                  child: SizedBox(
+                      height: 200,
+                          width: 200,
+                    child: CustomProfileRecipeCard(
+                      internalUse: '',
+                      recipe: recipe,
+                    ),
                   ),
                 ),
               ),
+            ),
+          );
+        },
+        childCount: recipes.length,
+      ),
+    ),
+  ),
+
             if (_isLoading)
               const SliverPadding(
                 padding: EdgeInsets.all(16.0),

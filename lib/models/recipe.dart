@@ -58,47 +58,37 @@ class Recipe {
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
-    return Recipe(
-      id: json['_id']?.toString() ?? '',
-      recipeTitle: json['recipeTitle'] ?? '',
-      recipeImage: json['recipeImage'] ?? '',
-      ingredients:
-          (json['ingredients'] as List<dynamic>?)?.cast<String>().toList() ??
-              [],
-      instructions:
-          (json['instructions'] as List<dynamic>?)?.cast<String>().toList() ??
-              [],
-      prepDuration: json['prepDuration'] ?? '',
-      cookDuration: json['cookDuration'] ?? '',
-      servingNumber: json['servingNumber'] ?? '',
-      difficulty: json['difficulty'] ?? '',
-      username: json['username'] ?? '',
-      useImage: json['useImage'] ?? '',
-      userId: json['userId']?.toString() ?? '',
-      dateCreated: json['dateCreated'] != null
-          ? DateTime.parse(json['dateCreated'])
-          : DateTime.now(),
-      description: json['description'] ?? '',
-      categoryId: json['categoryId']?.toString() ?? '',
-      categoryColor: json['categoryColor'] ?? '',
-      categoryFont: json['categoryFont'] ?? '',
-      categoryName: json['categoryName'] ?? '',
-      recomendedBy:
-          (json['recomendedBy'] as List<dynamic>?)?.cast<String>().toList() ??
-              [],
-      meal: (json['meal'] as List<dynamic>?)?.cast<String>().toList() ?? [],
-      commentId:
-          (json['commentId'] as List<dynamic>?)?.cast<String>().toList() ?? [],
-      isForDiet: json['isForDiet'] ?? false,
-      isForVegetarians: json['isForVegetarians'] ?? false,
-      rating: json['rating']?.toDouble() ?? 0.0,
-      ratingCount: json['ratingCount']?.toInt() ?? 0,
-      cookingAdvices:
-          (json['cookingAdvices'] as List<dynamic>?)?.cast<String>().toList() ??
-              [],
-      calories: json['calories'] ?? '',
-    );
-  }
+  return Recipe(
+    id: json['_id'] as String? ?? '',
+    recipeTitle: json['recipeTitle'] as String? ?? '',
+    recipeImage: json['recipeImage'] as String? ?? '',
+    ingredients: (json['ingredients'] as List<dynamic>?)?.map((item) => item as String).toList() ?? [],
+    instructions: (json['instructions'] as List<dynamic>?)?.map((item) => item as String).toList() ?? [],
+    prepDuration: json['prepDuration'] as String? ?? '',
+    cookDuration: json['cookDuration'] as String? ?? '',
+    servingNumber: json['servingNumber'] as String? ?? '',
+    difficulty: json['difficulty'] as String? ?? '',
+    username: json['username'] as String? ?? '',
+    useImage: json['useImage'] as String? ?? '',
+    userId: json['userId']?.toString() ?? '',
+    dateCreated: json['dateCreated'] != null ? DateTime.parse(json['dateCreated'] as String) : DateTime.now(),
+    description: json['description'] as String? ?? '',
+    categoryId: json['categoryId']?.toString() ?? '',
+    categoryColor: json['categoryColor'] as String? ?? '',
+    categoryFont: json['categoryFont'] as String? ?? '',
+    categoryName: json['categoryName'] as String? ?? 'Unknown', // Ensure this is never null
+    recomendedBy: (json['recomendedBy'] as List<dynamic>?)?.map((item) => item as String).toList() ?? [],
+    meal: (json['meal'] as List<dynamic>?)?.map((item) => item as String).toList() ?? [],
+    commentId: (json['commentId'] as List<dynamic>?)?.map((item) => item as String).toList() ?? [],
+    isForDiet: json['isForDiet'] as bool? ?? false,
+    isForVegetarians: json['isForVegetarians'] as bool? ?? false,
+    rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+    ratingCount: (json['ratingCount'] as int?) ?? 0,
+    cookingAdvices: (json['cookingAdvices'] as List<dynamic>?)?.map((item) => item as String).toList() ?? [],
+    calories: json['calories'] as String? ?? '',
+  );
+}
+
 
   Map<String, dynamic> toJson() {
     var map = {

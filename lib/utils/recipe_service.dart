@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -53,29 +54,28 @@ class RecipeService {
   }
 
   Future<bool> createRecipe(
-    String recipeTitle,
-    List<String> ingredients,
-    List<String> instructions,
-    String prepDuration,
-    String cookDuration,
-    String servingNumber,
-    String difficulty,
-    String username,
-    String useImage,
-    String userId,
-    DateTime date,
-    String description,
-    String categoryId,
-    String categoryColor,
-    String categoryFont,
-    String selectedCategoryName,
-    List<String> likedBy,
-    List<WeeklyMenu> meal,
-    bool isForDiet,
-    bool isForVegetarians,
-    List<String> cookingAdvices,
-     String calories
-  ) async {
+      String recipeTitle,
+      List<String> ingredients,
+      List<String> instructions,
+      String prepDuration,
+      String cookDuration,
+      String servingNumber,
+      String difficulty,
+      String username,
+      String useImage,
+      String userId,
+      DateTime date,
+      String description,
+      String categoryId,
+      String categoryColor,
+      String categoryFont,
+      String selectedCategoryName,
+      List<String> likedBy,
+      List<WeeklyMenu> meal,
+      bool isForDiet,
+      bool isForVegetarians,
+      List<String> cookingAdvices,
+      String calories) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/saveRecipe'),
@@ -101,7 +101,7 @@ class RecipeService {
           'isForDiet': isForDiet,
           'isForVegetarians': isForVegetarians,
           'cookingAdvices': cookingAdvices,
-            'calories': calories,
+          'calories': calories,
         }),
       );
       if (response.statusCode == 201) {
@@ -121,29 +121,28 @@ class RecipeService {
   }
 
   Future<bool> updateRecipe(
-    String recipeId,
-    String recipeTitle,
-    List<String> ingredients,
-    List<String> instructions,
-    String prepDuration,
-    String cookDuration,
-    String servingNumber,
-    String difficulty,
-    String username,
-    String userImage,
-    String userId,
-    DateTime date,
-    String description,
-    String categoryId,
-    String categoryColor,
-    String categoryFont,
-    String selectedCategoryName,
-    List<String> likedBy,
-    bool isForDiet,
-    bool isForVegetarians,
-    List<String> cookingAdvices,
-     String calories
-  ) async {
+      String recipeId,
+      String recipeTitle,
+      List<String> ingredients,
+      List<String> instructions,
+      String prepDuration,
+      String cookDuration,
+      String servingNumber,
+      String difficulty,
+      String username,
+      String userImage,
+      String userId,
+      DateTime date,
+      String description,
+      String categoryId,
+      String categoryColor,
+      String categoryFont,
+      String selectedCategoryName,
+      List<String> likedBy,
+      bool isForDiet,
+      bool isForVegetarians,
+      List<String> cookingAdvices,
+      String calories) async {
     print(recipeId);
     try {
       final response = await http.put(
@@ -451,11 +450,13 @@ class RecipeService {
   static Future<List<Recipe>> getFollowingUsersRecipes() async {
     try {
       final String userId = await UserService().getCurrentUserId();
-      final response = await http.get(Uri.parse('${Constants.baseUrl}/api/getFollowingUsersRecipes/$userId'));
+      final response = await http.get(Uri.parse(
+          '${Constants.baseUrl}/api/getFollowingUsersRecipes/$userId'));
 
       if (response.statusCode == 200) {
         List<dynamic> body = jsonDecode(response.body);
-        List<Recipe> recipes = body.map((dynamic item) => Recipe.fromJson(item)).toList();
+        List<Recipe> recipes =
+            body.map((dynamic item) => Recipe.fromJson(item)).toList();
         return recipes;
       } else {
         print('Failed to load following recipes: ${response.body}');
@@ -464,6 +465,59 @@ class RecipeService {
     } catch (e) {
       print('Error fetching following recipes: $e');
       return [];
+    }
+  }
+
+  Future<bool> saveUserRecipe(String userId, String recipeId) async {
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/saveUserRecipes/$userId'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'recipeId': recipeId}),
+    );
+    return response.statusCode == 200;
+  }
+
+  Future<bool> removeUserRecipe(String userId, String recipeId) async {
+    final uri = Uri.parse('${Constants.baseUrl}/api/removeUserRecipes/$userId');
+    log('recipeId :$recipeId');
+    log('userId: $userId');
+    final response = await http.delete(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'recipeId': recipeId}),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Failed to remove recipe');
+    }
+  }
+
+ Future<List<String>> getUserSavedRecipes(String userId) async {
+    try {
+      final response = await http.get(Uri.parse('${Constants.baseUrl}/api/getUserSavedRecipes/$userId'));
+      if (response.statusCode == 200) {
+        List<dynamic> savedRecipes = json.decode(response.body);
+        log('Fetched saved recipes for user $userId: $savedRecipes', name: 'RecipeService');
+        return savedRecipes.map((recipeId) => recipeId.toString()).toList();
+      } else {
+        log('Failed to fetch saved recipes for user $userId. Status code: ${response.statusCode}', name: 'RecipeService', error: true);
+        throw Exception('Failed to load saved recipes');
+      }
+    } catch (e) {
+      log('Exception occurred while fetching saved recipes for user $userId: $e', name: 'RecipeService', error: e);
+      throw e;
+    }
+  }
+
+    Future<List<Recipe>> getUserSavedRecipesDetails(String userId) async {
+    final response = await http.get(Uri.parse('${Constants.baseUrl}/api/getUserSavedRecipesDetails/$userId'));
+    if (response.statusCode == 200) {
+      List<dynamic> savedRecipes = json.decode(response.body);
+      return savedRecipes.map((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+    } else {
+      throw Exception('Failed to load saved recipes details');
     }
   }
 

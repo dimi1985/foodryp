@@ -14,6 +14,7 @@ class User {
   List<String>? followRequestsReceived;
   List<String>? followRequestsCanceled;
   final List<String>? commentId;
+    final List<String>? savedRecipes;
 
   User({
     required this.id,
@@ -31,6 +32,7 @@ class User {
     required this.followRequestsReceived,
     required this.followRequestsCanceled,
     required this.commentId,
+    required this.savedRecipes,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -52,6 +54,7 @@ class User {
       followRequestsReceived: json['followRequestsReceived']?.cast<String>(),
       followRequestsCanceled: json['followRequestsCanceled']?.cast<String>(),
       commentId: json['commentId']?.cast<String>(),
+      savedRecipes: json['savedRecipes']?.cast<String>(),
     );
   }
 
@@ -73,5 +76,6 @@ class User {
         'followRequestsReceived': followRequestsReceived,
         'followRequestsCanceled': followRequestsCanceled,
         'commentId': commentId,
+         'savedRecipes': savedRecipes,
       };
 }
