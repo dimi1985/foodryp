@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'dart:async';
 
@@ -6,11 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
-import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/utils/user_service.dart';
 
 class DeleteAccountPage extends StatefulWidget {
-  const DeleteAccountPage({Key? key}) : super(key: key);
+  const DeleteAccountPage({super.key});
 
   @override
   _DeleteAccountPageState createState() => _DeleteAccountPageState();

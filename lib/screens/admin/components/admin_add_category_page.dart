@@ -1,10 +1,10 @@
+// ignore_for_file: unused_field, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'dart:developer';
+
 import 'dart:io';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
@@ -259,7 +259,7 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                       .deleteCategory(widget.category?.id ?? '')
                       .then((value) {
                     if (value) {
-                      print('Category Deleted Successfully!');
+                    
                     }
                   });
                 },
@@ -339,7 +339,7 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                 );
 
                 // Perform category update if category exists, otherwise create category
-                   
+
                 bool success = isUpdating
                     ? await CategoryService().updateCategory(
                         widget.category?.id ?? '',

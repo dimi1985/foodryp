@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +8,10 @@ import 'package:foodryp/screens/offline_recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/connectivity_service.dart';
-import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
-import 'package:foodryp/utils/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

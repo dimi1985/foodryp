@@ -1,13 +1,9 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
-import 'dart:async';
-import 'dart:math';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodryp/models/recipe.dart';
-import 'package:foodryp/models/wikifood.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/comment_service.dart';
 import 'package:foodryp/utils/connectivity_service.dart';
@@ -16,7 +12,6 @@ import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/utils/wiki_food_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/recipe_save_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -86,7 +81,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
           await CommentService().getCommsentsByRecipeId(widget.recipe.id ?? '');
       setState(() {});
     } catch (error) {
-      print('Failed to load comments: $error');
+      if (kDebugMode) {
+        print('Failed to load comments: $error');
+      }
     }
   }
 

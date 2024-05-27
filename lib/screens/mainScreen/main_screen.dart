@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import '../../widgets/desktopLeftSide/desktopLeftSide.dart';
 import '../../widgets/DesktopMiddleSide/desktopMiddleSide.dart';
@@ -8,7 +7,7 @@ import '../../widgets/desktopRightSide/desktopRightSide.dart';
 
 class MainScreen extends StatefulWidget {
   final User? user;
-  const MainScreen({Key? key, this.user});
+  const MainScreen({super.key, this.user});
 
   @override
   State<MainScreen> createState() => _MainScreenState();

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
@@ -869,10 +868,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                     .height /
                                                                 4,
                                                           )
-                                                        : Container(
-                                                            child: Text(
-                                                                'No Image'),
-                                                          ),
+                                                        : const Text(
+                                                            'No Image'),
                                                   ),
                                                 )
                                               : Center(

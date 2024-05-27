@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/token_manager.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,17 +50,17 @@ class UserService {
           'followedByRequest': followedByRequest,
         }),
       );
+
+      final responseData = jsonDecode(response.body);
+
       if (response.statusCode == 201) {
-        // Registration successful
-        final responseData = jsonDecode(response.body);
         final userID = responseData['userId'];
-
         await saveUserIDLocally(userID);
-        _user = Constants.defaultUser;
-
         return true;
+      } else {
+        print('Error: ${responseData['message']}');
+        return false;
       }
-      return false;
     } catch (e) {
       print('Error registering user: $e');
       return false;
@@ -78,10 +79,17 @@ class UserService {
       );
 
       final responseData = jsonDecode(response.body);
-      final userID = responseData['userId'];
 
-      await saveUserIDLocally(userID);
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        final userID = responseData['userId'];
+        final token = responseData['token'];
+        await saveUserIDLocally(userID);
+        TokenManager.saveTokenLocally(token);
+        return true;
+      } else {
+        print('Error: ${responseData['message']}');
+        return false;
+      }
     } catch (e) {
       print('Error logging in user: $e');
       return false;
@@ -89,24 +97,32 @@ class UserService {
   }
 
   Future<User?> getUserProfile() async {
-    await _initPrefs();
-    final userId =
-        _prefs.getString('userId'); // Use 'userId' instead of 'userID'
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  final token = await TokenManager.getTokenLocally();
+  final headers = {'Authorization': 'Bearer $token'};
+  
+  try {
+    final response = await http.get(
+      Uri.parse('${Constants.baseUrl}/api/userProfile/$userId'),
+      headers: headers,
+    );
 
-    try {
-      final response = await http.get(
-        Uri.parse('${Constants.baseUrl}/api/userProfile/$userId'),
-      );
-      if (response.statusCode == 200) {
-        final userData = jsonDecode(response.body);
-        return User.fromJson(userData);
-      }
-      return null;
-    } catch (e) {
-      print('Error fetching user profile: $e');
+    if (response.statusCode == 200) {
+      final userData = jsonDecode(response.body);
+      return User.fromJson(userData); // Return User object if profile is found
+    } else {
+      // Handle other status codes, e.g., profile not found
+      print('Error fetching user profile: ${response.statusCode}');
       return null;
     }
+  } catch (e) {
+    // Handle network errors or other exceptions
+    print('Error fetching user profile: $e');
+    return null;
   }
+}
+
 
   Future<User?> getPublicUserProfile(String username) async {
     try {
@@ -124,50 +140,56 @@ class UserService {
     }
   }
 
-  Future<void> uploadImageProfile(File image, List<int>? bytes) async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
+ Future<void> uploadImageProfile(File image, List<int>? bytes) async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
 
-    try {
-      String url = '${Constants.baseUrl}/api/uploadProfilePic';
-      var request = http.MultipartRequest('POST', Uri.parse(url));
+  try {
+    final token = await TokenManager.getTokenLocally();
+    final headers = {'Authorization': 'Bearer $token'};
 
-      String filename = 'user-$userId-${DateTime.now()}.jpg';
+    String url = '${Constants.baseUrl}/api/uploadProfilePic';
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    
+    // Add headers to the request
+    request.headers.addAll(headers);
 
-      if (kIsWeb) {
-        // For web platform
-        request.fields['userId'] = userId!;
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            'profilePicture',
-            bytes!,
-            filename: filename,
-          ),
-        );
-      } else {
-        // For Android platform
+    String filename = 'user-$userId-${DateTime.now()}.jpg';
 
-        request.fields['userId'] = userId!;
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'profilePicture',
-            image.path,
-          ),
-        );
-      }
-
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        // Profile picture uploaded successfully
-        // Handle the response data as needed
-      } else {
-        // Error uploading profile picture
-      }
-    } catch (e) {
-      // Handle upload error
-      print('Error uploading profile picture: $e');
+    if (kIsWeb) {
+      // For web platform
+      request.fields['userId'] = userId!;
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'profilePicture',
+          bytes!,
+          filename: filename,
+        ),
+      );
+    } else {
+      // For Android platform
+      request.fields['userId'] = userId!;
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'profilePicture',
+          image.path,
+        ),
+      );
     }
+
+    var response = await request.send();
+    if (response.statusCode == 200) {
+      // Profile picture uploaded successfully
+      // Handle the response data as needed
+    } else {
+      // Error uploading profile picture
+    }
+  } catch (e) {
+    // Handle upload error
+    print('Error uploading profile picture: $e');
   }
+}
+
 
 //Admin Methods
   static Future<List<User>> getAllUsers() async {
@@ -237,151 +259,180 @@ class UserService {
   }
 
   Future<void> deleteUser() async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
-    try {
-      final url = Uri.parse('${Constants.baseUrl}/api/deleteUser/$userId');
-      final response = await http.delete(url);
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  try {
+    final token = await TokenManager.getTokenLocally();
+    final headers = {'Authorization': 'Bearer $token'};
+    
+    final url = Uri.parse('${Constants.baseUrl}/api/deleteUser/$userId');
+    final response = await http.delete(
+      url,
+      headers: headers, // Include authorization headers
+    );
 
-      if (response.statusCode == 200) {
-        // User deleted successfully
-        clearUserId();
-        print('User deleted successfully');
-      } else {
-        // Handle error deleting user
-        print('Error deleting user: ${response.statusCode}');
-      }
-    } catch (e) {
-      // Handle network error
-      print('Network error: $e');
+    if (response.statusCode == 200) {
+      // User deleted successfully
+      clearUserId();
+      print('User deleted successfully');
+    } else {
+      // Handle error deleting user
+      print('Error deleting user: ${response.statusCode}');
     }
+  } catch (e) {
+    // Handle network error
+    print('Network error: $e');
   }
+}
+
 
   Future<void> followUser(String userToFollowId) async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
-    try {
-      final response = await http.post(
-        Uri.parse('${Constants.baseUrl}/api/sendFollowRequest'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({
-          'userId': userId,
-          'userToFollowId': userToFollowId,
-        }),
-      );
-      if (response.statusCode == 200) {
-        // Successfully followed user
-        // You can update the UI or perform any other necessary actions
-        print('Following Use Sent!!');
-      } else {
-        // Handle non-200 status code
-        // You can show an error message to the user
-        print('Following Not Sent!!');
-      }
-    } catch (e) {
-      print('Error following user: $e');
-      // Handle error
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  try {
+    final token = await TokenManager.getTokenLocally();
+    final headers = {'Authorization': 'Bearer $token'};
+    
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/sendFollowRequest'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        ...headers, // Include authorization headers
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'userToFollowId': userToFollowId,
+      }),
+    );
+    if (response.statusCode == 200) {
+      // Successfully followed user
+      // You can update the UI or perform any other necessary actions
+      print('Following User Sent!');
+    } else {
+      // Handle non-200 status code
       // You can show an error message to the user
+      print('Following Not Sent!');
     }
+  } catch (e) {
+    print('Error following user: $e');
+    // Handle error
+    // You can show an error message to the user
   }
+}
+
 
   Future<bool> rejectFollowRequest(String userToRejectId) async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
-    try {
-      final response = await http.post(
-        Uri.parse('${Constants.baseUrl}/api/rejectFollowRequest'),
-        body: {
-          'userId': userId, // The ID of the current user
-          'userToRejectId':
-              userToRejectId, // The ID of the user whose follow request is being rejected
-        },
-      );
-      if (response.statusCode == 200) {
-        // Request rejected successfully
-        // You can update the UI or perform any other necessary actions
-        return true;
-      } else {
-        // Handle non-200 status code
-        // You can show an error message to the user
-        return false;
-      }
-    } catch (e) {
-      print('Error rejecting follow request: $e');
-      // Handle error
-      // You can show a
-      //n error message to the user
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  try {
+    final token = await TokenManager.getTokenLocally();
+    final headers = {'Authorization': 'Bearer $token'};
+    
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/rejectFollowRequest'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        ...headers, // Include authorization headers
+      },
+      body: jsonEncode({
+        'userId': userId, // The ID of the current user
+        'userToRejectId': userToRejectId, // The ID of the user whose follow request is being rejected
+      }),
+    );
+    if (response.statusCode == 200) {
+      // Request rejected successfully
+      // You can update the UI or perform any other necessary actions
       return true;
+    } else {
+      // Handle non-200 status code
+      // You can show an error message to the user
+      return false;
     }
+  } catch (e) {
+    print('Error rejecting follow request: $e');
+    // Handle error
+    // You can show an error message to the user
+    return true;
   }
+}
+
 
   Future<bool> unFollow(String userToUnfollowId) async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
-    try {
-      final response = await http.post(
-        Uri.parse('${Constants.baseUrl}/api/unfollowUser'),
-        body: {
-          'userId': userId, // The ID of the current user
-          'userToUnfollowId':
-              userToUnfollowId, // The ID of the user whose follow request is being rejected
-        },
-        // Add any necessary headers, such as authorization token
-      );
-      if (response.statusCode == 200) {
-        // Successfully followed user back
-        // You can update the UI or perform any other necessary actions
-        return true;
-      } else {
-        // Handle non-200 status code
-        // You can show an error message to the user
-        return false;
-      }
-    } catch (e) {
-      print('Error following user back: $e');
-      // Handle error
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  try {
+    final token = await TokenManager.getTokenLocally();
+    final headers = {'Authorization': 'Bearer $token'};
+
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/unfollowUser'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        ...headers, // Include authorization headers
+      },
+      body: jsonEncode({
+        'userId': userId, // The ID of the current user
+        'userToUnfollowId': userToUnfollowId, // The ID of the user to unfollow
+      }),
+    );
+    if (response.statusCode == 200) {
+      // Successfully unfollowed user
+      // You can update the UI or perform any other necessary actions
+      return true;
+    } else {
+      // Handle non-200 status code
       // You can show an error message to the user
       return false;
     }
+  } catch (e) {
+    print('Error unfollowing user: $e');
+    // Handle error
+    // You can show an error message to the user
+    return false;
   }
+}
+
 
   Future<bool> followBack(String userToFollowBackId) async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
-    try {
-      final response = await http.post(
-        Uri.parse('${Constants.baseUrl}/api/followUserBack'),
-        body: {
-          'userId': userId, // The ID of the current user
-          'userToFollowBackId': userToFollowBackId,
-        },
-        // Add any necessary headers, such as authorization token
-      );
-      if (response.statusCode == 200) {
-        // Successfully followed user back
-        // You can update the UI or perform any other necessary actions
-        return true;
-      } else {
-        // Handle non-200 status code
-        // You can show an error message to the user
-        return false;
-      }
-    } catch (e) {
-      print('Error following user back: $e');
-      // Handle error
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  try {
+    final token = await TokenManager.getTokenLocally();
+    final headers = {'Authorization': 'Bearer $token'};
+
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/followUserBack'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        ...headers, // Include authorization headers
+      },
+      body: jsonEncode({
+        'userId': userId, // The ID of the current user
+        'userToFollowBackId': userToFollowBackId, // The ID of the user to follow back
+      }),
+    );
+    if (response.statusCode == 200) {
+      // Successfully followed user back
+      // You can update the UI or perform any other necessary actions
+      return true;
+    } else {
+      // Handle non-200 status code
       // You can show an error message to the user
       return false;
     }
+  } catch (e) {
+    print('Error following user back: $e');
+    // Handle error
+    // You can show an error message to the user
+    return false;
   }
+}
+
 
   Future<void> saveUserIDLocally(String userId) async {
     await _initPrefs(); // Initialize SharedPreferences
     await _prefs.setString('userId', userId); // Save userID locally
   }
-
-  
 
   Future<void> clearUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -389,23 +440,20 @@ class UserService {
   }
 
   Future<String> getCurrentUserId() async {
-    await _initPrefs(); 
-    String? userId =
-        _prefs.getString('userId'); 
-    return userId ?? ''; 
+    await _initPrefs();
+    String? userId = _prefs.getString('userId');
+    return userId ?? '';
   }
 
-  
   Future<void> saveOneTimeSheetShow() async {
-    await _initPrefs(); 
-    await _prefs.setBool('OneTimeSheetShow', true); 
+    await _initPrefs();
+    await _prefs.setBool('OneTimeSheetShow', true);
   }
 
-   Future<bool> getsaveOneTimeSheetShow() async {
-    await _initPrefs(); 
-    bool? oneTimeShow =
-        _prefs.getBool('OneTimeSheetShow');
-    return oneTimeShow ?? false; 
+  Future<bool> getsaveOneTimeSheetShow() async {
+    await _initPrefs();
+    bool? oneTimeShow = _prefs.getBool('OneTimeSheetShow');
+    return oneTimeShow ?? false;
   }
 
   Future<bool> changeCredentials({

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -46,7 +46,9 @@ class MealService {
       }
       return false;
     } catch (e) {
-      print('Error saving weekly menu: $e');
+      if (kDebugMode) {
+        print('Error saving weekly menu: $e');
+      }
       return false;
     }
   }
@@ -81,7 +83,9 @@ class MealService {
         return [];
       }
     } catch (e) {
-      print('Error fetching weekly menus: $e');
+      if (kDebugMode) {
+        print('Error fetching weekly menus: $e');
+      }
       // Handle error
       return [];
     }
@@ -117,7 +121,9 @@ class MealService {
         return [];
       }
     } catch (e) {
-      print('Error fetching fixed-length weekly menus: $e');
+      if (kDebugMode) {
+        print('Error fetching fixed-length weekly menus: $e');
+      }
       // Handle error
       return [];
     }
@@ -156,7 +162,9 @@ class MealService {
         return [];
       }
     } catch (e) {
-      print('Error fetching weekly menus: $e');
+      if (kDebugMode) {
+        print('Error fetching weekly menus: $e');
+      }
       // Handle error
       return [];
     }
@@ -193,7 +201,9 @@ class MealService {
         return [];
       }
     } catch (e) {
-      print('Error fetching weekly menus: $e');
+      if (kDebugMode) {
+        print('Error fetching weekly menus: $e');
+      }
       // Handle error
       return [];
     }
@@ -239,7 +249,9 @@ class MealService {
       }
       return false;
     } catch (e) {
-      print('Error updating weekly menu: $e');
+      if (kDebugMode) {
+        print('Error updating weekly menu: $e');
+      }
       return false;
     }
   }

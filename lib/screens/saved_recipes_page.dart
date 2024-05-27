@@ -54,17 +54,22 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           ? const Center(child: CircularProgressIndicator())
           : _savedRecipes.isEmpty
               ?  Center(child: Text(AppLocalizations.of(context).translate('No saved recipes')))
-              : ListView.builder(
-                  itemCount: _savedRecipes.length,
-                  itemBuilder: (context, index) {
-                    var recipe = _savedRecipes[index];
-                    return SizedBox(
-                        height: 300,
-                        width: 300,
-                        child:
-                            CustomRecipeCard(internalUse: '', recipe: recipe));
-                  },
+              : Center(
+                child: Container(
+                   constraints: const BoxConstraints(maxWidth: 600),
+                  child: ListView.builder(
+                      itemCount: _savedRecipes.length,
+                      itemBuilder: (context, index) {
+                        var recipe = _savedRecipes[index];
+                        return SizedBox(
+                            height: 300,
+                            width: 300,
+                            child:
+                                CustomRecipeCard(internalUse: '', recipe: recipe));
+                      },
+                    ),
                 ),
+              ),
     );
   }
 }

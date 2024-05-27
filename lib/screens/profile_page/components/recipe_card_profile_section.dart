@@ -1,4 +1,6 @@
-import 'dart:developer';
+
+// ignore_for_file: use_key_in_widget_constructors
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
@@ -6,7 +8,6 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_profile_recipe_card.dart';
-import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 
 class RecipeCardProfileSection extends StatefulWidget {
   final String publicUsername;

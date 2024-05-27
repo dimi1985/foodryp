@@ -119,6 +119,7 @@ class CustomCategoryCard extends StatelessWidget {
                                   Constants.emptyField,
                               fit: BoxFit.cover,
                               width: screenSize.width,
+                              height: screenSize.height,
                               filterQuality: FilterQuality.none,
                               progressIndicatorBuilder:
                                   (context, url, downloadProgress) => Center(

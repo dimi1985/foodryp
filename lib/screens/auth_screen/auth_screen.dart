@@ -1,6 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/screens/auth_screen/components/reusable_textfield.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
@@ -28,11 +26,68 @@ class _AuthScreenState extends State<AuthScreen> {
   TextEditingController userNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  bool isLogin = false;
+  bool isLogin = true; // Set to true to show login screen first
   bool obscureText = true;
   bool isLoading = false;
   final UserService _userService = UserService();
   Gender? _selectedGender;
+
+  void _handleAuth(bool isAndroid) async {
+    setState(() {
+      isLoading = true; // Show loading indicator
+    });
+
+    try {
+      bool success = false;
+      String message = '';
+
+      if (!isLogin) {
+        // Perform registration
+        String selectedGender = _selectedGender.toString().split('.').last;
+
+        success = await _userService.registerUser(
+          userNameController.text,
+          emailController.text,
+          passwordController.text,
+          selectedGender,
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+        );
+
+        if (!success) {
+          message = 'Registration failed: Email or Username already exists';
+        }
+      } else {
+        // Perform login
+        success = await _userService.loginUser(
+          emailController.text,
+          passwordController.text,
+        );
+
+        if (!success) {
+          message = 'Login failed: Invalid email or password';
+        }
+      }
+
+      if (success) {
+        // Authentication successful
+        await navigateToHomeScreen(context, isAndroid);
+      } else {
+        // Authentication failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } finally {
+      setState(() {
+        isLoading = false; // Hide loading indicator
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,23 +115,20 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(height: 30.0),
                     ReusableTextField(
-                      hintText:
-                          'Email', // Ensure this matches the case in getIcon
+                      hintText: 'Email',
                       controller: emailController,
                       togglePasswordVisibility: (isVisible) {},
                     ),
                     const SizedBox(height: 15.0),
                     if (!isLogin)
                       ReusableTextField(
-                        hintText:
-                            'Username', // Ensure this matches the case in getIcon
+                        hintText: 'Username',
                         controller: userNameController,
                         togglePasswordVisibility: (isVisible) {},
                       ),
                     const SizedBox(height: 15.0),
                     ReusableTextField(
-                      hintText:
-                          'Password', // Ensure this matches the case in getIcon
+                      hintText: 'Password',
                       controller: passwordController,
                       obscureText: obscureText,
                       togglePasswordVisibility: (isVisible) {
@@ -228,63 +280,8 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  void _handleAuth(bool isAndroid) async {
-    setState(() {
-      isLoading = true; // Show loading indicator
-    });
-
-    try {
-      if (!isLogin) {
-        // Perform registration
-
-        String selectedGender = _selectedGender.toString().split('.').last;
-
-        final success = await _userService.registerUser(
-          userNameController.text,
-          emailController.text,
-          passwordController.text,
-          selectedGender.toString().split('.').last,
-          [],
-          [],
-          [],
-          [],
-          [],
-          [],
-        );
-
-        if (success) {
-          // Registration successful
-
-          await navigateToHomeScreen(context, isAndroid);
-        } else {
-          // Registration failed
-        }
-      } else {
-        // Perform login
-
-        final success = await _userService.loginUser(
-          emailController.text,
-          passwordController.text,
-        );
-
-        if (success) {
-          // Login successful
-          await navigateToHomeScreen(context, isAndroid);
-        } else {
-          // Login failed
-        }
-      }
-    } finally {
-      setState(() {
-        isLoading = false; // Hide loading indicator
-      });
-    }
-  }
-
   Future<void> navigateToHomeScreen(
       BuildContext context, bool isAndroid) async {
-    
-
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
@@ -294,6 +291,4 @@ class _AuthScreenState extends State<AuthScreen> {
       (Route<dynamic> route) => false,
     );
   }
-
-  
 }

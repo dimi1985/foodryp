@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/celebration_day.dart';
 import 'package:foodryp/models/recipe.dart';
-import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/wikifood.dart';
 import 'package:foodryp/utils/app_localizations.dart';

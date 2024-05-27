@@ -4,14 +4,11 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/meal_service.dart';
-import 'package:foodryp/utils/responsive.dart';
-
 class WeeklyMenuDeletionConfirmationScreen extends StatelessWidget {
   final WeeklyMenu weeklyMenu;
 
@@ -22,7 +19,6 @@ class WeeklyMenuDeletionConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = Responsive.isMobile(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).translate('Confirm Deletion')),
@@ -92,7 +88,9 @@ class WeeklyMenuDeletionConfirmationScreen extends StatelessWidget {
         }
       } catch (error) {
         Navigator.pop(context); // Close the alert dialog in case of error
-        print('Failed to remove recipe from weekly menu: $error');
+        if (kDebugMode) {
+          print('Failed to remove recipe from weekly menu: $error');
+        }
       }
     }
 

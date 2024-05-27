@@ -1,13 +1,10 @@
 // ignore_for_file: library_private_types_in_public_api
-
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/screens/recipe_by_category_page/recipe_by_category_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
-import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_category_card.dart';
 
 class CategoryPage extends StatefulWidget {

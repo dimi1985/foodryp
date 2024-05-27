@@ -1,9 +1,8 @@
-import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_creator_card.dart';
 
@@ -42,13 +41,14 @@ class _CreatorsPageState extends State<CreatorsPage> {
         });
       }
     } catch (e) {
-      print('Error fetching users: $e');
+      if (kDebugMode) {
+        print('Error fetching users: $e');
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(Constants.defaultPadding),

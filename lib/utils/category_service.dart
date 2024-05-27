@@ -1,6 +1,5 @@
-import 'dart:developer';
+// ignore_for_file: unnecessary_null_comparison
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/contants.dart';
@@ -150,15 +149,21 @@ class CategoryService {
           // Handle the response data as needed
         } else {
           // Error uploading category image
-          print('Error uploading category image: ${response.statusCode}');
+          if (kDebugMode) {
+            print('Error uploading category image: ${response.statusCode}');
+          }
         }
       } else {
         // No image selected
-        print('No file selected');
+        if (kDebugMode) {
+          print('No file selected');
+        }
       }
     } catch (e) {
       // Handle upload error
-      print('Error uploading category image: $e');
+      if (kDebugMode) {
+        print('Error uploading category image: $e');
+      }
     }
   }
 
@@ -191,7 +196,9 @@ class CategoryService {
       }
       return false;
     } catch (e) {
-      print('Error updating category: $e');
+      if (kDebugMode) {
+        print('Error updating category: $e');
+      }
       return false;
     }
   }
@@ -207,7 +214,9 @@ class CategoryService {
       }
       return false;
     } catch (e) {
-      print('Error deleting category: $e');
+      if (kDebugMode) {
+        print('Error deleting category: $e');
+      }
       return false;
     }
   }

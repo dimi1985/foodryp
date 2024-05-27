@@ -1,5 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-import 'dart:developer';
+
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +10,13 @@ import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/screens/settings_page/components/delete_account_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
-import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/language.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
+import 'package:foodryp/utils/token_manager.dart';
 import 'package:foodryp/utils/user_service.dart';
-import 'package:foodryp/widgets/CustomWidgets/celebration_input.dart';
 import 'package:foodryp/widgets/CustomWidgets/changeFieldDialog.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:foodryp/widgets/CustomWidgets/language_settings_tile.dart';
@@ -80,9 +79,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
     final searchSettingsProvider = Provider.of<SearchSettingsProvider>(context);
-    final settingsProvider = Provider.of<CelebrationSettingsProvider>(context);
 
-    int currentSelection = settingsProvider.daysBeforeNotification;
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -501,6 +499,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void signout(BuildContext context) async {
     // Clear user ID from shared preferences
     await UserService().clearUserId();
+    await TokenManager.clearTokenLocally();
     // Navigating to the main screen
     Navigator.pushAndRemoveUntil(
       context,

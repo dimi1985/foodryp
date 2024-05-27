@@ -1,5 +1,5 @@
 // ignore_for_file: use_build_context_synchronously, must_be_immutable
-import 'dart:developer';
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';

@@ -118,179 +118,144 @@ class _MyFridgePageState extends State<MyFridgePage>
   }
 
   String removeGreekDiacritics(String input) {
-    const Map<String, String> diacriticMap = {
-      'Ά': 'Α',
-      'Έ': 'Ε',
-      'Ή': 'Η',
-      'Ί': 'Ι',
-      'Ό': 'Ο',
-      'Ύ': 'Υ',
-      'Ώ': 'Ω',
-      'ά': 'α',
-      'έ': 'ε',
-      'ή': 'η',
-      'ί': 'ι',
-      'ό': 'ο',
-      'ύ': 'υ',
-      'ώ': 'ω',
-      'ϊ': 'ι',
-      'ϋ': 'υ',
-      'ΐ': 'ι',
-      'ΰ': 'υ',
-    };
+  const Map<String, String> diacriticMap = {
+    'Ά': 'Α',
+    'Έ': 'Ε',
+    'Ή': 'Η',
+    'Ί': 'Ι',
+    'Ό': 'Ο',
+    'Ύ': 'Υ',
+    'Ώ': 'Ω',
+    'ά': 'α',
+    'έ': 'ε',
+    'ή': 'η',
+    'ί': 'ι',
+    'ό': 'ο',
+    'ύ': 'υ',
+    'ώ': 'ω',
+    'ϊ': 'ι',
+    'ϋ': 'υ',
+    'ΐ': 'ι',
+    'ΰ': 'υ',
+  };
 
-    final buffer = StringBuffer();
-    for (int i = 0; i < input.length; i++) {
-      final char = input[i];
-      buffer.write(diacriticMap[char] ?? char);
-    }
-    return buffer.toString();
+  final buffer = StringBuffer();
+  for (int i = 0; i < input.length; i++) {
+    final char = input[i];
+    buffer.write(diacriticMap[char] ?? char);
+  }
+  return buffer.toString();
+}
+
+String normalizeString(String input) {
+  return removeGreekDiacritics(input.toLowerCase().replaceAll(
+    RegExp(r'[^a-zα-ωάέήίόύώ0-9 ]'),
+    '',
+  ));
+}
+
+String toSingular(String word) {
+  if (word.endsWith('ες')) {
+    return '${word.substring(0, word.length - 2)}α';
+  }
+  if (word.endsWith('οι')) {
+    return '${word.substring(0, word.length - 2)}ος';
+  }
+  return word;
+}
+
+bool ingredientMatches(
+    String recipeIngredient, List<String> fridgeItemsNormalized) {
+  List<String> ignoreWords = [
+    'of', 'the', 'with', 'a', 'an', 'some', 'in', 'for', 'on', 'at', 'to', 'from', 'by', 'as',
+    'της', 'σου', 'κρεας', 'κρέας', 'κον', 'κασσε', 'g', 'kg', 'ml', 'l', 'cup', 'cups', 'tbsp', 'tsp',
+  ];
+
+  List<String> wordsInIngredient = normalizeString(recipeIngredient)
+      .split(' ')
+      .where((word) => !ignoreWords.contains(word) && word.length > 2)
+      .toList();
+
+  String normalizedRecipeIngredient = normalizeString(recipeIngredient);
+  if (fridgeItemsNormalized.contains(normalizedRecipeIngredient)) {
+    return true;
   }
 
-  String normalizeString(String input) {
-    return removeGreekDiacritics(input.toLowerCase().replaceAll(
-          RegExp(r'[^a-zα-ωάέήίόύώ0-9 ]'),
-          '',
-        ));
-  }
+  List<List<String>> fridgeItemWordsList = fridgeItemsNormalized.map((item) {
+    return normalizeString(item).split(' ');
+  }).toList();
 
-  String toSingular(String word) {
-    if (word.endsWith('ες')) {
-      return '${word.substring(0, word.length - 2)}α';
-    }
-    if (word.endsWith('οι')) {
-      return '${word.substring(0, word.length - 2)}ος';
-    }
-    return word;
-  }
-
-// Function to check if any fridge item matches any recipe ingredient
-  bool ingredientMatches(
-      String recipeIngredient, List<String> fridgeItemsNormalized) {
-    // List of common words and quantities to ignore for more meaningful matches
-    List<String> ignoreWords = [
-      'of',
-      'the',
-      'with',
-      'a',
-      'an',
-      'some',
-      'in',
-      'for',
-      'on',
-      'at',
-      'to',
-      'from',
-      'by',
-      'as',
-      'της',
-      'σου',
-      'κρεας',
-      'κρέας',
-      'κον',
-      'κασσε',
-      'g',
-      'kg',
-      'ml',
-      'l',
-      'cup',
-      'cups',
-      'tbsp',
-      'tsp',
-    ];
-
-    // Normalize and split the ingredient into words, filtering out ignored words
-    List<String> wordsInIngredient = normalizeString(recipeIngredient)
-        .split(' ')
-        .where((word) => !ignoreWords.contains(word) && word.length > 2)
-        .toList();
-
-    // Check if any normalized fridge item exactly matches the normalized ingredient
-    String normalizedRecipeIngredient = normalizeString(recipeIngredient);
-    if (fridgeItemsNormalized.contains(normalizedRecipeIngredient)) {
-      return true;
-    }
-
-    // Normalize each fridge item into words
-    List<List<String>> fridgeItemWordsList = fridgeItemsNormalized.map((item) {
-      return normalizeString(item).split(' ');
-    }).toList();
-
-    // Check if any fridge item matches the recipe ingredient meaningfully
-    return fridgeItemWordsList.any((fridgeItemWords) {
-      if (fridgeItemWords.length > 1) {
-        // For multi-word fridge items, check if all words are in the recipe ingredient
-        bool allWordsMatch = fridgeItemWords.every((fridgeWord) =>
-            wordsInIngredient.contains(fridgeWord) ||
-            wordsInIngredient.any((word) =>
-                word.contains(fridgeWord) || fridgeWord.contains(word)));
-        if (allWordsMatch) {
+  return fridgeItemWordsList.any((fridgeItemWords) {
+    if (fridgeItemWords.length > 1) {
+      bool allWordsMatch = fridgeItemWords.every((fridgeWord) =>
+          wordsInIngredient.contains(fridgeWord) ||
+          wordsInIngredient.any((word) =>
+              word.contains(fridgeWord) || fridgeWord.contains(word)));
+      if (allWordsMatch) {
+        return true;
+      }
+    } else {
+      return fridgeItemWords.any((fridgeWord) {
+        if (wordsInIngredient.contains(fridgeWord)) {
           return true;
         }
-      } else {
-        // For single-word fridge items, check for exact matches only
-        return fridgeItemWords.any((fridgeWord) {
-          if (wordsInIngredient.contains(fridgeWord)) {
-            return true;
-          }
-          return false;
-        });
-      }
-      return false;
-    });
-  }
-
-  Future<void> _fetchRecipes() async {
-    if (mounted) {
-      setState(() {
-        _isLoading = true;
+        return false;
       });
     }
-    try {
-      var fetchedRecipes = await RecipeService().getAllRecipesByPage(
-        _currentPage,
-        _pageSize,
-      );
+    return false;
+  });
+}
 
-      filteredRecipes.clear();
+Future<void> _fetchRecipes() async {
+  if (mounted) {
+    setState(() {
+      _isLoading = true;
+    });
+  }
+  try {
+    var fetchedRecipes = await RecipeService().getAllRecipesByPage(
+      _currentPage,
+      _pageSize,
+    );
 
-      if (fridgeItems != null) {
-        List<String> fridgeItemsNormalized =
-            fridgeItems!.map((item) => normalizeString(item['name'])).toList();
+    filteredRecipes.clear();
 
-        for (var recipe in fetchedRecipes) {
-          bool hasMatchingIngredient = false;
-          List<String> missingIngredients = [];
-          List<String> matchedIngredients = [];
+    if (fridgeItems != null) {
+      List<String> fridgeItemsNormalized =
+          fridgeItems!.map((item) => normalizeString(item['name'])).toList();
 
-          for (var ingredient in recipe.ingredients ?? []) {
-            if (ingredientMatches(ingredient, fridgeItemsNormalized)) {
-              hasMatchingIngredient = true; // At least one ingredient matches
-              matchedIngredients.add(ingredient);
-            } else {
-              missingIngredients.add(ingredient); // Collect missing ingredients
-            }
-          }
+      for (var recipe in fetchedRecipes) {
+        bool hasMatchingIngredient = false;
+        List<String> missingIngredients = [];
+        List<String> matchedIngredients = [];
 
-          if (hasMatchingIngredient) {
-            filteredRecipes.add(
-                recipe); // Add the recipe if at least one ingredient matches
-            // print(
-            //     'Recipe ${recipe.id} matched ingredients: ${matchedIngredients.join(', ')}');
-          }
-
-          if (missingIngredients.isNotEmpty) {
-            recipeMissingIngredients[recipe.id!] = missingIngredients;
+        for (var ingredient in recipe.ingredients ?? []) {
+          if (ingredientMatches(ingredient, fridgeItemsNormalized)) {
+            hasMatchingIngredient = true;
+            matchedIngredients.add(ingredient);
           } else {
-            recipeMissingIngredients[recipe.id!] = [];
+            missingIngredients.add(ingredient);
           }
         }
 
-        // Print to verify the updated missing ingredients list
-        recipeMissingIngredients.forEach((id, missing) {
-          // print(
-          //     'Recipe ID $id is missing these ingredients: ${missing.join(', ')}');
-        });
+        // If no exact match found, try partial match
+        if (!hasMatchingIngredient) {
+          for (var ingredient in recipe.ingredients ?? []) {
+            if (fridgeItemsNormalized.any((fridgeItem) =>
+                normalizeString(fridgeItem).contains(normalizeString(ingredient)) ||
+                normalizeString(ingredient).contains(normalizeString(fridgeItem)))) {
+              hasMatchingIngredient = true;
+              matchedIngredients.add(ingredient);
+              missingIngredients.remove(ingredient);
+            }
+          }
+        }
+
+        if (hasMatchingIngredient) {
+          filteredRecipes.add(recipe);
+        }
+
+        recipeMissingIngredients[recipe.id!] = missingIngredients;
       }
 
       if (mounted) {
@@ -299,15 +264,17 @@ class _MyFridgePageState extends State<MyFridgePage>
           _isLoading = false;
         });
       }
-    } catch (e) {
-      print('Error fetching recipes: $e');
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    }
+  } catch (e) {
+    print('Error fetching recipes: $e');
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
+}
+
 
   Future<void> _fetchMoreRecipes() async {
     if (!_isLoading) {

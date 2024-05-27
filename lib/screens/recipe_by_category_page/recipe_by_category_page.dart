@@ -1,21 +1,18 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
-import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
-import 'package:provider/provider.dart';
 
 class RecipeByCategoryPage extends StatefulWidget {
   final CategoryModel category;
 
-  const RecipeByCategoryPage({Key? key, required this.category})
-      : super(key: key);
+  const RecipeByCategoryPage({super.key, required this.category});
 
   @override
   _RecipeByCategoryPageState createState() => _RecipeByCategoryPageState();
@@ -80,7 +77,9 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
         _page++; // Increment page number for the next fetch
       });
     } catch (e) {
-      print('Error fetching recipes: $e');
+      if (kDebugMode) {
+        print('Error fetching recipes: $e');
+      }
       setState(() {
         _isLoading = false;
         timesCalled = 0;
@@ -105,7 +104,9 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
           _page++; // Increment page number for the next fetch
         });
       } catch (e) {
-        print('Error fetching more recipes: $e');
+        if (kDebugMode) {
+          print('Error fetching more recipes: $e');
+        }
         setState(() {
           _isLoading = false;
         });
@@ -135,7 +136,9 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
         _page++; // Increment page number for the next fetch
       });
     } catch (e) {
-      print('Error fetching recipes: $e');
+      if (kDebugMode) {
+        print('Error fetching recipes: $e');
+      }
       setState(() {
         _isLoading = false;
         timesCalled = 0;

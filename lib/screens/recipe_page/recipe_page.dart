@@ -1,4 +1,6 @@
-import 'dart:ui';
+
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -77,7 +79,9 @@ class _RecipePageState extends State<RecipePage> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error fetching recipes: $e');
+      if (kDebugMode) {
+        print('Error fetching recipes: $e');
+      }
       setState(() => _isLoading = false);
     }
   }
@@ -124,7 +128,9 @@ class _RecipePageState extends State<RecipePage> {
           }
         });
       } catch (e) {
-        print('Error fetching more recipes: $e');
+        if (kDebugMode) {
+          print('Error fetching more recipes: $e');
+        }
         setState(() {
           _isLoading = false;
         });
