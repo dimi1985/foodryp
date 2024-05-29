@@ -1,23 +1,29 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/admin/components/admin_category_page.dart';
 import 'package:foodryp/screens/admin/components/admin_food_wiki_page.dart';
 import 'package:foodryp/screens/admin/components/admin_recipe_page.dart';
 import 'package:foodryp/screens/admin/components/admin_running_event_Page.dart';
 import 'package:foodryp/screens/admin/components/admin_teams_page.dart';
 import 'package:foodryp/screens/admin/components/admin_user_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/responsive.dart';
 
 import 'components/widgets/custom_admin_card.dart';
 
 class AdminPanelScreen extends StatelessWidget {
-  const AdminPanelScreen({super.key});
+  final User user;
+  const AdminPanelScreen({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Panel'),
+        title: Text(AppLocalizations.of(context).translate('Admin Panel')),
       ),
       body: GridView.count(
         crossAxisCount:
@@ -27,72 +33,79 @@ class AdminPanelScreen extends StatelessWidget {
         mainAxisSpacing: 16.0,
         children: [
           CustomAdminCard(
-            title: 'Users',
+            title: AppLocalizations.of(context).translate('Users'),
             icon: Icons.person,
             onTap: () {
               // Navigate to Users screen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AdminUserPage()),
+                MaterialPageRoute(
+                    builder: (context) => AdminUserPage(userRole: user.role)),
               );
             },
           ),
           CustomAdminCard(
-            title: 'Recipes',
+            title: AppLocalizations.of(context).translate('Recipes'),
             icon: Icons.restaurant_menu,
             onTap: () {
               // Navigate to Recipes screen
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const AdminRecipePage()),
+                    builder: (context) => AdminRecipePage(
+                          user: user,
+                        )),
               );
             },
           ),
           CustomAdminCard(
-            title: 'Categories',
+            title: AppLocalizations.of(context).translate('Categories'),
             icon: Icons.category,
             onTap: () {
               // Navigate to Categories screen
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const AdminCategoryPage()),
+                    builder: (context) => AdminCategoryPage(user: user)),
               );
             },
           ),
           CustomAdminCard(
-            title: 'Teams',
+            title: AppLocalizations.of(context).translate('Teams'),
             icon: Icons.multiline_chart_sharp,
             onTap: () {
               // Navigate to Teams screen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AdminTeamsPage()),
+                MaterialPageRoute(
+                    builder: (context) => AdminTeamsPage(userRole: user.role)),
               );
             },
           ),
 
           CustomAdminCard(
-            title: 'Running Events',
+            title: AppLocalizations.of(context).translate('Running Events'),
             icon: Icons.restaurant_menu,
             onTap: () {
               // Navigate to Running Events screen
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const AdminRunningEventPage()),
+                    builder: (context) =>
+                        AdminRunningEventPage(userRole: user.role)),
               );
             },
           ),
           CustomAdminCard(
-            title: 'Food Wiki',
+            title: AppLocalizations.of(context).translate('Food Wiki'),
             icon: Icons.person,
             onTap: () {
               // Navigate to Users screen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AdminFoodWikiPage()),
+                MaterialPageRoute(
+                    builder: (context) =>
+                        AdminFoodWikiPage(userRole: user.role)),
               );
             },
           ),

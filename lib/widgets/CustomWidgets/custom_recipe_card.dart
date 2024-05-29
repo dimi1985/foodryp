@@ -104,6 +104,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     imageUrl: widget.recipe.recipeImage ?? Constants.emptyField,
                     fit: BoxFit.cover,
                     width: screenSize.width,
+                    height: screenSize.height,
                     filterQuality: FilterQuality.none,
                     progressIndicatorBuilder:
                         (context, url, downloadProgress) => Center(

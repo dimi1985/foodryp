@@ -8,7 +8,7 @@ import 'package:foodryp/utils/user_service.dart';
 import 'package:intl/intl.dart';
 
 class AdminUserPage extends StatefulWidget {
-  const AdminUserPage({super.key});
+  const AdminUserPage({super.key, String? userRole});
 
   @override
   _AdminUserPageState createState() => _AdminUserPageState();
@@ -54,7 +54,7 @@ class _AdminUserPageState extends State<AdminUserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Users'),
+        title: Text(AppLocalizations.of(context).translate('All Users')),
       ),
       body: _users.isEmpty
           ? const CircularProgressIndicator()
@@ -72,17 +72,37 @@ class _AdminUserPageState extends State<AdminUserPage> {
                             ? BoxFit.none
                             : BoxFit.fitWidth,
                         child: DataTable(
-                          columns: const [
+                          columns: [
                             DataColumn(
-                                label: Expanded(child: Text('Username'))),
-                            DataColumn(label: Expanded(child: Text('Email'))),
+                              label: Expanded(
+                                child: Text(AppLocalizations.of(context)
+                                    .translate('Username')),
+                              ),
+                            ),
                             DataColumn(
-                                label: Expanded(child: Text('Member Since'))),
-                            DataColumn(label: Expanded(child: Text('Role'))),
+                              label: Expanded(
+                                child: Text(AppLocalizations.of(context)
+                                    .translate('Email')),
+                              ),
+                            ),
                             DataColumn(
-                                label: Expanded(
-                                    child: Text(
-                                        'Actions'))), // New column for actions
+                              label: Expanded(
+                                child: Text(AppLocalizations.of(context)
+                                    .translate('Member Since')),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Expanded(
+                                child: Text(AppLocalizations.of(context)
+                                    .translate('Role')),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Expanded(
+                                child: Text(AppLocalizations.of(context)
+                                    .translate('Actions')),
+                              ),
+                            ), // New column for actions
                           ],
                           rows: _users.map((user) {
                             return DataRow(cells: [
@@ -126,14 +146,16 @@ class _AdminUserPageState extends State<AdminUserPage> {
                                                 _selectedRoles[user.id]!);
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
-                                              const SnackBar(
+                                              SnackBar(
                                                 content: Row(
                                                   children: [
-                                                    Icon(Icons.check,
+                                                    const Icon(Icons.check,
                                                         color: Colors.green),
-                                                    SizedBox(width: 8),
-                                                    Text(
-                                                        'Role updated successfully'),
+                                                    const SizedBox(width: 8),
+                                                    Text(AppLocalizations.of(
+                                                            context)
+                                                        .translate(
+                                                            'Role updated successfully')),
                                                   ],
                                                 ),
                                               ),
@@ -141,14 +163,16 @@ class _AdminUserPageState extends State<AdminUserPage> {
                                           } catch (e) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
-                                              const SnackBar(
+                                              SnackBar(
                                                 content: Row(
                                                   children: [
-                                                    Icon(Icons.error,
+                                                    const Icon(Icons.error,
                                                         color: Colors.red),
-                                                    SizedBox(width: 8),
-                                                    Text(
-                                                        'Failed to update role'),
+                                                    const SizedBox(width: 8),
+                                                    Text(AppLocalizations.of(
+                                                            context)
+                                                        .translate(
+                                                            'Failed to update role')),
                                                   ],
                                                 ),
                                               ),
@@ -160,8 +184,9 @@ class _AdminUserPageState extends State<AdminUserPage> {
                                           }
                                         },
                                   child: _isUpdatingMap[user.id]!
-                                      ? CircularProgressIndicator()
-                                      : const Text('Update'),
+                                      ? const CircularProgressIndicator()
+                                      : Text(AppLocalizations.of(context)
+                                          .translate('Update')),
                                 ),
                               ),
                             ]);

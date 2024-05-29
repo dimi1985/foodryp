@@ -1,12 +1,17 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/admin/components/admin_add_category_page.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_category_card.dart';
 
 class AdminCategoryPage extends StatefulWidget {
-  const AdminCategoryPage({Key? key});
+  final User user;
+  const AdminCategoryPage({super.key, required this.user,});
 
   @override
   State<AdminCategoryPage> createState() => _AdminCategoryPageState();
@@ -39,15 +44,17 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Category Page'),
+        title:  Text(AppLocalizations.of(context).translate('Admin Category Page')),
       ),
       body: _categories.isEmpty
           ? Column(
             children: [
-              const Center(
-                  child: Text('No categories'),
+               Center(
+                  child: Text(AppLocalizations.of(context).translate('No categories')),
                 ),
                  Padding(
                   padding: const EdgeInsets.all(Constants.defaultPadding),
@@ -57,11 +64,11 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              const AdminAddCategoryPage(category: null),
+                               AdminAddCategoryPage(category: null,userRole:widget.user.role),
                         ),
                       );
                     },
-                    child: const Text('Add Category'),
+                    child:  Text(AppLocalizations.of(context).translate('Add Category')),
                   ),
                 ),
             ],
@@ -79,7 +86,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    AdminAddCategoryPage(category: category),
+                                    AdminAddCategoryPage(category: category, userRole: widget.user.role,),
                               ),
                             );
                           },
@@ -98,11 +105,12 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              const AdminAddCategoryPage(category: null),
+                               AdminAddCategoryPage(category: null, userRole: widget.user.role,),
                         ),
                       );
                     },
-                    child: const Text('Add Category'),
+                    
+                    child:  Text(AppLocalizations.of(context).translate('Add Category')),
                   ),
                 ),
               ],

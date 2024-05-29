@@ -59,7 +59,9 @@ class _AuthScreenState extends State<AuthScreen> {
         );
 
         if (!success) {
-          message = 'Registration failed: Email or Username already exists';
+          
+          message = AppLocalizations.of(context)
+                                  .translate('Registration failed: Email or Username already exists');
         }
       } else {
         // Perform login
@@ -69,7 +71,9 @@ class _AuthScreenState extends State<AuthScreen> {
         );
 
         if (!success) {
-          message = 'Login failed: Invalid email or password';
+          
+          message = AppLocalizations.of(context)
+                                  .translate('Login failed: Invalid email or password');
         }
       }
 

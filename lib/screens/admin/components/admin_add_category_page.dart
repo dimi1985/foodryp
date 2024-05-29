@@ -1,5 +1,7 @@
 // ignore_for_file: unused_field, use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'dart:io';
@@ -17,7 +19,9 @@ import 'dart:convert';
 
 class AdminAddCategoryPage extends StatefulWidget {
   final CategoryModel? category;
-  const AdminAddCategoryPage({super.key, required this.category});
+  final String? userRole;
+  const AdminAddCategoryPage(
+      {super.key, required this.category, required this.userRole});
 
   @override
   State<AdminAddCategoryPage> createState() => _AdminAddCategoryPageState();
@@ -66,9 +70,11 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Category'),
+        title:
+            Text(AppLocalizations.of(context).translate('Add Category Page')),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -92,14 +98,17 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Category:',
-                                style: TextStyle(fontSize: 16),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('Category:'),
+                                style: const TextStyle(fontSize: 16),
                               ),
                               const SizedBox(height: 20),
+
                               CustomTextField(
                                 controller: _nameController,
-                                hintText: 'Enter category name',
+                                hintText: AppLocalizations.of(context)
+                                    .translate('Enter category name'),
                                 labelText: '',
                                 onChanged: (value) {
                                   // Handle text changes here
@@ -108,9 +117,11 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                               ),
                               const SizedBox(height: 20),
                               // Add Chips for "Is for Diet" and "Is for Vegetarians"
-                              const Text(
-                                'Commit it as special category:',
-                                style: TextStyle(fontSize: 16),
+
+                              Text(
+                                AppLocalizations.of(context).translate(
+                                    'Commit it as special category:'),
+                                style: const TextStyle(fontSize: 16),
                               ),
                               const SizedBox(height: 20),
                               Row(
@@ -118,7 +129,8 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ChoiceChip(
-                                    label: const Text('Is for Diet'),
+                                    label: Text(AppLocalizations.of(context)
+                                        .translate('Is for Diet')),
                                     selected: isForDiet,
                                     onSelected: (selected) {
                                       setState(() {
@@ -129,7 +141,8 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: ChoiceChip(
-                                      label: const Text('Is for Vegetarians'),
+                                      label: Text(AppLocalizations.of(context)
+                                          .translate('Is for Vegetarians')),
                                       selected: isForVegetarians,
                                       onSelected: (selected) {
                                         setState(() {
@@ -178,14 +191,15 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Selected font: ${_selectedFont ?? 'None'}',
+                                '${AppLocalizations.of(context).translate('Selected font:')} ${_selectedFont ?? AppLocalizations.of(context).translate('None')}',
                                 style: const TextStyle(fontSize: 16),
                               ),
                               const SizedBox(height: 20),
                               if (_selectedFont != null)
-                                const Text(
-                                  'Font Preview:',
-                                  style: TextStyle(
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('Font Preview:'),
+                                  style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -208,7 +222,7 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Category Color:'),
+            Text(AppLocalizations.of(context).translate('Category Color:')),
             ColorPicker(
               onColorChanged: (color) {
                 setState(() {
@@ -217,7 +231,7 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
               },
             ),
             const SizedBox(height: 16),
-            const Text('Category Image:'),
+            Text(AppLocalizations.of(context).translate('Category Image:')),
             SizedBox(
               height: 300,
               child: ImagePickerPreviewContainer(
@@ -246,7 +260,8 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                 _showCategoryPreview(context, _nameController.text,
                     _selectedColor, _selectedFont);
               },
-              child: const Text('Preview Category'),
+              child: Text(
+                  AppLocalizations.of(context).translate('Preview Category')),
             ),
             const SizedBox(
               height: 20,
@@ -258,12 +273,11 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                   CategoryService()
                       .deleteCategory(widget.category?.id ?? '')
                       .then((value) {
-                    if (value) {
-                    
-                    }
+                    if (value) {}
                   });
                 },
-                child: const Text('Delete Category'),
+                child: Text(
+                    AppLocalizations.of(context).translate('Delete Category')),
               ),
           ],
         ),
@@ -330,8 +344,10 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                         const SizedBox(width: 16),
                         Text(AppLocalizations.of(context).translate(
                           isUpdating
-                              ? 'Updating category...'
-                              : 'Creating category...',
+                              ? AppLocalizations.of(context)
+                                  .translate('Updating category...')
+                              : AppLocalizations.of(context)
+                                  .translate('Creating category...'),
                         )), // Text indicating category creation or update
                       ],
                     ),
@@ -349,7 +365,9 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                         '',
                         [],
                         isForDiet,
-                        isForVegetarians)
+                        isForVegetarians,
+                        widget.userRole,
+                      )
                     : await CategoryService().createCategory(
                         categoryName,
                         selectedFont ?? '',
@@ -357,7 +375,9 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                         '',
                         [],
                         isForDiet,
-                        isForVegetarians);
+                        isForVegetarians,
+                        widget.userRole,
+                      );
 
                 // Handle success or failure
                 if (success) {
@@ -370,8 +390,10 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                     SnackBar(
                       content: Text(AppLocalizations.of(context).translate(
                         isUpdating
-                            ? 'Category updated successfully'
-                            : 'Category created successfully',
+                            ? AppLocalizations.of(context)
+                                .translate('Category updated successfully')
+                            : AppLocalizations.of(context)
+                                .translate('Category created successfully'),
                       )), // Show success message
                     ),
                   );
@@ -398,8 +420,10 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
                     SnackBar(
                       content: Text(AppLocalizations.of(context).translate(
                         isUpdating
-                            ? 'Failed to update category'
-                            : 'Failed to create category',
+                            ? AppLocalizations.of(context)
+                                .translate('Failed to update category')
+                            : AppLocalizations.of(context)
+                                .translate('Failed to create category'),
                       )), // Show failure message
                     ),
                   );
@@ -414,8 +438,10 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
               ),
               child: Text(
                 widget.category != null
-                    ? 'Update Category to server'
-                    : 'Save Category to server',
+                    ? AppLocalizations.of(context)
+                        .translate('Update Category to server')
+                    : AppLocalizations.of(context)
+                        .translate('Save Category to server'),
                 style: const TextStyle(color: Colors.white),
               ),
             ),

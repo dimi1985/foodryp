@@ -84,7 +84,9 @@ class UserService {
         final userID = responseData['userId'];
         final token = responseData['token'];
         await saveUserIDLocally(userID);
+        TokenManager.clearTokenLocally();
         TokenManager.saveTokenLocally(token);
+
         return true;
       } else {
         print('Error: ${responseData['message']}');

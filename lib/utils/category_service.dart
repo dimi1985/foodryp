@@ -79,7 +79,7 @@ class CategoryService {
       String categoryImage,
       List<String> recipes,
       bool isForDiet,
-      bool isForVegetarians) async {
+      bool isForVegetarians, String? userRole,) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/saveCategory'),
@@ -92,6 +92,7 @@ class CategoryService {
           'recipes': recipes,
           'isForDiet': isForDiet,
           'isForVegetarians': isForVegetarians,
+          'userRole': userRole,
         }),
       );
 
@@ -175,7 +176,7 @@ class CategoryService {
       String categoryImage,
       List<String> recipes,
       bool isForDiet,
-      bool isForVegetarians) async {
+      bool isForVegetarians, String? userRole,) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/updateCategory/$categoryId'),
@@ -187,6 +188,7 @@ class CategoryService {
           'recipes': recipes,
           'isForDiet': isForDiet,
           'isForVegetarians': isForVegetarians,
+            'userRole': userRole,
         }),
       );
 

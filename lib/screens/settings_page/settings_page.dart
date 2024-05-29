@@ -92,10 +92,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AdminPanelScreen()),
+                        builder: (context) =>  AdminPanelScreen(user:widget.user)),
                   );
                 },
-                child: Text(AppLocalizations.of(context).translate('Settings')))
+                child: Text(AppLocalizations.of(context).translate('Admin Panel')))
         ],
       ),
       body: ListView(
@@ -267,6 +267,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                         child: Text(
                             AppLocalizations.of(context).translate('Cancel')),
+                            
                       ),
                       TextButton(
                         onPressed: () {

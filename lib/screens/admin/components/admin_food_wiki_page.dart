@@ -4,7 +4,7 @@ import 'package:foodryp/screens/admin/components/add_wiki_food.dart';
 import 'package:foodryp/utils/wiki_food_service.dart';
 
 class AdminFoodWikiPage extends StatefulWidget {
-  const AdminFoodWikiPage({super.key});
+  const AdminFoodWikiPage({super.key, String? userRole});
 
   @override
   State<AdminFoodWikiPage> createState() => _AdminFoodWikiPageState();
