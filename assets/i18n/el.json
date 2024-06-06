@@ -252,7 +252,12 @@
   "Recipe deleted successfully": "Η συνταγή διαγράφηκε με επιτυχία",
   "Failed to delete recipe": "Αποτυχία διαγραφής συνταγής",
   "Registration failed: Email or Username already exists": "Η εγγραφή απέτυχε: Το email ή το όνομα χρήστη υπάρχει ήδη",
-  "Login failed: Invalid email or password": "Η σύνδεση απέτυχε: Μη έγκυρη ηλεκτρονική διεύθυνση ή κωδικός πρόσβασης"
+  "Login failed: Invalid email or password": "Η σύνδεση απέτυχε: Μη έγκυρη ηλεκτρονική διεύθυνση ή κωδικός πρόσβασης",
+  "User is following you, you can follow back at any time": "Ο χρήστης σας ακολουθεί, μπορείτε να ακολουθήσετε ανά πάσα στιγμή",
+  "Sent Request": "Απεσταλμένο αίτημα",
+  "No Thanks": "Οχι ευχαριστώ",
+  "Following Back": "Ακολουθώντας πίσω",
+  "UnFollowing": "Δεν ακολουθείτε"
 
   }
   

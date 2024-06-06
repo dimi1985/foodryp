@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
@@ -33,16 +34,16 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
     if (widget.user.followRequestsReceived
             ?.contains(widget.currentLoggedUserId) ??
         false) {
-      buttonText = 'Sent Request';
+      buttonText = AppLocalizations.of(context).translate('Sent Request');
     } else if (widget.user.followRequestsCanceled
             ?.contains(widget.currentLoggedUserId) ??
         false) {
-      buttonText = 'Follow Back';
+      buttonText = AppLocalizations.of(context).translate('Follow Back');
     } else if (widget.user.followers?.contains(widget.currentLoggedUserId) ??
         false) {
-      buttonText = 'Following';
+      buttonText = AppLocalizations.of(context).translate('Following');
     } else {
-      buttonText = 'Follow';
+      buttonText = AppLocalizations.of(context).translate('Follow');
     }
   }
 
@@ -63,12 +64,13 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
           allowSelection: false,
         ),
         title: Text(widget.user.username,
-            style: TextStyle(fontWeight: FontWeight.bold)),
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(
           widget.user.followRequestsCanceled
                       ?.contains(widget.currentLoggedUserId) ??
                   false
-              ? 'User is following you, you can follow back at any time'
+              ? AppLocalizations.of(context).translate(
+                  'User is following you, you can follow back at any time')
               : widget.user.email,
           style: TextStyle(color: Colors.grey.shade600),
         ),
@@ -89,7 +91,8 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
                         child: ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              buttonText = 'Following Back';
+                              buttonText = AppLocalizations.of(context)
+                                  .translate('Following Back');
                               requestAccepted = true;
                             });
                             UserService()
@@ -97,7 +100,8 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
                                 .then((success) {
                               if (success) {
                                 setState(() {
-                                  buttonText = 'Following';
+                                  buttonText = AppLocalizations.of(context)
+                                      .translate('Following');
                                 });
                               }
                             });
@@ -121,20 +125,22 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
                         child: ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              buttonText = 'No Thanks';
+                              buttonText = AppLocalizations.of(context)
+                                  .translate('No Thanks');
                               requestRejected = true;
                             });
                             UserService().rejectFollowRequest(widget.user.id);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.red, // Color for rejection
+                            backgroundColor: Colors.red, // Color for rejection
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18)),
                           ),
-                          child: const Text('No Thanks',
-                              style:
-                                  TextStyle(color: Constants.secondaryColor)),
+                          child: Text(
+                              AppLocalizations.of(context)
+                                  .translate('No Thanks'),
+                              style: const TextStyle(
+                                  color: Constants.secondaryColor)),
                         ),
                       ),
                   ],
@@ -165,14 +171,14 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
     if (widget.user.followers?.contains(widget.currentLoggedUserId) ?? false) {
       // Implement logic for following user
       setState(() {
-        buttonText = 'UnFollowing';
+        buttonText = AppLocalizations.of(context).translate('UnFollowing');
       });
       UserService().unFollow(widget.user.id);
     } else if (widget.user.followRequestsCanceled
             ?.contains(widget.currentLoggedUserId) ??
         false) {
       setState(() {
-        buttonText = 'Following Back';
+        buttonText = AppLocalizations.of(context).translate('Following Back');
       });
       UserService().followBack(widget.user.id);
     } else if (!((widget.user.following ?? []).contains(widget.user.id)) &&
@@ -186,8 +192,8 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
       setState(() {
         buttonText =
             widget.user.following?.contains(widget.currentLoggedUserId) ?? false
-                ? 'Following'
-                : 'Sent Request';
+                ? AppLocalizations.of(context).translate('Following')
+                : AppLocalizations.of(context).translate('Sent Request');
       });
       // Implement logic for accepting follow request
     }

@@ -250,5 +250,10 @@
   "Recipe deleted successfully": "Recipe deleted successfully",
   "Failed to delete recipe": "Failed to delete recipe",
   "Registration failed: Email or Username already exists": "Registration failed: Email or Username already exists",
-  "Login failed: Invalid email or password": "Login failed: Invalid email or password"
+  "Login failed: Invalid email or password": "Login failed: Invalid email or password",
+  "User is following you, you can follow back at any time": "User is following you, you can follow back at any time",
+  "Sent Request": "Sent Request",
+  "No Thanks": "No Thanks",
+  "Following Back": "Following Back",
+  "UnFollowing": "UnFollowing"
 }

@@ -102,7 +102,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     memCacheHeight:screenSize.height.toInt() ,
                     memCacheWidth:screenSize.width.toInt() ,
                     imageUrl: widget.recipe.recipeImage ?? Constants.emptyField,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fitWidth,
                     width: screenSize.width,
                     height: screenSize.height,
                     filterQuality: FilterQuality.none,

@@ -8,7 +8,7 @@ import 'package:foodryp/screens/saved_recipes_page.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
-import 'package:foodryp/screens/profile_page/components/recipe_card_profile_section.dart';
+import 'package:foodryp/widgets/CustomWidgets/recipe_card_profile_section.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/settings_page/settings_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
@@ -222,7 +222,7 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(
                 height: MediaQuery.of(context).size.height,
                 child: RecipeCardProfileSection(
-                    publicUsername: widget.user.username)),
+                    user: widget.user)),
           ],
         ),
       ),

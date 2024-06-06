@@ -1,10 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:foodryp/database/database_helper.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
-import 'package:foodryp/screens/offline_recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/connectivity_service.dart';
@@ -20,7 +18,7 @@ void main() async {
   // Initialize the language provider and load the language
   // Ensure that the necessary bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
-  initializeAsyncOperations();
+
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? languageCode = prefs.getString('languageCode');
@@ -45,11 +43,6 @@ void main() async {
   );
 }
 
-void initializeAsyncOperations() async {
-  var db = getDatabase();
-  await db.init(); // This now happens in the background
-  // Any other asynchronous initialization can also be done here
-}
 
 class Foodryp extends StatefulWidget {
   final Locale initialLocale;
@@ -113,10 +106,10 @@ class _FoodrypState extends State<Foodryp> {
     bool isOffline = connectionStatus.contains(ConnectivityResult.none);
     
     if (kIsWeb) {
-      return isOffline ? const OfflineRecipePage() : const EntryWebNavigationPage();
+      return isOffline ?  const Center(child: Text('You are offline'),) : const EntryWebNavigationPage();
     } else if (defaultTargetPlatform == TargetPlatform.android ||
                defaultTargetPlatform == TargetPlatform.iOS) {
-      return isOffline ? const OfflineRecipePage() : const BottomNavScreen();
+      return isOffline ?const Center(child: Text('You are offline'),) : const BottomNavScreen();
     } else {
       return const BottomNavScreen(); // Default to BottomNavScreen for other platforms
     }

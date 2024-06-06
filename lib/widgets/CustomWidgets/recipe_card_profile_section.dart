@@ -1,19 +1,20 @@
-
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_profile_recipe_card.dart';
 
 class RecipeCardProfileSection extends StatefulWidget {
-  final String publicUsername;
+  final User user;
   const RecipeCardProfileSection({
     Key? key,
-    required this.publicUsername,
+    required this.user,
   });
 
   @override
@@ -62,7 +63,7 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
     try {
       final fetchedRecipes = await _fetchRecipesData(_currentPage, _pageSize);
       setState(() {
-        recipes = fetchedRecipes.reversed.toList();
+        recipes = fetchedRecipes;
         _isLoading = false;
       });
     } catch (_) {
@@ -78,14 +79,10 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
         _isLoading = true;
       });
       try {
-        final fetchedRecipes = await _fetchRecipesData(_currentPage, _pageSize);
-        for (var recipe in fetchedRecipes) {
-          if (!recipes
-              .any((existingRecipe) => existingRecipe.id == recipe.id)) {
-            recipes.add(recipe);
-          }
-        }
+        final fetchedRecipes =
+            await _fetchRecipesData(_currentPage + 1, _pageSize);
         setState(() {
+          recipes.addAll(fetchedRecipes);
           _currentPage++;
           _isLoading = false;
         });
@@ -98,16 +95,18 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
   }
 
   Future<List<Recipe>> _fetchRecipesData(int currentPage, int pageSize) async {
+    final currentUserId = await UserService().getCurrentUserId();
     try {
       List<Recipe> fetchedRecipes = [];
-      if (widget.publicUsername.isEmpty) {
+      print(widget.user.id);
+      if (widget.user.id == currentUserId) {
         fetchedRecipes = await RecipeService().getUserRecipesByPage(
           currentPage,
           pageSize,
         );
       } else {
         fetchedRecipes = await RecipeService().getUserPublicRecipesByPage(
-          widget.publicUsername,
+          widget.user.username,
           currentPage,
           pageSize,
         );
@@ -168,59 +167,59 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
               ),
             ),
             if (Responsive.isDesktop(context))
-  SliverPadding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    sliver: SliverGrid(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 10.0,
-        mainAxisSpacing: 10.0,
-        childAspectRatio: 1.0,
-      ),
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final recipe = recipes[index];
-          return Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                hoverColor: Colors.transparent,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RecipeDetailPage(
-                        recipe: recipe,
-                        internalUse: '',
-                        missingIngredients: const [],
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(Constants.defaultPadding),
-                    color: Colors.transparent,
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 10.0,
+                    mainAxisSpacing: 10.0,
+                    childAspectRatio: 1.0,
                   ),
-                  child: SizedBox(
-                      height: 200,
-                          width: 200,
-                    child: CustomProfileRecipeCard(
-                      internalUse: '',
-                      recipe: recipe,
-                    ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final recipe = recipes[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            hoverColor: Colors.transparent,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RecipeDetailPage(
+                                    recipe: recipe,
+                                    internalUse: '',
+                                    missingIngredients: const [],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                    Constants.defaultPadding),
+                                color: Colors.transparent,
+                              ),
+                              child: SizedBox(
+                                height: 200,
+                                width: 200,
+                                child: CustomProfileRecipeCard(
+                                  internalUse: '',
+                                  recipe: recipe,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: recipes.length,
                   ),
                 ),
               ),
-            ),
-          );
-        },
-        childCount: recipes.length,
-      ),
-    ),
-  ),
-
             if (_isLoading)
               const SliverPadding(
                 padding: EdgeInsets.all(16.0),

@@ -38,7 +38,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
   late User user = Constants.defaultUser;
   List<String> menuItems = [];
   bool isForInternalUse = true;
-  bool userIsBeingFetched =false;
+  bool userIsBeingFetched = false;
 
   @override
   void initState() {
@@ -54,10 +54,9 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
   }
 
   Future<void> _loadData() async {
-    if (kIsWeb) {
-      await _fetchUserProfile();
-    }
+    await _fetchUserProfile();
   }
+
 
   Future<void> _fetchUserProfile() async {
     bool oneTimeSave = await UserService().getsaveOneTimeSheetShow();
@@ -76,14 +75,14 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       }
       if (userProfile != null) {
         user = userProfile;
-         setState(() {
-      userIsBeingFetched = false;
-    });
+        setState(() {
+          userIsBeingFetched = false;
+        });
       } else {
         user = Constants.defaultUser;
-         setState(() {
-      userIsBeingFetched = false;
-    });
+        setState(() {
+          userIsBeingFetched = false;
+        });
       }
     });
   }
@@ -163,15 +162,15 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
                 child: SizedBox(
                   height: 100,
                   child: ListView(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          children: menuItems
-                              .where((item) =>
-                                  item !=
-                                  'ProfilePage') // Exclude 'ProfilePage' from view
-                              .map((item) => _buildMenuItem(item))
-                              .toList(),
-                        ),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: menuItems
+                        .where((item) =>
+                            item !=
+                            'ProfilePage') // Exclude 'ProfilePage' from view
+                        .map((item) => _buildMenuItem(item))
+                        .toList(),
+                  ),
                 ),
               ),
           ],

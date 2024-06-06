@@ -19,53 +19,55 @@ class UserService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<bool> registerUser(
-    String username,
-    String email,
-    String password,
-    String gender,
-    List<String> recipes,
-    List<String> following,
-    List<String> followedBy,
-    List<String> likedRecipes,
-    List<String> mealId,
-    List<String> followedByRequest,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${Constants.baseUrl}/api/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': username,
-          'email': email,
-          'password': password,
-          'gender': gender,
-          'profileImage': '',
-          'memberSince': DateTime.now().toIso8601String(),
-          'role': 'user',
-          'recipes': recipes,
-          'following': following,
-          'followedBy': followedBy,
-          'likedRecipes': likedRecipes,
-          'followedByRequest': followedByRequest,
-        }),
-      );
+ Future<bool> registerUser(
+  String username,
+  String email,
+  String password,
+  String gender,
+  List<String> recipes,
+  List<String> following,
+  List<String> followedBy,
+  List<String> likedRecipes,
+  List<String> mealId,
+  List<String> followedByRequest,
+) async {
+  try {
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': username,
+        'email': email,
+        'password': password,
+        'gender': gender,
+        'profileImage': '',
+        'memberSince': DateTime.now().toIso8601String(),
+        'role': 'user',
+        'recipes': recipes,
+        'following': following,
+        'followedBy': followedBy,
+        'likedRecipes': likedRecipes,
+        'followedByRequest': followedByRequest,
+      }),
+    );
 
-      final responseData = jsonDecode(response.body);
+    final responseData = jsonDecode(response.body);
 
-      if (response.statusCode == 201) {
-        final userID = responseData['userId'];
-        await saveUserIDLocally(userID);
-        return true;
-      } else {
-        print('Error: ${responseData['message']}');
-        return false;
-      }
-    } catch (e) {
-      print('Error registering user: $e');
+    if (response.statusCode == 201) {
+      final userID = responseData['userId'];
+      final token = responseData['token'];
+      await saveUserIDLocally(userID);
+      await TokenManager.saveTokenLocally(token);
+      return true;
+    } else {
+      print('Error: ${responseData['message']}');
       return false;
     }
+  } catch (e) {
+    print('Error registering user: $e');
+    return false;
   }
+}
 
   Future<bool> loginUser(String email, String password) async {
     try {
@@ -495,124 +497,148 @@ class UserService {
   }
 
   Future<bool> addFridgeItem(String category, String name) async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
-    try {
-      final response = await http.post(
-        Uri.parse('${Constants.baseUrl}/api/addFridgeItem'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'userId': userId,
-          'category': category,
-          'name': name,
-        }),
-      );
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  final token = await TokenManager.getTokenLocally();
+  final headers = {
+    'Authorization': 'Bearer $token',
+    'Content-Type': 'application/json'
+  };
+  
+  try {
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/addFridgeItem'),
+      headers: headers,
+      body: jsonEncode({
+        'userId': userId,
+        'category': category,
+        'name': name,
+      }),
+    );
 
-      return response.statusCode == 200;
-    } catch (e) {
-      print('Error adding fridge item: $e');
-      return false;
-    }
+    return response.statusCode == 200;
+  } catch (e) {
+    print('Error adding fridge item: $e');
+    return false;
   }
+}
+
 
   Future<List<dynamic>?> getFridgeItems() async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
-    final url = Uri.parse('${Constants.baseUrl}/api/getFridgeItems/$userId');
-    try {
-      final response = await http.get(url);
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  final token = await TokenManager.getTokenLocally();
+  final headers = {
+    'Authorization': 'Bearer $token',
+    'Content-Type': 'application/json'
+  };
+  final url = Uri.parse('${Constants.baseUrl}/api/getFridgeItems/$userId');
 
-      if (response.statusCode == 200) {
-        List<dynamic> fridgeItems = jsonDecode(response.body)['fridgeItems'];
-        return fridgeItems;
-      } else {
-        print('Failed to load fridge items');
-        return null;
-      }
-    } catch (e) {
-      print('Error fetching fridge items: $e');
+  try {
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      List<dynamic> fridgeItems = jsonDecode(response.body)['fridgeItems'];
+      return fridgeItems;
+    } else {
+      print('Failed to load fridge items');
       return null;
     }
+  } catch (e) {
+    print('Error fetching fridge items: $e');
+    return null;
   }
+}
 
-  Future<bool> updateFridgeItem(
-      String oldItemName, String newItemName, String newItemCategory) async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
 
-    final url = Uri.parse('${Constants.baseUrl}/api/updateFridgeItem');
-    try {
-      final response = await http.put(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'userId': userId,
-          'oldItemName': oldItemName,
-          'newItem': {'name': newItemName, 'category': newItemCategory}
-        }),
-      );
+ Future<bool> updateFridgeItem(
+    String oldItemName, String newItemName, String newItemCategory) async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  final token = await TokenManager.getTokenLocally();
 
-      if (response.statusCode == 200) {
-        print('Fridge item updated successfully.');
-        return true;
-      } else {
-        print('Failed to update fridge item: ${response.body}');
-        return false;
-      }
-    } catch (e) {
-      print('Error updating fridge item: $e');
+  final url = Uri.parse('${Constants.baseUrl}/api/updateFridgeItem');
+  try {
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'oldItemName': oldItemName,
+        'newItem': {'name': newItemName, 'category': newItemCategory}
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Fridge item updated successfully.');
+      return true;
+    } else {
+      print('Failed to update fridge item: ${response.body}');
       return false;
     }
+  } catch (e) {
+    print('Error updating fridge item: $e');
+    return false;
   }
+}
 
-  Future<bool> deleteFridgeItem(String itemName) async {
-    await _initPrefs();
-    final userId = _prefs.getString('userId');
-    try {
-      final response = await http.delete(
-        Uri.parse(
-            '${Constants.baseUrl}/api/deleteFridgeItem?itemName=$itemName&userId=$userId'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
+Future<bool> deleteFridgeItem(String itemName) async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+  final token = await TokenManager.getTokenLocally();
+  
+  try {
+    final response = await http.delete(
+      Uri.parse(
+          '${Constants.baseUrl}/api/deleteFridgeItem?itemName=$itemName&userId=$userId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
 
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        print('Failed to delete fridge item: ${response.body}');
-        return false;
-      }
-    } catch (e) {
-      print('Error deleting fridge item: $e');
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      print('Failed to delete fridge item: ${response.body}');
       return false;
     }
+  } catch (e) {
+    print('Error deleting fridge item: $e');
+    return false;
   }
+}
 
   Future<bool> acceptFollowRequest(String targetUserId) async {
-    try {
-      final String userId = await getCurrentUserId();
-      final response = await http.post(
-        Uri.parse('${Constants.baseUrl}/api/acceptFollowRequest'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'userId': userId,
-          'targetUserId': targetUserId,
-        }),
-      );
+  try {
+    final String userId = await getCurrentUserId();
+    final token = await TokenManager.getTokenLocally();
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/acceptFollowRequest'),
+      headers: <String, String>{
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'userId': userId,
+        'targetUserId': targetUserId,
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        print('Follow request accepted successfully.');
-        return true;
-      } else {
-        print('Failed to accept follow request: ${response.body}');
-        return false;
-      }
-    } catch (e) {
-      print('Error accepting follow request: $e');
+    if (response.statusCode == 200) {
+      print('Follow request accepted successfully.');
+      return true;
+    } else {
+      print('Failed to accept follow request: ${response.body}');
       return false;
     }
+  } catch (e) {
+    print('Error accepting follow request: $e');
+    return false;
   }
+}
+
 }

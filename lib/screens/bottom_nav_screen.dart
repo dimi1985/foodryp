@@ -28,6 +28,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   int _selectedIndex = 0;
   User? user;
   bool userIsNull = true;
+  String localUserId = Constants.emptyField;
 
   @override
   void initState() {
@@ -53,13 +54,13 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
     try {
       final userService = UserService();
       User? userProfile;
-
+      localUserId = await userService.getCurrentUserId();
       if ((user?.username.isEmpty ?? true)) {
-        userProfile =
-            await userService.getUserProfile() ?? Constants.defaultUser;
+        userProfile = await userService.getUserProfile() ?? Constants.defaultUser;
       } else {
-        userProfile = await userService.getPublicUserProfile(user!.username) ??
-            Constants.defaultUser;
+        if (user?.id != localUserId || localUserId.isEmpty) {
+          userService.clearUserId();
+        }
       }
 
       setState(() {
@@ -70,16 +71,16 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
     }
   }
 
-  List<Widget> _widgetOptions(BuildContext context) {
+  List<Widget> _widgetOptions(BuildContext context, String localUserId) {
     return <Widget>[
       MainScreen(user: user ?? Constants.defaultUser),
       const RecipePage(seeAll: false),
-      if (user != null) const AddRecipePage(isForEdit: false),
-      if (user != null) ProfilePage(user: user ?? Constants.defaultUser),
-      if (user != null) CreatorsPage(user: user ?? Constants.defaultUser),
-      if (user != null) MyFridgePage(user: user ?? Constants.defaultUser),
-      if (user != null) const FollowingRecipesPage(),
-      if (user == null) const AuthScreen(),
+      if (localUserId.isNotEmpty) const AddRecipePage(isForEdit: false),
+      if (localUserId.isNotEmpty) ProfilePage(user: user ?? Constants.defaultUser),
+      if (localUserId.isNotEmpty) CreatorsPage(user: user ?? Constants.defaultUser),
+      if (localUserId.isNotEmpty) MyFridgePage(user: user ?? Constants.defaultUser),
+      if (localUserId.isNotEmpty) const FollowingRecipesPage(),
+      if (localUserId.isEmpty) const AuthScreen(),
     ];
   }
 
@@ -97,20 +98,13 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryItemsCount = user != null
-        ? user == null
-            ? 0
-            : 4
-        : user == null
-            ? 3
-            : 0; // Number of primary items
-    final contextMenuItemsStartIndex =
-        primaryItemsCount; // Start index for context menu items
+    final primaryItemsCount = localUserId.isNotEmpty ? 4 : 3; // Number of primary items
+    final contextMenuItemsStartIndex = primaryItemsCount; // Start index for context menu items
 
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: _widgetOptions(context),
+        children: _widgetOptions(context, localUserId).where((widget) => widget != null).toList(), // Filter out null widgets
       ),
       bottomNavigationBar: user == null
           ? Container()
@@ -118,38 +112,35 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
               type: BottomNavigationBarType.fixed,
               items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                  icon:  Icon(MdiIcons.homeCircle),
+                  icon: Icon(MdiIcons.homeCircle),
                   label: AppLocalizations.of(context).translate('Home'),
                 ),
                 BottomNavigationBarItem(
-                  icon:  Icon(MdiIcons.food),
+                  icon: Icon(MdiIcons.food),
                   label: AppLocalizations.of(context).translate('Recipes'),
                 ),
-                if (user != null)
+                if (localUserId.isNotEmpty)
                   BottomNavigationBarItem(
-                    icon:  Icon(MdiIcons.plusBox),
+                    icon: Icon(MdiIcons.plusBox),
                     label: AppLocalizations.of(context).translate('Add Recipe'),
                   ),
-                if (user != null)
+                if (localUserId.isNotEmpty)
                   BottomNavigationBarItem(
-                    icon:  Icon(MdiIcons.account),
+                    icon: Icon(MdiIcons.account),
                     label: user?.username ?? Constants.emptyField,
                   ),
-                if (user != null)
+                if (localUserId.isNotEmpty)
                   BottomNavigationBarItem(
-                    icon:  Icon(MdiIcons.menuOpen),
+                    icon: Icon(MdiIcons.menuOpen),
                     label: AppLocalizations.of(context).translate('More'),
                   ),
-                if (user == null)
+                if (localUserId.isEmpty)
                   BottomNavigationBarItem(
-                    icon:  Icon(MdiIcons.twoFactorAuthentication),
-                    label:
-                        AppLocalizations.of(context).translate('Auth Screen'),
+                    icon: Icon(MdiIcons.twoFactorAuthentication),
+                    label: AppLocalizations.of(context).translate('Auth Screen'),
                   ),
               ],
-              currentIndex: _selectedIndex < primaryItemsCount
-                  ? _selectedIndex
-                  : contextMenuItemsStartIndex,
+              currentIndex: _selectedIndex,
               selectedItemColor: Colors.amber[800],
               unselectedItemColor: Colors.grey,
               selectedLabelStyle: TextStyle(
@@ -159,7 +150,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
               ),
               unselectedLabelStyle: Constants.globalTextStyle,
               onTap: (index) {
-                if (index == contextMenuItemsStartIndex && user != null) {
+                if (index == contextMenuItemsStartIndex && localUserId.isNotEmpty) {
                   showModalBottomSheet(
                     context: context,
                     builder: (context) => Padding(
@@ -167,34 +158,30 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                       child: ListView(
                         children: [
                           ListTile(
-                            leading:  Icon(MdiIcons.creation),
+                            leading: Icon(MdiIcons.creation),
                             title: Text(AppLocalizations.of(context)
                                 .translate('Creators')),
                             onTap: () {
                               Navigator.pop(context);
-                              _onContextMenuItemTapped(
-                                  4); // Set to corresponding index
+                              _onContextMenuItemTapped(4); // Set to corresponding index
                             },
                           ),
                           ListTile(
-                            leading:  Icon(
-                                MdiIcons.fridge),
+                            leading: Icon(MdiIcons.fridge),
                             title: Text(AppLocalizations.of(context)
                                 .translate('My Fridge')),
                             onTap: () {
                               Navigator.pop(context);
-                              _onContextMenuItemTapped(
-                                  5); // Set to corresponding index
+                              _onContextMenuItemTapped(5); // Set to corresponding index
                             },
                           ),
                           ListTile(
-                            leading:  Icon(MdiIcons.naturePeople),
+                            leading: Icon(MdiIcons.naturePeople),
                             title: Text(AppLocalizations.of(context)
                                 .translate('Following Recipes Page')),
                             onTap: () {
                               Navigator.pop(context);
-                              _onContextMenuItemTapped(
-                                  6); // Set to corresponding index
+                              _onContextMenuItemTapped(6); // Set to corresponding index
                             },
                           ),
                         ],
@@ -221,8 +208,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
               Text(
                 AppLocalizations.of(context).translate(
                     'Your session and NOT credentials is saved automaticly for a one-time login'),
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               Row(
@@ -233,8 +219,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                       await UserService().saveOneTimeSheetShow();
                       Navigator.pop(context);
                     },
-                    child:
-                        Text(AppLocalizations.of(context).translate('Thanks')),
+                    child: Text(AppLocalizations.of(context).translate('Thanks')),
                   ),
                 ],
               ),

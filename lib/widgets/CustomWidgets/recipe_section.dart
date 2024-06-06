@@ -1,15 +1,11 @@
 import 'dart:ui';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:foodryp/database/database_helper.dart';
 import 'package:foodryp/models/comment.dart';
-import 'package:foodryp/utils/connectivity_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
-import 'package:provider/provider.dart';
 
 class RecipeSection extends StatefulWidget {
   final isFor;
@@ -40,31 +36,8 @@ class _RecipeSectionState extends State<RecipeSection> {
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final connectionService = Provider.of<ConnectivityService>(context);
-    if (connectionService.connectionStatus
-            .contains(ConnectivityResult.mobile) ||
-        connectionService.connectionStatus.contains(ConnectivityResult.wifi) ||
-        connectionService.connectionStatus
-            .contains(ConnectivityResult.ethernet)) {
-      initializeAsyncOperations();
-    } else {
-      return;
-    }
-  }
 
-  void initializeAsyncOperations() async {
-    var db = getDatabase();
-    await db.init();
-    List<Recipe> fetchedRecipes = await db.queryAllRecipes();
-    if (fetchedRecipes.isEmpty) {
-      for (var recipe in recipes) {
-        await db.insertRecipe(recipe);
-      }
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {

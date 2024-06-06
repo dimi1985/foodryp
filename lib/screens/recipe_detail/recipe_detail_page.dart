@@ -251,21 +251,44 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.recipe.recipeTitle ?? Constants.emptyField,
-            style: connectionService.connectionStatus
-                    .contains(ConnectivityResult.none)
-                ? const TextStyle(fontFamily: 'Comfortaa')
-                : GoogleFonts.getFont(
-                    widget.recipe.categoryFont ?? Constants.emptyField,
-                    fontSize: Responsive.isDesktop(context)
-                        ? Constants.desktopHeadingTitleSize
-                        : Constants.mobileHeadingTitleSize,
-                    fontWeight: FontWeight.bold,
-                    color: HexColor(
-                            widget.recipe.categoryColor ?? Constants.emptyField)
-                        .withOpacity(0.7),
+          Row(
+            children: [
+              Text(
+                widget.recipe.recipeTitle ?? Constants.emptyField,
+                style: connectionService.connectionStatus
+                        .contains(ConnectivityResult.none)
+                    ? const TextStyle(fontFamily: 'Comfortaa')
+                    : GoogleFonts.getFont(
+                        widget.recipe.categoryFont ?? Constants.emptyField,
+                        fontSize: Responsive.isDesktop(context)
+                            ? Constants.desktopHeadingTitleSize
+                            : Constants.mobileHeadingTitleSize,
+                        fontWeight: FontWeight.bold,
+                        color: HexColor(widget.recipe.categoryColor ??
+                                Constants.emptyField)
+                            .withOpacity(0.7),
+                      ),
+              ),
+              const SizedBox(width: 20,),
+              Container(
+                decoration: BoxDecoration(
+                  color:
+                      const Color.fromARGB(255, 221, 221, 221).withOpacity(0.5),
+                  borderRadius:
+                      BorderRadius.circular(10), // Add rounded corners
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Text(
+                    overflow: TextOverflow.ellipsis,
+                    widget.recipe.difficulty ?? Constants.emptyField,
+                    style: const TextStyle(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontWeight: FontWeight.bold),
                   ),
+                ),
+              )
+            ],
           ),
           const SizedBox(height: 10.0),
 
@@ -340,8 +363,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
           const SizedBox(height: 20.0),
           // Ingredients section
           Row(
+            mainAxisAlignment:
+                MainAxisAlignment.center, // Center children horizontally
             children: [
               Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // Center text within columns
                 children: [
                   Text(
                     overflow: TextOverflow.ellipsis,
@@ -352,7 +379,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                     overflow: TextOverflow.ellipsis,
                     widget.recipe.servingNumber.toString(),
                     style: TextStyle(
-                      fontSize: isAndroid ? 14 : 20,
+                      fontSize: MediaQuery.of(context).size.width < 600
+                          ? 14
+                          : 20, // Adjust font size based on screen width
                       fontWeight: FontWeight.bold,
                       color: themeProvider.currentTheme == ThemeType.dark
                           ? Colors.white
@@ -365,6 +394,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                 width: isDesktop ? 40 : 20,
               ),
               Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // Center text within columns
                 children: [
                   Text(
                     overflow: TextOverflow.ellipsis,
@@ -375,7 +406,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                     overflow: TextOverflow.ellipsis,
                     widget.recipe.prepDuration.toString(),
                     style: TextStyle(
-                      fontSize: isAndroid ? 14 : 20,
+                      fontSize: MediaQuery.of(context).size.width < 600
+                          ? 14
+                          : 20, // Adjust font size based on screen width
                       fontWeight: FontWeight.bold,
                       color: themeProvider.currentTheme == ThemeType.dark
                           ? Colors.white
@@ -389,6 +422,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               ),
               Expanded(
                 child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.center, // Center text within columns
                   children: [
                     Text(
                       AppLocalizations.of(context).translate('Cook Time'),
@@ -397,7 +432,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                     Text(
                       widget.recipe.cookDuration.toString(),
                       style: TextStyle(
-                        fontSize: isAndroid ? 14 : 20,
+                        fontSize: MediaQuery.of(context).size.width < 600
+                            ? 14
+                            : 20, // Adjust font size based on screen width
                         fontWeight: FontWeight.bold,
                         color: themeProvider.currentTheme == ThemeType.dark
                             ? Colors.white
@@ -409,6 +446,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               ),
             ],
           ),
+
           const SizedBox(height: 20.0),
           Text(
             AppLocalizations.of(context).translate('Ingredients'),

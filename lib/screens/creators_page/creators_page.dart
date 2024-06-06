@@ -6,7 +6,6 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_creator_card.dart';
 
-
 class CreatorsPage extends StatefulWidget {
   final User user;
 
@@ -25,18 +24,31 @@ class _CreatorsPageState extends State<CreatorsPage> {
   @override
   void initState() {
     super.initState();
-
+    // Fetch users in initState
     _fetchUsers();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Fetch current user ID in didChangeDependencies
+    _fetchCurrentUserId();
+  }
+
+  Future<void> _fetchCurrentUserId() async {
+    final getCurrentUserId = await UserService().getCurrentUserId();
+    if (mounted) {
+      setState(() {
+        currentLoggedUserId = getCurrentUserId;
+      });
+    }
   }
 
   Future<void> _fetchUsers() async {
     try {
       final users = await UserService.getUsersByPage(1, 10);
-      final getCurrentUserId = await UserService().getCurrentUserId();
       if (mounted) {
         setState(() {
-          currentLoggedUserId = getCurrentUserId;
-
           _users = users.where((user) => user.id != widget.user.id).toList();
         });
       }
