@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -9,18 +8,19 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_top_three_card.dart';
+import 'package:foodryp/widgets/shimmer_custom_category_top_three_card.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class TopThreeRecipeCardSection extends StatefulWidget {
   const TopThreeRecipeCardSection({super.key});
 
   @override
-  State<TopThreeRecipeCardSection> createState() =>
-      _TopThreeRecipeCardSectionState();
+  State<TopThreeRecipeCardSection> createState() => _TopThreeRecipeCardSectionState();
 }
 
 class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
   List<Recipe> _topRecipes = [];
+  bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<bool> _showText = ValueNotifier(true);
 
@@ -46,6 +46,7 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
       final List<Recipe> recipes = await RecipeService().fetchTopThreeRecipes();
       setState(() {
         _topRecipes = recipes;
+        _isLoading = false;
       });
     } catch (e) {
       // Handle error
@@ -122,40 +123,51 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
-                        itemCount: _topRecipes.length,
+                        itemCount: _isLoading ? 3 : _topRecipes.length, // Show shimmer cards while loading
                         itemBuilder: (context, index) {
-                          Recipe recipe = _topRecipes[index];
-                          return SizedBox(
-                            width: screenSize.width <= 1100
-                                ? 260
-                                : screenSize.width <= 1400
-                                    ? screenSize.width / 7
-                                    : screenSize.width / 8,
-                            height: screenSize.height,
-                            child: CustomCategoryTopThreeCard(
-                              title: recipe.recipeTitle ?? Constants.emptyField,
-                              imageUrl: recipe.recipeImage ?? Constants.emptyField,
-                              color: HexColor(
-                                  recipe.categoryColor ?? Constants.emptyField),
-                              itemList: _topRecipes.length.toString(),
-                              internalUse: 'top_three',
-                              onTap: () {
-                                // Navigate to ProfilePage
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
+                          if (_isLoading) {
+                            return SizedBox(
+                              width: screenSize.width <= 1100
+                                  ? 260
+                                  : screenSize.width <= 1400
+                                      ? screenSize.width / 7
+                                      : screenSize.width / 8,
+                              height: screenSize.height,
+                              child: ShimmerCustomCategoryTopThreeCard(),
+                            );
+                          } else {
+                            Recipe recipe = _topRecipes[index];
+                            return SizedBox(
+                              width: screenSize.width <= 1100
+                                  ? 260
+                                  : screenSize.width <= 1400
+                                      ? screenSize.width / 7
+                                      : screenSize.width / 8,
+                              height: screenSize.height,
+                              child: CustomCategoryTopThreeCard(
+                                title: recipe.recipeTitle ?? Constants.emptyField,
+                                imageUrl: recipe.recipeImage ?? Constants.emptyField,
+                                color: HexColor(recipe.categoryColor ?? Constants.emptyField),
+                                itemList: _topRecipes.length.toString(),
+                                internalUse: 'top_three',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
                                       builder: (context) => RecipeDetailPage(
-                                            recipe: recipe,
-                                            internalUse: 'top_three',
-                                            missingIngredients: const [],
-                                          )),
-                                );
-                              },
-                              username: recipe.username ?? Constants.emptyField,
-                              userImageURL: recipe.useImage ?? Constants.emptyField,
-                              date: recipe.dateCreated ?? DateTime.now(),
-                            ),
-                          );
+                                        recipe: recipe,
+                                        internalUse: 'top_three',
+                                        missingIngredients: const [],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                username: recipe.username ?? Constants.emptyField,
+                                userImageURL: recipe.useImage ?? Constants.emptyField,
+                                date: recipe.dateCreated ?? DateTime.now(),
+                              ),
+                            );
+                          }
                         },
                         separatorBuilder: (BuildContext context, int index) {
                           return SizedBox(

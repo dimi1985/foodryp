@@ -6,6 +6,7 @@ import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
+import 'package:foodryp/widgets/shimmer_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -112,26 +113,15 @@ class CustomCategoryCard extends StatelessWidget {
                         ),
                         child: Stack(
                           children: [
-                            CachedNetworkImage(
-                              memCacheHeight: screenSize.height.toInt(),
-                              memCacheWidth: screenSize.width.toInt(),
-                              imageUrl: category.categoryImage ??
+                            ShimmerNetworkImage(
+                    imageUrl:category.categoryImage ??
                                   Constants.emptyField,
-                              fit: BoxFit.cover,
-                              width: screenSize.width,
-                              height: screenSize.height,
-                              filterQuality: FilterQuality.none,
-                              progressIndicatorBuilder:
-                                  (context, url, downloadProgress) => Center(
-                                child: CircularProgressIndicator(
-                                  value: downloadProgress.progress,
-                                ),
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Center(
-                                child: Icon(Icons.error),
-                              ),
-                            ),
+                    fit: BoxFit.cover,
+                    width: screenSize.width,
+                    height: screenSize.height,
+                    memCacheHeight: screenSize.height,
+                    memCacheWidth: screenSize.width,
+                  ),
                             category.isForDiet || category.isForVegetarians
                                 ? Positioned(
                                     bottom: 10,

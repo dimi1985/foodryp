@@ -25,22 +25,17 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
   bool requestRejected = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setButtonText();
   }
 
   void setButtonText() {
-    if (widget.user.followRequestsReceived
-            ?.contains(widget.currentLoggedUserId) ??
-        false) {
+    if (widget.user.followRequestsReceived?.contains(widget.currentLoggedUserId) ?? false) {
       buttonText = AppLocalizations.of(context).translate('Sent Request');
-    } else if (widget.user.followRequestsCanceled
-            ?.contains(widget.currentLoggedUserId) ??
-        false) {
+    } else if (widget.user.followRequestsCanceled?.contains(widget.currentLoggedUserId) ?? false) {
       buttonText = AppLocalizations.of(context).translate('Follow Back');
-    } else if (widget.user.followers?.contains(widget.currentLoggedUserId) ??
-        false) {
+    } else if (widget.user.followers?.contains(widget.currentLoggedUserId) ?? false) {
       buttonText = AppLocalizations.of(context).translate('Following');
     } else {
       buttonText = AppLocalizations.of(context).translate('Follow');
@@ -66,9 +61,7 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
         title: Text(widget.user.username,
             style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(
-          widget.user.followRequestsCanceled
-                      ?.contains(widget.currentLoggedUserId) ??
-                  false
+          widget.user.followRequestsCanceled?.contains(widget.currentLoggedUserId) ?? false
               ? AppLocalizations.of(context).translate(
                   'User is following you, you can follow back at any time')
               : widget.user.email,
@@ -76,14 +69,10 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
         ),
         trailing: SizedBox(
           height: 75,
-          width: widget.user.followRequestsSent
-                      ?.contains(widget.currentLoggedUserId) ??
-                  false
+          width: widget.user.followRequestsSent?.contains(widget.currentLoggedUserId) ?? false
               ? 250
               : 100,
-          child: widget.user.followRequestsSent
-                      ?.contains(widget.currentLoggedUserId) ??
-                  false
+          child: widget.user.followRequestsSent?.contains(widget.currentLoggedUserId) ?? false
               ? Row(
                   children: [
                     if (!requestRejected)
@@ -107,8 +96,7 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
                             });
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context)
-                                .primaryColor, // Use the primary theme color
+                            backgroundColor: Theme.of(context).primaryColor,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18)),
                           ),
@@ -132,7 +120,7 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
                             UserService().rejectFollowRequest(widget.user.id);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red, // Color for rejection
+                            backgroundColor: Colors.red,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18)),
                           ),
@@ -148,8 +136,7 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
               : ElevatedButton(
                   onPressed: () => buttonPressAction(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context)
-                        .primaryColor, // Use the primary theme color
+                    backgroundColor: Theme.of(context).primaryColor,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18)),
                     padding: const EdgeInsets.symmetric(
@@ -167,35 +154,26 @@ class _CustomCreatorCardState extends State<CustomCreatorCard> {
 
   void buttonPressAction() {
     // Include your existing logic to handle button press here.
-    // This part should handle different states like following, unfollowing, etc.
     if (widget.user.followers?.contains(widget.currentLoggedUserId) ?? false) {
-      // Implement logic for following user
       setState(() {
         buttonText = AppLocalizations.of(context).translate('UnFollowing');
       });
       UserService().unFollow(widget.user.id);
-    } else if (widget.user.followRequestsCanceled
-            ?.contains(widget.currentLoggedUserId) ??
-        false) {
+    } else if (widget.user.followRequestsCanceled?.contains(widget.currentLoggedUserId) ?? false) {
       setState(() {
         buttonText = AppLocalizations.of(context).translate('Following Back');
       });
       UserService().followBack(widget.user.id);
     } else if (!((widget.user.following ?? []).contains(widget.user.id)) &&
         !((widget.user.followRequestsSent ?? []).contains(widget.user.id)) &&
-        !((widget.user.followRequestsReceived ?? [])
-            .contains(widget.user.id)) &&
-        !((widget.user.followRequestsCanceled ?? [])
-            .contains(widget.user.id))) {
+        !((widget.user.followRequestsReceived ?? []).contains(widget.user.id)) &&
+        !((widget.user.followRequestsCanceled ?? []).contains(widget.user.id))) {
       UserService().followUser(widget.user.id);
-
       setState(() {
-        buttonText =
-            widget.user.following?.contains(widget.currentLoggedUserId) ?? false
-                ? AppLocalizations.of(context).translate('Following')
-                : AppLocalizations.of(context).translate('Sent Request');
+        buttonText = widget.user.following?.contains(widget.currentLoggedUserId) ?? false
+            ? AppLocalizations.of(context).translate('Following')
+            : AppLocalizations.of(context).translate('Sent Request');
       });
-      // Implement logic for accepting follow request
     }
   }
 }

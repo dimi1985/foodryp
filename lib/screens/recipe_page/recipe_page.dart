@@ -12,6 +12,7 @@ import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/shimmer_loader.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -287,11 +288,11 @@ class _RecipePageState extends State<RecipePage> {
     );
   }
 
+
   Widget _buildLoader() {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
+    return const ShimmerLoader(); // Use the shimmer loader here
   }
+
 
   Widget _buildSearchField(bool searchOnEveryKeystroke, bool isDesktop) {
     return Container(

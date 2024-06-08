@@ -7,6 +7,7 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_weekly_menu_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/shimmer_loader.dart';
 
 class WeeklyMenuPage extends StatefulWidget {
   final User? user;
@@ -26,7 +27,6 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
   int _currentPage = 1;
   final int _pageSize = 10;
   late String currentPage;
-
 
   @override
   void initState() {
@@ -122,9 +122,12 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
     return Padding(
       padding: const EdgeInsets.all(Constants.defaultPadding),
       child: Center(
-        child: SizedBox(
+        child: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
+          constraints: const BoxConstraints(
+            maxWidth: 600
+          ),
           child: ListView.builder(
               key:  const PageStorageKey<String>('weekly_menu_page'),
             shrinkWrap: true,
@@ -165,8 +168,6 @@ class _WeeklyMenuPageState extends State<WeeklyMenuPage> {
   }
 
   Widget _buildLoader() {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
+    return const ShimmerLoader(); // Use the shimmer loader here
   }
 }

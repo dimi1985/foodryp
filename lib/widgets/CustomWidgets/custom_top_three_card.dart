@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:foodryp/widgets/shimmer_network_image.dart';
 
 class CustomCategoryTopThreeCard extends StatelessWidget {
   final String title;
@@ -44,23 +45,13 @@ class CustomCategoryTopThreeCard extends StatelessWidget {
               Stack(
                 fit: StackFit.expand,
                 children: [
-                  CachedNetworkImage(
-                    memCacheHeight: screenSize.height.toInt(),
-                    memCacheWidth: screenSize.width.toInt(),
-                    imageUrl: imageUrl,
+                  ShimmerNetworkImage(
+                    imageUrl:imageUrl,
                     fit: BoxFit.cover,
                     width: screenSize.width,
                     height: screenSize.height,
-                    filterQuality: FilterQuality.none,
-                    progressIndicatorBuilder:
-                        (context, url, downloadProgress) => Center(
-                      child: CircularProgressIndicator(
-                        value: downloadProgress.progress,
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => const Center(
-                      child: Icon(Icons.error),
-                    ),
+                    memCacheHeight: screenSize.height,
+                    memCacheWidth: screenSize.width,
                   ),
                   const Positioned.fill(
                     child: DecoratedBox(

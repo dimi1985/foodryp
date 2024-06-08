@@ -1,5 +1,3 @@
-// ignore_for_file: use_key_in_widget_constructors
-
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
@@ -9,6 +7,7 @@ import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_profile_recipe_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/shimmer_custom_profile_recipe_card.dart'; // Import the shimmer card
 
 class RecipeCardProfileSection extends StatefulWidget {
   final User user;
@@ -18,8 +17,7 @@ class RecipeCardProfileSection extends StatefulWidget {
   });
 
   @override
-  State<RecipeCardProfileSection> createState() =>
-      _RecipeCardProfileSectionState();
+  State<RecipeCardProfileSection> createState() => _RecipeCardProfileSectionState();
 }
 
 class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
@@ -98,7 +96,6 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
     final currentUserId = await UserService().getCurrentUserId();
     try {
       List<Recipe> fetchedRecipes = [];
-      print(widget.user.id);
       if (widget.user.id == currentUserId) {
         fetchedRecipes = await RecipeService().getUserRecipesByPage(
           currentPage,
@@ -133,6 +130,12 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                     if (Responsive.isDesktop(context)) {
                       return null;
                     }
+                    if (_isLoading && index >= recipes.length) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ShimmerCustomProfileRecipeCard(),
+                      );
+                    }
                     final recipe = recipes[index];
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -161,8 +164,7 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                       ),
                     );
                   },
-                  childCount:
-                      Responsive.isDesktop(context) ? 0 : recipes.length,
+                  childCount: _isLoading ? recipes.length + 1 : recipes.length,
                 ),
               ),
             ),
@@ -178,6 +180,12 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
+                      if (_isLoading && index >= recipes.length) {
+                        return Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: ShimmerCustomProfileRecipeCard(),
+                        );
+                      }
                       final recipe = recipes[index];
                       return Padding(
                         padding: const EdgeInsets.all(4.0),
@@ -216,7 +224,7 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
                         ),
                       );
                     },
-                    childCount: recipes.length,
+                    childCount: _isLoading ? recipes.length + 1 : recipes.length,
                   ),
                 ),
               ),

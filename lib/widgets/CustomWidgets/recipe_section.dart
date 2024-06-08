@@ -1,11 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:foodryp/models/comment.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/screens/recipe_detail/recipe_detail_page.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/shimmer_custom_recipe_card.dart'; // Import the shimmer card
 
 class RecipeSection extends StatefulWidget {
   final isFor;
@@ -17,15 +17,14 @@ class RecipeSection extends StatefulWidget {
 
 class _RecipeSectionState extends State<RecipeSection> {
   List<Recipe> recipes = [];
-  late List<Comment> comments = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    if(recipes.isEmpty){
-  fetchixedRecipes();
+    if (recipes.isEmpty) {
+      fetchixedRecipes();
     }
-  
   }
 
   Future<void> fetchixedRecipes() async {
@@ -33,11 +32,9 @@ class _RecipeSectionState extends State<RecipeSection> {
     final fetchedRecipes = await RecipeService().getFixedRecipes(desiredLength);
     setState(() {
       recipes = fetchedRecipes;
+      _isLoading = false;
     });
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -59,37 +56,47 @@ class _RecipeSectionState extends State<RecipeSection> {
               physics: const AlwaysScrollableScrollPhysics(),
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: recipes.length,
+              itemCount: _isLoading ? 4 : recipes.length, // Show shimmer cards while loading
               itemBuilder: (context, index) {
-                final recipe = recipes[index];
-                return Padding(
-                  padding: const EdgeInsets.all(Constants.defaultPadding),
-                  child: SizedBox(
-                    width: 250,
-                    child: InkWell(
-                      onTap: () async {
-                        var result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RecipeDetailPage(
-                              recipe: recipe,
-                              internalUse: '',
-                              missingIngredients: const [],
+                if (_isLoading) {
+                  return Padding(
+                    padding: const EdgeInsets.all(Constants.defaultPadding),
+                    child: SizedBox(
+                      width: 250,
+                      child: ShimmerCustomRecipeCard(),
+                    ),
+                  );
+                } else {
+                  final recipe = recipes[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(Constants.defaultPadding),
+                    child: SizedBox(
+                      width: 250,
+                      child: InkWell(
+                        onTap: () async {
+                          var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RecipeDetailPage(
+                                recipe: recipe,
+                                internalUse: '',
+                                missingIngredients: const [],
+                              ),
                             ),
-                          ),
-                        );
+                          );
 
-                        if (result == true) {
-                          fetchixedRecipes();
-                        }
-                      },
-                      child: CustomRecipeCard(
-                        recipe: recipe,
-                        internalUse: widget.isFor,
+                          if (result == true) {
+                            fetchixedRecipes();
+                          }
+                        },
+                        child: CustomRecipeCard(
+                          recipe: recipe,
+                          internalUse: widget.isFor,
+                        ),
                       ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(

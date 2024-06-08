@@ -1,7 +1,5 @@
-import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/screens/add_weekly_menu_page.dart';
 import 'package:foodryp/screens/weekly_menu_detail_page.dart';
@@ -9,6 +7,8 @@ import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/meal_service.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_weekly_menu_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/shimmer_weekly_menu_list.dart';
+import 'package:foodryp/widgets/shimmer_custom_weekly_menu_card.dart';
 
 class WeeklyMenuSection extends StatefulWidget {
   final bool showAll;
@@ -56,17 +56,12 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
       currentUserId = await UserService().getCurrentUserId();
       List<WeeklyMenu> fetchedMenus = [];
 
-
       if (widget.showAll) {
         fetchedMenus = await mealService.getWeeklyMenusFixedLength(4);
       } else {
-        if ( widget.publicUserId == currentUserId) {
-           print('getWeeklyMenusByPageAndUser');
-          print('publicUserId: ${widget.publicUserId}');
+        if (widget.publicUserId == currentUserId) {
           fetchedMenus = await mealService.getWeeklyMenusByPageAndUser(1, 10);
         } else {
-                 print('getWeeklyMenusByPageAndPublicUser');
-           print('publicUserId: ${widget.publicUserId}');
           fetchedMenus = await mealService.getWeeklyMenusByPageAndPublicUser(
               1, 10, widget.publicUserId);
         }
@@ -94,7 +89,7 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
 
     return displayList.isEmpty
         ? isLoading
-            ? const LinearProgressIndicator()
+            ? const ShimmerWeeklyMenuList() // Use the shimmer widget here
             : widget.showAll
                 ? Container()
                 : Column(
@@ -118,10 +113,10 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                             child: Text(
                               AppLocalizations.of(context).translate(
                                   widget.isForDiet
-                                      ?  AppLocalizations.of(context)
-                                  .translate('Add Weekly Diet Menu')
-                              : AppLocalizations.of(context)
-                                  .translate('Add Weekly Menu'),),
+                                      ? AppLocalizations.of(context)
+                                          .translate('Add Weekly Diet Menu')
+                                      : AppLocalizations.of(context)
+                                          .translate('Add Weekly Menu')),
                             ),
                           ),
                         ),
@@ -168,27 +163,31 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
-                    itemCount: displayList.length,
+                    itemCount: isLoading ? 4 : displayList.length, // Show shimmer cards while loading
                     itemBuilder: (context, index) {
-                      final meal = displayList[index];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    WeeklyMenuDetailPage(meal: meal)),
-                          );
-                        },
-                        child: CustomWeeklyMenuCard(
-                          meal: meal,
-                          currentPage: '',
-                          isForAll: widget.showAll,
-                          publicUserId: widget.publicUserId,
-                          currentUserId: currentUserId,
-                          isForDiet: widget.isForDiet,
-                        ),
-                      );
+                      if (isLoading) {
+                        return const ShimmerCustomWeeklyMenuCard();
+                      } else {
+                        final meal = displayList[index];
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      WeeklyMenuDetailPage(meal: meal)),
+                            );
+                          },
+                          child: CustomWeeklyMenuCard(
+                            meal: meal,
+                            currentPage: '',
+                            isForAll: widget.showAll,
+                            publicUserId: widget.publicUserId,
+                            currentUserId: currentUserId,
+                            isForDiet: widget.isForDiet,
+                          ),
+                        );
+                      }
                     },
                   ),
                 ),

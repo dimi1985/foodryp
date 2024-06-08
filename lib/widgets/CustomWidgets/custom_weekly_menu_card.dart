@@ -6,8 +6,10 @@ import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:foodryp/widgets/shimmer_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CustomWeeklyMenuCard extends StatefulWidget {
   final WeeklyMenu meal;
@@ -79,26 +81,15 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                                     topRight: Radius.circular(15),
                                     bottomRight: Radius.circular(0))
                                 : BorderRadius.zero,
-                        child: Image.network(
-                          widget.meal.dayOfWeek[index].recipeImage ??
+                        child: ShimmerNetworkImage(
+                    imageUrl:widget.meal.dayOfWeek[index].recipeImage ??
                               Constants.emptyField,
-                               loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child; // image fully loaded, return the image widget
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null, // This will show a determinate progress indicator if size is known, otherwise indeterminate
-                          ),
-                        );
-                      }},
-                          fit: BoxFit.cover,
-                          filterQuality: FilterQuality.none,
-                        ),
+                    fit: BoxFit.cover,
+                    width: screenSize.width,
+                    height: screenSize.height,
+                    memCacheHeight: screenSize.height,
+                    memCacheWidth: screenSize.width,
+                  ),
                       ),
                     );
                   },
@@ -169,19 +160,20 @@ class _CustomWeeklyMenuCardState extends State<CustomWeeklyMenuCard> {
                             },
                             icon: const Icon(Icons.edit))
                         : Container(),
-                   !widget.isForAll &&
+                    !widget.isForAll &&
                             widget.publicUserId == widget.currentUserId
                         ? IconButton(
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              WeeklyMenuDeletionConfirmationScreen(
-                            weeklyMenu: widget.meal,
-                          ),
-                        ));
-                      },
-                      icon: const Icon(Icons.delete),
-                    ):Container(),
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    WeeklyMenuDeletionConfirmationScreen(
+                                  weeklyMenu: widget.meal,
+                                ),
+                              ));
+                            },
+                            icon: const Icon(Icons.delete),
+                          )
+                        : Container(),
                   ],
                 ),
               ),

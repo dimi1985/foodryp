@@ -5,6 +5,7 @@ import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_category_card.dart';
+import 'package:foodryp/widgets/CustomWidgets/shimmer_custom_category_card.dart'; // Import the shimmer card
 
 class CategorySection extends StatefulWidget {
   const CategorySection({super.key});
@@ -15,7 +16,7 @@ class CategorySection extends StatefulWidget {
 
 class _CategorySectionState extends State<CategorySection> {
   List<CategoryModel> categories = [];
-  
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -27,14 +28,17 @@ class _CategorySectionState extends State<CategorySection> {
     try {
       const int desiredLength = 3;
       final categoryService = CategoryService();
-      final fetchedCategories =
-          await categoryService.getFixedCategories(desiredLength);
+      final fetchedCategories = await categoryService.getFixedCategories(desiredLength);
 
       setState(() {
         categories = fetchedCategories;
+        _isLoading = false;
       });
     } catch (e) {
       print('Error fetching categories: $e');
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -58,26 +62,30 @@ class _CategorySectionState extends State<CategorySection> {
               physics: const AlwaysScrollableScrollPhysics(),
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
+              itemCount: _isLoading ? 3 : categories.length, // Show shimmer cards while loading
               itemBuilder: (context, index) {
-                final category = categories[index];
-                if (category.name == 'Uncategorized') {
-                  return const SizedBox.shrink();
-                }
-                return InkWell(
-                  hoverColor: Colors.transparent,
-                  onTap: () async{
-                   await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RecipeByCategoryPage(
-                          category: category,
+                if (_isLoading) {
+                  return ShimmerCustomCategoryCard();
+                } else {
+                  final category = categories[index];
+                  if (category.name == 'Uncategorized') {
+                    return const SizedBox.shrink();
+                  }
+                  return InkWell(
+                    hoverColor: Colors.transparent,
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RecipeByCategoryPage(
+                            category: category,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  child: CustomCategoryCard(category: category),
-                );
+                      );
+                    },
+                    child: CustomCategoryCard(category: category),
+                  );
+                }
               },
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(

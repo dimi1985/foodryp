@@ -14,6 +14,7 @@ import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:foodryp/widgets/shimmer_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -98,23 +99,13 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     topLeft: Radius.circular(Constants.defaultPadding),
                     topRight: Radius.circular(Constants.defaultPadding),
                   ),
-                  child: CachedNetworkImage(
-                    memCacheHeight:screenSize.height.toInt() ,
-                    memCacheWidth:screenSize.width.toInt() ,
-                    imageUrl: widget.recipe.recipeImage ?? Constants.emptyField,
-                    fit: BoxFit.fitWidth,
+                  child: ShimmerNetworkImage(
+                    imageUrl:widget.recipe.recipeImage ?? Constants.emptyField,
+                    fit: BoxFit.cover,
                     width: screenSize.width,
                     height: screenSize.height,
-                    filterQuality: FilterQuality.none,
-                    progressIndicatorBuilder:
-                        (context, url, downloadProgress) => Center(
-                      child: CircularProgressIndicator(
-                        value: downloadProgress.progress,
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => const Center(
-                      child: Icon(Icons.error),
-                    ),
+                    memCacheHeight: screenSize.height,
+                    memCacheWidth: screenSize.width,
                   ),
                 ),
                 Positioned(
