@@ -1,6 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/category_page/category_page.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/screens/weekly_menu_page/weekly_menu_page.dart';
@@ -14,8 +15,11 @@ import 'package:foodryp/widgets/CustomWidgets/top_three_recipe_card_section.dart
 import 'package:foodryp/widgets/CustomWidgets/weeklyMenu_section.dart';
 
 class DesktopMiddleSide extends StatelessWidget {
-
-  const DesktopMiddleSide({Key? key,});
+  final User? user;
+  const DesktopMiddleSide({
+    Key? key,
+    this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +33,7 @@ class DesktopMiddleSide extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                   const SizedBox(
+                  const SizedBox(
                     height: 400,
                     child: TopThreeRecipeCardSection(),
                   ),
@@ -45,7 +49,8 @@ class DesktopMiddleSide extends StatelessWidget {
                             builder: (context) => const CategoryPage()),
                       );
                     },
-                    showSeeALl: true, isForDiet: false,
+                    showSeeALl: true,
+                    isForDiet: false,
                   ),
                   const CategorySection(),
                   const SizedBox(height: 15.0),
@@ -56,18 +61,23 @@ class DesktopMiddleSide extends StatelessWidget {
                               ? 10
                               : 50),
                   HeadingTitleRow(
-                    title: AppLocalizations.of(context).translate('Latest Recipes'),
+                    title: AppLocalizations.of(context)
+                        .translate('Latest Recipes'),
                     onPressed: () {
                       // Navigate to the corresponding page
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const RecipePage(seeAll: true)),
+                            builder: (context) => RecipePage(
+                                  seeAll: true,
+                                  user: user,
+                                )),
                       );
                     },
-                    showSeeALl: true, isForDiet: false,
+                    showSeeALl: true,
+                    isForDiet: false,
                   ),
-                  const RecipeSection(isFor: 'MainScreen'),
+                  RecipeSection(isFor: 'MainScreen', user: user),
                   const SizedBox(height: 15.0),
                   HeadingTitleRow(
                     title:
@@ -77,47 +87,55 @@ class DesktopMiddleSide extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const WeeklyMenuPage(isForDiet: false, showAll: false,)),
-                      );
-                    },
-                    showSeeALl: true, isForDiet: false,
-                  ),
-                   Padding(
-                    padding:const EdgeInsets.all(16),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: WeeklyMenuSection(
-                        showAll: true,
-                        publicUsername: Constants.emptyField,
-                        publicUserId: Constants.emptyField, isForDiet: false,
-                      ),
-                    ),
-                  ),
-                    const SizedBox(height: 15.0),
-                  HeadingTitleRow(
-                    title:
-                        AppLocalizations.of(context).translate('Weekly Diet Menus',),
-                    onPressed: () {
-                      // Navigate to the corresponding page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const WeeklyMenuPage(isForDiet: true, showAll: false,)),
+                            builder: (context) => const WeeklyMenuPage(
+                                  isForDiet: false,
+                                  showAll: false,
+                                )),
                       );
                     },
                     showSeeALl: true,
-                    isForDiet: true,
+                    isForDiet: false,
                   ),
-                   Padding(
-                    padding:const EdgeInsets.all(16),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: WeeklyMenuSection(
                         showAll: true,
                         publicUsername: Constants.emptyField,
                         publicUserId: Constants.emptyField,
-                        isForDiet: true
+                        isForDiet: false,
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 15.0),
+                  HeadingTitleRow(
+                    title: AppLocalizations.of(context).translate(
+                      'Weekly Diet Menus',
+                    ),
+                    onPressed: () {
+                      // Navigate to the corresponding page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const WeeklyMenuPage(
+                                  isForDiet: true,
+                                  showAll: false,
+                                )),
+                      );
+                    },
+                    showSeeALl: true,
+                    isForDiet: true,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: WeeklyMenuSection(
+                          showAll: true,
+                          publicUsername: Constants.emptyField,
+                          publicUserId: Constants.emptyField,
+                          isForDiet: true),
                     ),
                   ),
                   const SizedBox(height: 15.0),

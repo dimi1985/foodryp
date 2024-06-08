@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodryp/models/recipe.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/comment_service.dart';
 import 'package:foodryp/utils/connectivity_service.dart';
@@ -24,11 +25,13 @@ class RecipeDetailPage extends StatefulWidget {
   final Recipe recipe;
   final String internalUse;
   final List<String> missingIngredients;
+  final User? user;
   const RecipeDetailPage(
       {super.key,
       required this.recipe,
       required this.internalUse,
-      required this.missingIngredients});
+      required this.missingIngredients,
+      this.user});
 
   @override
   State<RecipeDetailPage> createState() => _RecipeDetailPageState();
@@ -269,7 +272,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                             .withOpacity(0.7),
                       ),
               ),
-              const SizedBox(width: 20,),
+              const SizedBox(
+                width: 20,
+              ),
               Container(
                 decoration: BoxDecoration(
                   color:
@@ -340,7 +345,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                 recipeId: widget.recipe.id ?? Constants.emptyField,
                 recipeName: widget.recipe.recipeTitle ?? Constants.emptyField,
                 userId: widget.recipe.userId ?? Constants.emptyField,
-                 internalUse: widget.internalUse,
+                internalUse: widget.internalUse,
               )
             ],
           ),
@@ -558,6 +563,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
             itemCount: comments.length,
             itemBuilder: (context, index) {
               final comment = comments[index];
+              final bool isEnabled =
+                  isAuthenticated; // Input is enabled only if the user is authenticated
               return Card(
                 elevation: 0, // Adds a subtle shadow for depth
                 margin: const EdgeInsets.symmetric(
@@ -599,6 +606,23 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                         style: const TextStyle(
                             color: Colors.grey), // Color of the dot
                       ),
+                      if (widget.user?.role == 'admin' ||
+                          widget.user?.role == 'moderator')
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: isEnabled
+                              ? () async {
+                                  await CommentService().deleteComment(
+                                      comment.id,
+                                      widget.user?.role,
+                                      widget.recipe.id ?? '');
+
+                                  setState(() {
+                                    fetchComments();
+                                  });
+                                }
+                              : null, // Disable onPressed if the user is not authenticated
+                        ),
                     ],
                   ),
                   subtitle: Text(
@@ -654,7 +678,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                     await CommentService().createComment(
                         widget.recipe.id ?? '',
                         text,
-                        widget.recipe.username ?? Constants.emptyField,
+                        widget.user?.username ?? Constants.emptyField,
                         widget.recipe.useImage ?? '', []);
                     _commentController.clear();
                     setState(() {

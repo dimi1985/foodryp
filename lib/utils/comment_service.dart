@@ -7,37 +7,36 @@ import 'package:http/http.dart' as http;
 
 class CommentService {
   Future<Comment> createComment(String recipeId, String text, String username,
-    String userImage, List<Comment>? replies) async {
-  try {
-    final token = await TokenManager.getTokenLocally();
-    final headers = {'Authorization': 'Bearer $token'};
+      String userImage, List<Comment>? replies) async {
+    try {
+      final token = await TokenManager.getTokenLocally();
+      final headers = {'Authorization': 'Bearer $token'};
 
-    final response = await http.post(
-      Uri.parse('${Constants.baseUrl}/api/createComment'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        ...headers, // Include authorization headers
-      },
-      body: jsonEncode({
-        'text': text,
-        'userId': await UserService().getCurrentUserId(),
-        'recipeId': recipeId,
-        'username': username,
-        'useImage': userImage,
-        'replies': replies ?? [], // Pass empty list if replies are null
-      }),
-    );
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/api/createComment'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          ...headers, // Include authorization headers
+        },
+        body: jsonEncode({
+          'text': text,
+          'userId': await UserService().getCurrentUserId(),
+          'recipeId': recipeId,
+          'username': username,
+          'useImage': userImage,
+          'replies': replies ?? [], // Pass empty list if replies are null
+        }),
+      );
 
-    if (response.statusCode == 201) {
-      return Comment.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to create comment');
+      if (response.statusCode == 201) {
+        return Comment.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to create comment');
+      }
+    } catch (e) {
+      throw Exception('Failed to create comment: $e');
     }
-  } catch (e) {
-    throw Exception('Failed to create comment: $e');
   }
-}
-
 
   Future<List<Comment>> getCommsentsByRecipeId(String recipeId) async {
     final response = await http.get(
@@ -56,52 +55,53 @@ class CommentService {
     }
   }
 
-Future<Comment> updateComment(String commentId, String newText) async {
-  try {
-    final token = await TokenManager.getTokenLocally();
-    final headers = {'Authorization': 'Bearer $token'};
+  Future<Comment> updateComment(String commentId, String newText) async {
+    try {
+      final token = await TokenManager.getTokenLocally();
+      final headers = {'Authorization': 'Bearer $token'};
 
-    final response = await http.put(
-      Uri.parse('${Constants.baseUrl}/api/updateComment/$commentId'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        ...headers, // Include authorization headers
-      },
-      body: jsonEncode({
-        'text': newText,
-      }),
-    );
+      final response = await http.put(
+        Uri.parse('${Constants.baseUrl}/api/updateComment/$commentId'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          ...headers, // Include authorization headers
+        },
+        body: jsonEncode({
+          'text': newText,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      return Comment.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to update comment');
+      if (response.statusCode == 200) {
+        return Comment.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to update comment');
+      }
+    } catch (e) {
+      throw Exception('Failed to update comment: $e');
     }
-  } catch (e) {
-    throw Exception('Failed to update comment: $e');
   }
-}
 
+  Future<void> deleteComment(
+      String commentId, String? role, String recipeId) async {
+    try {
+      final Map<String, dynamic> requestBody = {
+        'role': role ?? '',
+        'recipeId': recipeId,
+      };
 
-Future<void> deleteComment(String commentId) async {
-  try {
-    final token = await TokenManager.getTokenLocally();
-    final headers = {'Authorization': 'Bearer $token'};
+      final response = await http.delete(
+        Uri.parse('${Constants.baseUrl}/api/deleteComment/$commentId'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestBody),
+      );
 
-    final response = await http.delete(
-      Uri.parse('${Constants.baseUrl}/api/deleteComment/$commentId'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        ...headers, // Include authorization headers
-      },
-    );
-
-    if (response.statusCode != 204) {
-      throw Exception('Failed to delete comment');
+      if (response.statusCode != 204) {
+        throw Exception('Failed to delete comment');
+      }
+    } catch (e) {
+      throw Exception('Failed to delete comment: $e');
     }
-  } catch (e) {
-    throw Exception('Failed to delete comment: $e');
   }
-}
-
 }

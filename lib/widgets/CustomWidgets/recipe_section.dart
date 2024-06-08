@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:foodryp/models/user.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -9,7 +10,8 @@ import 'package:foodryp/widgets/CustomWidgets/shimmer_custom_recipe_card.dart'; 
 
 class RecipeSection extends StatefulWidget {
   final isFor;
-  const RecipeSection({super.key, required this.isFor});
+  final User? user;
+  const RecipeSection({super.key, required this.isFor, this.user});
 
   @override
   State<RecipeSection> createState() => _RecipeSectionState();
@@ -56,7 +58,9 @@ class _RecipeSectionState extends State<RecipeSection> {
               physics: const AlwaysScrollableScrollPhysics(),
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: _isLoading ? 4 : recipes.length, // Show shimmer cards while loading
+              itemCount: _isLoading
+                  ? 4
+                  : recipes.length, // Show shimmer cards while loading
               itemBuilder: (context, index) {
                 if (_isLoading) {
                   return Padding(
@@ -81,6 +85,7 @@ class _RecipeSectionState extends State<RecipeSection> {
                                 recipe: recipe,
                                 internalUse: '',
                                 missingIngredients: const [],
+                                user: widget.user,
                               ),
                             ),
                           );

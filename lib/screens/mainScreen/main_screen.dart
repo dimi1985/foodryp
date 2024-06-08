@@ -28,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             Expanded(
               flex: isDesktop ? 4 : 2,
-              child:  const DesktopMiddleSide(),
+              child: DesktopMiddleSide(user: widget.user),
             ),
             if (isDesktop)
               Expanded(
