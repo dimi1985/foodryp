@@ -547,7 +547,9 @@ class RecipeService {
     }
   }
 
-  Future<bool> saveUserRecipe(String userId, String recipeId) async {
+  Future<bool> saveUserRecipe( String recipeId) async {
+    await _initPrefs();
+  final userId = _prefs.getString('userId');
     try {
       final token = await TokenManager
           .getTokenLocally(); // Retrieve token from local storage
@@ -570,7 +572,9 @@ class RecipeService {
     }
   }
 
-  Future<bool> removeUserRecipe(String userId, String recipeId) async {
+  Future<bool> removeUserRecipe(String recipeId) async {
+        await _initPrefs();
+  final userId = _prefs.getString('userId');
     try {
       final token = await TokenManager
           .getTokenLocally(); // Retrieve token from local storage
@@ -600,7 +604,9 @@ class RecipeService {
     }
   }
 
-  Future<List<String>> getUserSavedRecipes(String userId) async {
+  Future<List<String>> getUserSavedRecipes() async {
+        await _initPrefs();
+  final userId = _prefs.getString('userId');
     try {
       final token = await TokenManager
           .getTokenLocally(); // Retrieve token from local storage
@@ -631,7 +637,9 @@ class RecipeService {
     }
   }
 
-  Future<List<Recipe>> getUserSavedRecipesDetails(String userId) async {
+  Future<List<Recipe>> getUserSavedRecipesDetails() async {
+        await _initPrefs();
+  final userId = _prefs.getString('userId');
     try {
       final token = await TokenManager
           .getTokenLocally(); // Retrieve token from local storage

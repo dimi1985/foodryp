@@ -5,10 +5,12 @@ import 'package:foodryp/models/weeklyMenu.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/theme_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
 
 class WeeklyMenuDetailPage extends StatelessWidget {
   final WeeklyMenu meal;
@@ -22,6 +24,7 @@ class WeeklyMenuDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
 
+ final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Column(
@@ -30,7 +33,9 @@ class WeeklyMenuDetailPage extends StatelessWidget {
             Text(
               meal.title,
               style: GoogleFonts.lobster(
-                color: Colors.white,
+                color:  themeProvider.currentTheme == ThemeType.light
+                  ? const Color.fromARGB(255, 0, 0, 0)
+                  : const Color.fromARGB(255, 224, 224, 224),
                 fontSize: isDesktop ? 24 : 20,
               ),
             ),
@@ -39,12 +44,17 @@ class WeeklyMenuDetailPage extends StatelessWidget {
                 Text(
                   'Posted by ${meal.username} on ',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color:  themeProvider.currentTheme == ThemeType.light
+                  ? const Color.fromARGB(255, 0, 0, 0)
+                  : const Color.fromARGB(255, 224, 224, 224),
                     fontSize: isDesktop ? 14 : 12,
                   ),
                 ),
                 Text(
                   DateFormat('dd MMM yyyy').format(meal.dateCreated),
+                  style: TextStyle(color:  themeProvider.currentTheme == ThemeType.light
+                  ? const Color.fromARGB(255, 0, 0, 0)
+                  : const Color.fromARGB(255, 224, 224, 224),),
                 ),
               ],
             ),

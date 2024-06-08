@@ -340,6 +340,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                 recipeId: widget.recipe.id ?? Constants.emptyField,
                 recipeName: widget.recipe.recipeTitle ?? Constants.emptyField,
                 userId: widget.recipe.userId ?? Constants.emptyField,
+                 internalUse: widget.internalUse,
               )
             ],
           ),

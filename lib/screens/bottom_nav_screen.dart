@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +16,7 @@ import 'package:foodryp/utils/user_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BottomNavScreen extends StatefulWidget {
-  const BottomNavScreen({super.key});
+  const BottomNavScreen({Key? key}) : super(key: key);
 
   @override
   _BottomNavScreenState createState() => _BottomNavScreenState();
@@ -27,7 +25,6 @@ class BottomNavScreen extends StatefulWidget {
 class _BottomNavScreenState extends State<BottomNavScreen> {
   int _selectedIndex = 0;
   User? user;
-  bool userIsNull = true;
   String localUserId = Constants.emptyField;
 
   @override
@@ -36,29 +33,29 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
     if (kIsWeb) {
       fetchUserProfile();
-      userIsNull = false;
     } else {
       fetchUserProfile().then((value) {
         setState(() {
-          userIsNull = false;
+          // Update state after fetching user profile
         });
       });
     }
   }
 
   Future<void> fetchUserProfile() async {
-    bool oneTimeSave = await UserService().getsaveOneTimeSheetShow();
-    if (!oneTimeSave) {
-      _showSaveCredentialsBottomSheet();
-    }
     try {
       final userService = UserService();
-      User? userProfile;
+      bool oneTimeSave = await userService.getsaveOneTimeSheetShow();
+      if (!oneTimeSave) {
+        _showSaveCredentialsBottomSheet();
+      }
+
       localUserId = await userService.getCurrentUserId();
-      if ((user?.username.isEmpty ?? true)) {
-        userProfile = await userService.getUserProfile() ?? Constants.defaultUser;
+      User? userProfile = await userService.getUserProfile();
+      if (userProfile == null || userProfile.username.isEmpty) {
+        userProfile = Constants.defaultUser;
       } else {
-        if (user?.id != localUserId || localUserId.isEmpty) {
+        if (userProfile.id != localUserId || localUserId.isEmpty) {
           userService.clearUserId();
         }
       }
@@ -140,13 +137,13 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                     label: AppLocalizations.of(context).translate('Auth Screen'),
                   ),
               ],
-              currentIndex: _selectedIndex,
-              selectedItemColor: Colors.amber[800],
+              currentIndex: _selectedIndex.clamp(0, primaryItemsCount - 1),
+              selectedItemColor: Colors.amber[800], // Set the selected item color here
               unselectedItemColor: Colors.grey,
               selectedLabelStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.amber[800], // Use any color that fits your design
+                color: Colors.amber[800],
               ),
               unselectedLabelStyle: Constants.globalTextStyle,
               onTap: (index) {
@@ -159,29 +156,26 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                         children: [
                           ListTile(
                             leading: Icon(MdiIcons.creation),
-                            title: Text(AppLocalizations.of(context)
-                                .translate('Creators')),
+                            title: Text(AppLocalizations.of(context).translate('Creators')),
                             onTap: () {
                               Navigator.pop(context);
-                              _onContextMenuItemTapped(4); // Set to corresponding index
+                              _onContextMenuItemTapped(primaryItemsCount); // Set to corresponding index
                             },
                           ),
                           ListTile(
                             leading: Icon(MdiIcons.fridge),
-                            title: Text(AppLocalizations.of(context)
-                                .translate('My Fridge')),
+                            title: Text(AppLocalizations.of(context).translate('My Fridge')),
                             onTap: () {
                               Navigator.pop(context);
-                              _onContextMenuItemTapped(5); // Set to corresponding index
+                              _onContextMenuItemTapped(primaryItemsCount + 1); // Set to corresponding index
                             },
                           ),
                           ListTile(
                             leading: Icon(MdiIcons.naturePeople),
-                            title: Text(AppLocalizations.of(context)
-                                .translate('Following Recipes Page')),
+                            title: Text(AppLocalizations.of(context).translate('Following Recipes Page')),
                             onTap: () {
                               Navigator.pop(context);
-                              _onContextMenuItemTapped(6); // Set to corresponding index
+                              _onContextMenuItemTapped(primaryItemsCount + 2); // Set to corresponding index
                             },
                           ),
                         ],
@@ -206,8 +200,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                AppLocalizations.of(context).translate(
-                    'Your session and NOT credentials is saved automaticly for a one-time login'),
+                AppLocalizations.of(context).translate('Your session and NOT credentials is saved automaticly for a one-time login'),
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),

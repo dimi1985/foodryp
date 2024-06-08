@@ -14,6 +14,7 @@ import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
+import 'package:foodryp/widgets/CustomWidgets/recipe_save_widget.dart';
 import 'package:foodryp/widgets/shimmer_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -24,12 +25,13 @@ class CustomRecipeCard extends StatefulWidget {
   final String internalUse;
   final Recipe recipe;
   final List<String>? missingIngredients;
-
+  final String? userId;
   const CustomRecipeCard({
     super.key,
     required this.internalUse,
     required this.recipe,
     this.missingIngredients,
+    this.userId,
   });
 
   @override
@@ -79,6 +81,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -100,7 +103,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     topRight: Radius.circular(Constants.defaultPadding),
                   ),
                   child: ShimmerNetworkImage(
-                    imageUrl:widget.recipe.recipeImage ?? Constants.emptyField,
+                    imageUrl: widget.recipe.recipeImage ?? Constants.emptyField,
                     fit: BoxFit.cover,
                     width: screenSize.width,
                     height: screenSize.height,

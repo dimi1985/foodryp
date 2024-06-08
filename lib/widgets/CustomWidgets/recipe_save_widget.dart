@@ -7,11 +7,14 @@ class RecipSaveWidget extends StatefulWidget {
   final String recipeId;
   final String recipeName;
   final String userId;
+  final String internalUse;
 
-  const RecipSaveWidget({super.key, 
+  const RecipSaveWidget({
+    super.key,
     required this.recipeId,
     required this.recipeName,
     required this.userId,
+    required this.internalUse,
   });
 
   @override
@@ -30,7 +33,7 @@ class _RecipSaveWidgetState extends State<RecipSaveWidget> {
 
   Future<void> _checkIfSaved() async {
     try {
-      List<String> savedRecipes = await _recipeService.getUserSavedRecipes(widget.userId);
+      List<String> savedRecipes = await _recipeService.getUserSavedRecipes();
       setState(() {
         isSaved = savedRecipes.contains(widget.recipeId);
       });
@@ -40,21 +43,26 @@ class _RecipSaveWidgetState extends State<RecipSaveWidget> {
   }
 
   Future<void> _toggleSave() async {
-
     try {
       if (isSaved) {
-        bool success = await _recipeService.removeUserRecipe(widget.userId, widget.recipeId);
+        bool success = await _recipeService.removeUserRecipe(widget.recipeId);
         if (success) {
           setState(() {
             isSaved = false;
           });
+          if (widget.internalUse == 'savedUserRecipes') {
+            Navigator.pop(context, true);
+          }
         }
       } else {
-        bool success = await _recipeService.saveUserRecipe(widget.userId, widget.recipeId);
+        bool success = await _recipeService.saveUserRecipe(widget.recipeId);
         if (success) {
           setState(() {
             isSaved = true;
           });
+          if (widget.internalUse == 'savedUserRecipes') {
+            Navigator.pop(context, true);
+          }
         }
       }
     } catch (error) {

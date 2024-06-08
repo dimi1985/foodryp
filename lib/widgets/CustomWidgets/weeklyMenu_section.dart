@@ -147,6 +147,7 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                                   )),
                         );
                       },
+
                       child: Text(
                         AppLocalizations.of(context).translate(
                           widget.isForDiet
@@ -160,35 +161,43 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
                   ),
                 SizedBox(
                   height: 200,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: isLoading ? 4 : displayList.length, // Show shimmer cards while loading
-                    itemBuilder: (context, index) {
-                      if (isLoading) {
-                        return const ShimmerCustomWeeklyMenuCard();
-                      } else {
-                        final meal = displayList[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      WeeklyMenuDetailPage(meal: meal)),
-                            );
-                          },
-                          child: CustomWeeklyMenuCard(
-                            meal: meal,
-                            currentPage: '',
-                            isForAll: widget.showAll,
-                            publicUserId: widget.publicUserId,
-                            currentUserId: currentUserId,
-                            isForDiet: widget.isForDiet,
-                          ),
-                        );
-                      }
-                    },
+                  child: ScrollConfiguration(
+                     behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              },
+            ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: isLoading ? 4 : displayList.length, // Show shimmer cards while loading
+                      itemBuilder: (context, index) {
+                        if (isLoading) {
+                          return const ShimmerCustomWeeklyMenuCard();
+                        } else {
+                          final meal = displayList[index];
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        WeeklyMenuDetailPage(meal: meal)),
+                              );
+                            },
+                            child: CustomWeeklyMenuCard(
+                              meal: meal,
+                              currentPage: '',
+                              isForAll: widget.showAll,
+                              publicUserId: widget.publicUserId,
+                              currentUserId: currentUserId,
+                              isForDiet: widget.isForDiet,
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
               ],
