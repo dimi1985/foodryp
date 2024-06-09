@@ -1,4 +1,4 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
+// ignore_for_file: no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +9,9 @@ import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/comment_service.dart';
 import 'package:foodryp/utils/connectivity_service.dart';
 import 'package:foodryp/utils/contants.dart';
+import 'package:foodryp/utils/profanity_error.dart';
 import 'package:foodryp/utils/recipe_service.dart';
+import 'package:foodryp/utils/report_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
@@ -623,6 +625,104 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                                 }
                               : null, // Disable onPressed if the user is not authenticated
                         ),
+                      TextButton(
+                        onPressed: isEnabled
+                            ? () {
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    String reportReason = '';
+
+                                    return StatefulBuilder(
+                                      builder: (BuildContext context,
+                                          StateSetter setState) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Text(
+                                                'Report Comment',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              const SizedBox(height: 20),
+                                              TextField(
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    reportReason = value;
+                                                  });
+                                                },
+                                                decoration:
+                                                    const InputDecoration(
+                                                  hintText:
+                                                      'Enter reason for report',
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                                maxLines: 3,
+                                              ),
+                                              const SizedBox(height: 20),
+                                              ElevatedButton(
+                                                onPressed: reportReason
+                                                        .isNotEmpty
+                                                    ? () async {
+                                                        try {
+                                                          // Call the reportComment method from ReportService
+                                                          await ReportService
+                                                              .reportComment(
+                                                                  comment.id,
+                                                                  reportReason);
+
+                                                          // Handle successful report submission
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            const SnackBar(
+                                                              content: Text(
+                                                                  'Report submitted successfully'),
+                                                            ),
+                                                          );
+
+                                                          Navigator.pop(
+                                                              context); // Close bottom sheet
+                                                        } catch (e) {
+                                                          // Handle errors
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                  'Failed to submit report: $e'),
+                                                            ),
+                                                          );
+                                                        }
+                                                      }
+                                                    : null,
+                                                child: Text('Submit Report'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              }
+                            : null,
+                        child: Text(
+                          'Report',
+                          style: TextStyle(
+                            color: isEnabled
+                                ? Theme.of(context).primaryColor
+                                : Colors.black,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   subtitle: Text(
@@ -650,7 +750,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
 
     return Padding(
       padding: EdgeInsets.symmetric(
-          horizontal: Responsive.isDesktop(context) ? 30 : 8),
+        horizontal: Responsive.isDesktop(context) ? 30 : 8,
+      ),
       child: Row(
         children: [
           Expanded(
@@ -675,15 +776,42 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                 ? () async {
                     String text = _commentController.text.trim();
 
-                    await CommentService().createComment(
+                    try {
+                      await CommentService().createComment(
                         widget.recipe.id ?? '',
                         text,
                         widget.user?.username ?? Constants.emptyField,
-                        widget.recipe.useImage ?? '', []);
-                    _commentController.clear();
-                    setState(() {
-                      fetchComments();
-                    });
+                        widget.recipe.useImage ?? '',
+                        [],
+                      );
+                      _commentController.clear();
+                      setState(() {
+                        fetchComments();
+                      });
+                    } catch (e) {
+                      if (e is ProfanityError) {
+                        // Handle error due to inappropriate language
+                        // Show appropriate message to the user
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)
+                                .translate(
+                                    'Comment contains inappropriate language')),
+                          ),
+                        );
+                      } else {
+                        // Handle other error scenarios
+                        // Show a generic error message to the user
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)
+                                .translate(
+                                    'Comment contains inappropriate language')),
+                          ),
+                        );
+                      }
+                    }
                   }
                 : null, // Disable onPressed if the user is not authenticated
           ),

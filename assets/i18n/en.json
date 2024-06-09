@@ -255,5 +255,24 @@
   "Sent Request": "Sent Request",
   "No Thanks": "No Thanks",
   "Following Back": "Following Back",
-  "UnFollowing": "UnFollowing"
+  "UnFollowing": "UnFollowing",
+  "Admin Reports": "Admin Reports",
+  "Reported Comment:": "Reported Comment:",
+  "'CommentId:": "'CommentId:",
+  "Text:": "Text:",
+  "User:": "User:",
+  "Date:": "Date:",
+  "Comment found:": "Comment found:",
+  "Comment not found": "Comment not found",
+  "Admin Comment Panel": "Admin Comment Panel",
+  "Search by Comment ID": "Search by Comment ID",
+  "All Comments:": "All Comments:",
+  "Reports": "Reports",
+  "No reports at this time": "No reports at this time",
+  "Password reset email sent successfully.": "Password reset email sent successfully.",
+  "Failed to send password reset email.": "Failed to send password reset email.",
+  "Comment contains inappropriate language": "Comment contains inappropriate language",
+  "Enter your email to receive password reset instructions.": "Enter your email to receive password reset instructions.",
+  "Send Reset Email": "Send Reset Email"
+
 }

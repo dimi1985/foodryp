@@ -641,4 +641,23 @@ Future<bool> deleteFridgeItem(String itemName) async {
   }
 }
 
+  Future<bool> forgotPassword(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/api/requestPasswordReset'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'email': email}),
+      );
+      if (response.statusCode == 200) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error sending password reset email: $e');
+      return false;
+    }
+  }
+
 }

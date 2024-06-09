@@ -257,7 +257,24 @@
   "Sent Request": "Απεσταλμένο αίτημα",
   "No Thanks": "Οχι ευχαριστώ",
   "Following Back": "Ακολουθώντας πίσω",
-  "UnFollowing": "Δεν ακολουθείτε"
-
+  "UnFollowing": "Δεν ακολουθείτε",
+  "Admin Reports": "Αναφορές διαχειριστή",
+  "Reported Comment:": "Αναφερόμενο σχόλιο:",
+  "'CommentId:": "Αναγνωριστικό σχολίου:",
+  "Text:": "Κείμενο:",
+  "User:": "Χρήστης:",
+  "Date:": "Ημερομηνία:",
+  "Comment found:": "Βρέθηκε σχόλιο:",
+  "Comment not found": "Το σχόλιο δεν βρέθηκε",
+  "Admin Comment Panel": "Πίνακας σχολίων διαχειριστή",
+  "Search by Comment ID": "Αναζήτηση κατά Αναγνωριστικό σχολίου",
+  "All Comments:": "Όλα τα σχόλια:",
+  "Reports": "Αναφορές",
+  "No reports at this time": "Δεν υπάρχουν αναφορές αυτή τη στιγμή",
+  "Password reset email sent successfully.": "Η ηλεκτρονική διεύθυνση επαναφοράς κωδικού πρόσβασης στάλθηκε με επιτυχία.",
+  "Failed to send password reset email.": "Αποτυχία αποστολής ηλεκτρονικής διεύθυνσης επαναφοράς κωδικού πρόσβασης.",
+    "Comment contains inappropriate language": "Το σχόλιο περιέχει ακατάλληλη γλώσσα",
+    "Enter your email to receive password reset instructions.": "Εισαγάγετε το email σας για να λάβετε οδηγίες επαναφοράς κωδικού πρόσβασης",
+  "Send Reset Email": "Αποστολή επαναφοράς emai"
   }
   

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/celebration_day.dart';
+import 'package:foodryp/models/comment.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/models/wikifood.dart';
@@ -123,4 +124,6 @@ class Constants {
   static bool checkIfAndroid() {
     return defaultTargetPlatform == TargetPlatform.android;
   }
+
+ static final Comment defaultComment = Comment(id: '', text: '', userId: '', username: '', useImage: '', recipeId: '');
 }

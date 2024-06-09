@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/screens/auth_screen/components/reusable_textfield.dart';
 import 'package:foodryp/screens/bottom_nav_screen.dart';
 import 'package:foodryp/screens/entry_web_navigation_page.dart';
+import 'package:foodryp/screens/forgot_password_screen.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/theme_provider.dart';
@@ -59,9 +60,8 @@ class _AuthScreenState extends State<AuthScreen> {
         );
 
         if (!success) {
-          
-          message = AppLocalizations.of(context)
-                                  .translate('Registration failed: Email or Username already exists');
+          message = AppLocalizations.of(context).translate(
+              'Registration failed: Email or Username already exists');
         }
       } else {
         // Perform login
@@ -71,9 +71,8 @@ class _AuthScreenState extends State<AuthScreen> {
         );
 
         if (!success) {
-          
           message = AppLocalizations.of(context)
-                                  .translate('Login failed: Invalid email or password');
+              .translate('Login failed: Invalid email or password');
         }
       }
 
@@ -244,7 +243,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     // Optional: Forgot Password Link
                     TextButton(
                       onPressed: () {
-                        // Handle forgot password logic
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordScreen(),
+                          ),
+                        );
                       },
                       child: Text(AppLocalizations.of(context)
                           .translate('Forgot Password?')),

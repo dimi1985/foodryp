@@ -8,6 +8,8 @@ import 'package:foodryp/screens/admin/components/admin_recipe_page.dart';
 import 'package:foodryp/screens/admin/components/admin_running_event_Page.dart';
 import 'package:foodryp/screens/admin/components/admin_teams_page.dart';
 import 'package:foodryp/screens/admin/components/admin_user_page.dart';
+import 'package:foodryp/screens/admin/components/widgets/admin_comment_panel_screen.dart';
+import 'package:foodryp/screens/admin/components/widgets/admin_report_panel.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/responsive.dart';
 
@@ -106,6 +108,30 @@ class AdminPanelScreen extends StatelessWidget {
                 MaterialPageRoute(
                     builder: (context) =>
                         AdminFoodWikiPage(userRole: user.role)),
+              );
+            },
+          ),
+             CustomAdminCard(
+            title: AppLocalizations.of(context).translate('Comments'),
+            icon: Icons.person,
+            onTap: () {
+              // Navigate to Users screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AdminCommentPanelPage(userRole: user.role)),
+              );
+            },
+          ),
+             CustomAdminCard(
+            title: AppLocalizations.of(context).translate('Reports'),
+            icon: Icons.person,
+            onTap: () {
+              // Navigate to Users screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AdminReportPage(userRole: user.role)),
               );
             },
           ),
