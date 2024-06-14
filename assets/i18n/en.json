@@ -273,6 +273,12 @@
   "Failed to send password reset email.": "Failed to send password reset email.",
   "Comment contains inappropriate language": "Comment contains inappropriate language",
   "Enter your email to receive password reset instructions.": "Enter your email to receive password reset instructions.",
-  "Send Reset Email": "Send Reset Email"
+  "Send Reset Email": "Send Reset Email",
+  "Recovery Pin": "Recovery Pin",
+  "Enter Your 4-Digit PIN": "Enter Your 4-Digit PIN",
+  "This PIN will be used for verification when you request to reset your forgotten password.": "This PIN will be used for verification when you request to reset your forgotten password.",
+  "PIN sent successfully": "PIN sent successfully",
+  "Failed to send PIN": "Failed to send PIN",
+  "Send PIN": "Send PIN"
 
 }

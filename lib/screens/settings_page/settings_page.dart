@@ -1,8 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:foodryp/main.dart';
 import 'package:foodryp/models/user.dart';
 import 'package:foodryp/screens/admin/admin_panel_screen.dart';
@@ -39,6 +40,9 @@ class _SettingsPageState extends State<SettingsPage> {
   late List<Language> supportedLanguages;
   int _selectedLanguageIndex = 1;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String pin = Constants.emptyField;
+  bool isPinSend = false;
+  bool isPinRegistered = false;
 
   @override
   void didChangeDependencies() {
@@ -73,13 +77,24 @@ class _SettingsPageState extends State<SettingsPage> {
         Foodryp.setLocale(context, locale);
       }
     });
+
+    // Fetch PIN status on page load
+    fetchPinStatus();
+  }
+
+  void fetchPinStatus() async {
+    try {
+      String? pinHash = await UserService().fetchPin();
+      setState(() {
+        isPinRegistered = pinHash != null;
+      });
+    } catch (e) {return;}
   }
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
     final searchSettingsProvider = Provider.of<SearchSettingsProvider>(context);
-
 
     return Scaffold(
       key: _scaffoldKey,
@@ -92,10 +107,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>  AdminPanelScreen(user:widget.user)),
+                        builder: (context) =>
+                            AdminPanelScreen(user: widget.user)),
                   );
                 },
-                child: Text(AppLocalizations.of(context).translate('Admin Panel')))
+                child:
+                    Text(AppLocalizations.of(context).translate('Admin Panel')))
         ],
       ),
       body: ListView(
@@ -147,7 +164,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(AppLocalizations.of(context).translate(
-                                  AppLocalizations.of(context).translate('Failed to change email, Please try again.'))),
+                                  AppLocalizations.of(context).translate(
+                                      'Failed to change email, Please try again.'))),
                               duration: const Duration(
                                   seconds: 2), // Adjust duration as needed
                             ),
@@ -157,8 +175,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         // Show error snackbar if something went wrong
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                                AppLocalizations.of(context).translate('Failed to change email, Please try again.')),
+                            content: Text(AppLocalizations.of(context).translate(
+                                'Failed to change email, Please try again.')),
                             duration: const Duration(
                                 seconds: 2), // Adjust duration as needed
                           ),
@@ -177,14 +195,16 @@ class _SettingsPageState extends State<SettingsPage> {
             Icons.lock,
             () {
               showDialog(
-                context: _scaffoldKey.currentContext!,
+                  context: _scaffoldKey.currentContext!,
                 builder: (BuildContext context) {
                   return ChangeFieldDialog(
-                    context: context, 
+                    context: context,
                     title:
-                        '${ AppLocalizations.of(context).translate('Change Password')}\n${AppLocalizations.of(context).translate('(Signout is automatic after change)')}',
-                    hintText: AppLocalizations.of(context).translate('Enter old Password'),
-                    newHintText: AppLocalizations.of(context).translate('Enter new Password'),
+                        '${AppLocalizations.of(context).translate('Change Password')}\n${AppLocalizations.of(context).translate('(Signout is automatic after change)')}',
+                    hintText: AppLocalizations.of(context)
+                        .translate('Enter old Password'),
+                    newHintText: AppLocalizations.of(context)
+                        .translate('Enter new Password'),
                     onSave: (String oldPassword, String newPassword) async {
                       UserService()
                           .changeCredentials(
@@ -198,10 +218,10 @@ class _SettingsPageState extends State<SettingsPage> {
                           // Password changed successfully
                           // Show success snackbar
                           ScaffoldMessenger.of(context).showSnackBar(
-                             SnackBar(
-                              
-                              content: Text(AppLocalizations.of(context).translate('Password changed successfully')),
-                              duration:const Duration(
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)
+                                  .translate('Password changed successfully')),
+                              duration: const Duration(
                                   seconds: 2), // Adjust duration as needed
                             ),
                           );
@@ -223,8 +243,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         // Show error snackbar if something went wrong
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                                AppLocalizations.of(context).translate('Password changed successfully')),
+                            content: Text(AppLocalizations.of(context)
+                                .translate('Password changed successfully')),
                             duration: const Duration(
                                 seconds: 2), // Adjust duration as needed
                           ),
@@ -267,7 +287,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                         child: Text(
                             AppLocalizations.of(context).translate('Cancel')),
-                            
                       ),
                       TextButton(
                         onPressed: () {
@@ -342,8 +361,8 @@ class _SettingsPageState extends State<SettingsPage> {
             child: MeasurementConversionTable(),
           ),
 
-          _sectionTitle(AppLocalizations.of(context).translate(
-              AppLocalizations.of(context).translate('Search Settings'))),
+          _sectionTitle(
+              AppLocalizations.of(context).translate('Search Settings')),
 
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,6 +397,94 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
           ),
+
+          _sectionTitle(AppLocalizations.of(context).translate(AppLocalizations.of(context).translate('Recovery Pin'))),
+
+
+
+
+
+          Column(
+            children: [
+              ListTile(
+                title:  Text(AppLocalizations.of(context).translate('Enter Your 4-Digit PIN')),
+                subtitle:  Text(
+                    AppLocalizations.of(context).translate('This PIN will be used for verification when you request to reset your forgotten password.')),
+                leading: const Icon(Icons.lock),
+                trailing: ElevatedButton(
+                  onPressed: () async {
+                    if (mounted) {
+                      setState(() {
+                        isPinSend = true;
+                      });
+                    }
+                    // Perform your logic to send 'pin' to the server
+                   
+                    bool success = await UserService().sendPin(pin);
+                    if (success) {
+                      // Handle success scenario (e.g., show confirmation message)
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        
+                        SnackBar(content: Text(AppLocalizations.of(context).translate('PIN sent successfully'))),
+                      );
+                      if (mounted) {
+                        setState(() {
+                          isPinSend = false;
+                        });
+                      }
+                    } else {
+                      
+                      // Handle failure scenario (e.g., show error message)
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context).translate('Failed to send PIN'))),
+                      );
+                      if (mounted) {
+                        setState(() {
+                          isPinSend = false;
+                        });
+                      }
+                    }
+                  },
+                  
+                  child:  Text(AppLocalizations.of(context).translate('Send PIN')),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                dense: true,
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    onChanged: (value) {
+                      pin = value;
+                    },
+                    keyboardType: TextInputType.number,
+                    decoration:  InputDecoration(
+                      
+                      hintText: AppLocalizations.of(context).translate('Enter PIN'),
+                    ),
+                  ),
+                ),
+              ),
+              // Add card based on isPinRegistered status
+              if (isPinRegistered)
+                 Card(
+                  color: Colors.red,
+                  child: ListTile(
+                    title: Text(
+                      AppLocalizations.of(context).translate('PIN Already Registered'),
+                   
+                      style:const TextStyle(color: Colors.white),
+                    ),
+                    leading:const Icon(Icons.warning, color: Colors.white),
+                  ),
+                ),
+            ],
+          )
+
           // Add units and measurements settings tiles here
         ],
       ),
@@ -407,7 +514,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  userImageSection(BuildContext context, bool isDesktop) {
+  Widget userImageSection(BuildContext context, bool isDesktop) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Row(
@@ -460,11 +567,9 @@ class _SettingsPageState extends State<SettingsPage> {
       SnackBar(
         content: Row(
           children: [
-            const CircularProgressIndicator(), // Add a circular progress indicator
+            const CircularProgressIndicator(),
             const SizedBox(width: 16),
-
-            Text(AppLocalizations.of(context)
-                .translate('Uploading file...')), // Text indicating file upload
+            Text(AppLocalizations.of(context).translate('Uploading file...')),
           ],
         ),
       ),
@@ -472,36 +577,30 @@ class _SettingsPageState extends State<SettingsPage> {
 
     // Call the uploadProfile method to upload the image file
     UserService().uploadImageProfile(imageFile, bytes).then((_) {
-      // Once the upload is complete, hide the SnackBar
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-      // Show a SnackBar indicating upload success
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context).translate(
-              'File uploaded successfully')), // Show upload success message
+          content: Text(AppLocalizations.of(context)
+              .translate('File uploaded successfully')),
         ),
       );
     }).catchError((error) {
-      // If there's an error during upload, hide the SnackBar
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-      // Show a SnackBar indicating upload failure
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
               '${AppLocalizations.of(context).translate('Error uploading file:')}'
-              '$error'), // Show upload error message
+              '$error'),
         ),
       );
     });
   }
 
   void signout(BuildContext context) async {
-    // Clear user ID from shared preferences
     await UserService().clearUserId();
-    await TokenManager.clearTokenLocally();
-    // Navigating to the main screen
+
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(

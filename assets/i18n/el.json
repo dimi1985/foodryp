@@ -275,6 +275,12 @@
   "Failed to send password reset email.": "Αποτυχία αποστολής ηλεκτρονικής διεύθυνσης επαναφοράς κωδικού πρόσβασης.",
     "Comment contains inappropriate language": "Το σχόλιο περιέχει ακατάλληλη γλώσσα",
     "Enter your email to receive password reset instructions.": "Εισαγάγετε το email σας για να λάβετε οδηγίες επαναφοράς κωδικού πρόσβασης",
-  "Send Reset Email": "Αποστολή επαναφοράς emai"
+  "Send Reset Email": "Αποστολή επαναφοράς email",
+  "Recovery Pin": "Ρυθμίσεις 4ψήφιου κωδικού ασφαλείας",
+  "Enter Your 4-Digit PIN": "Εισαγάγετε το 4ψήφιο PIN σας",
+  "This PIN will be used for verification when you request to reset your forgotten password.": "Αυτό το PIN θα χρησιμοποιηθεί για επαλήθευση όταν ζητήσετε να επαναφέρετε τον ξεχασμένο κωδικό πρόσβασής σας.",
+  "PIN sent successfully": "Το PIN στάλθηκε με επιτυχία",
+  "Failed to send PIN": "Αποτυχία αποστολής PIN",
+  "Send PIN": "Αποστολή PIN"
   }
   
