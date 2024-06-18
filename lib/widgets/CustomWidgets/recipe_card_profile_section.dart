@@ -55,9 +55,11 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
   }
 
   Future<void> _fetchRecipes() async {
-    setState(() {
+    if(mounted){
+      setState(() {
       _isLoading = true;
     });
+    }
     try {
       final fetchedRecipes = await _fetchRecipesData(_currentPage, _pageSize);
       setState(() {
@@ -65,9 +67,11 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
         _isLoading = false;
       });
     } catch (_) {
-      setState(() {
+     if(mounted){
+       setState(() {
         _isLoading = false;
       });
+     }
     }
   }
 

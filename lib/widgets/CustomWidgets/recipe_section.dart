@@ -9,7 +9,7 @@ import 'package:foodryp/widgets/CustomWidgets/custom_recipe_card.dart';
 import 'package:foodryp/widgets/CustomWidgets/shimmer_custom_recipe_card.dart'; // Import the shimmer card
 
 class RecipeSection extends StatefulWidget {
-  final isFor;
+  final String isFor;
   final User? user;
   const RecipeSection({super.key, required this.isFor, this.user});
 
@@ -58,9 +58,7 @@ class _RecipeSectionState extends State<RecipeSection> {
               physics: const AlwaysScrollableScrollPhysics(),
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: _isLoading
-                  ? 4
-                  : recipes.length, // Show shimmer cards while loading
+              itemCount: _isLoading ? 4 : recipes.length, // Show shimmer cards while loading
               itemBuilder: (context, index) {
                 if (_isLoading) {
                   return Padding(
@@ -72,6 +70,8 @@ class _RecipeSectionState extends State<RecipeSection> {
                   );
                 } else {
                   final recipe = recipes[index];
+                  // Log the recipe image URL
+                  print('Recipe ${recipe.recipeTitle} Image URL: ${recipe.recipeImage}');
                   return Padding(
                     padding: const EdgeInsets.all(Constants.defaultPadding),
                     child: SizedBox(

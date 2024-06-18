@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -17,9 +15,12 @@ class AdminRecipePage extends StatefulWidget {
 }
 
 class _AdminRecipePageState extends State<AdminRecipePage> {
-  late final List<Recipe> _recipes = [];
-  late int _page = 1;
+  List<Recipe> _recipes = [];
+  int _page = 1;
   final int _pageSize = 10;
+  bool _isLoading = false;
+  bool _hasMore = true;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -28,16 +29,28 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
   }
 
   Future<void> _fetchRecipes() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final List<Recipe> recipes =
           await RecipeService().getAllRecipesByPage(_page, _pageSize);
       setState(() {
         _recipes.addAll(recipes);
-        _page++; // Increment page for next fetch
+        _page++;
+        _hasMore = recipes.length == _pageSize;
+        log('Fetched ${recipes.length} recipes');
       });
     } catch (e) {
       // Handle error
-      print('Error fetching recipes: $e');
+      log('Error fetching recipes: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -76,8 +89,29 @@ class _AdminRecipePageState extends State<AdminRecipePage> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: _recipes.length,
+                    controller: _scrollController,
+                    itemCount: _recipes.length + 1,
                     itemBuilder: (context, index) {
+                      if (index == _recipes.length) {
+                        return _hasMore
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                  onPressed: _fetchRecipes,
+                                  child: _isLoading
+                                      ? CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                      : Text(AppLocalizations.of(context)
+                                          .translate('Load More')),
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(AppLocalizations.of(context)
+                                    .translate('No more recipes')),
+                              );
+                      }
                       final recipe = _recipes[index];
                       return ListTile(
                         title: Text(recipe.recipeTitle ?? Constants.emptyField),

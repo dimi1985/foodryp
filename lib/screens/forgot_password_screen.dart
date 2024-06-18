@@ -1,8 +1,11 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/user_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
@@ -13,20 +16,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   List<TextEditingController> pinControllers =
       List.generate(4, (_) => TextEditingController());
   TextEditingController newPasswordController = TextEditingController();
-  TextEditingController confirmNewPasswordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
   UserService userService = UserService();
-  bool isPINValidated = false;
-  bool usernameError = false;
   bool pinError = false;
-  int retryCount = 0;
-  int maxRetries = 3;
+  bool isPINValidated = false;
+  int validationAttempts = 0;
+  final int maxAttempts = 3;
 
   @override
   void dispose() {
     usernameController.dispose();
-    pinControllers.forEach((controller) => controller.dispose());
+    for (var controller in pinControllers) {
+      controller.dispose();
+    }
     newPasswordController.dispose();
-    confirmNewPasswordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -34,86 +38,181 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Forgot Password'),
+        title:
+            Text(AppLocalizations.of(context).translate('Reset Password Page')),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Enter your username and PIN to reset your password.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(
-                labelText: 'Username',
-                hintText: 'Enter your username',
-                errorText: usernameError ? 'Username not found or empty' : null,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Enter PIN',
-              style: TextStyle(color: Colors.grey, fontSize: 20),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                for (int i = 0; i < 4; i++)
-                  Expanded(
-                    child: PinBox(
-                      controller: pinControllers[i],
-                      error: pinError,
-                      onChanged: (value) {
-                        if (value.isNotEmpty) {
-                          // Move focus to the next box
-                          if (i < 3) {
-                            FocusScope.of(context).nextFocus();
-                          } else {
-                            // Last pin box, validate PIN
-                            _validatePIN();
-                          }
-                        }
-                      },
+      body: Center(
+        child: SizedBox(
+           width: 600,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppLocalizations.of(context).translate(
+                        'Please enter your username and you secret PIN registered in your setting page to reset your password.\n You have three attempts after that you will have to send us an email to support@foodryp.com\n with a subject-Foodryp reset password.'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context).translate('Username'),
+                      hintText: AppLocalizations.of(context)
+                          .translate('Enter your username'),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.red),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.red),
+                      ),
                     ),
                   ),
-              ],
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      for (int i = 0; i < 4; i++)
+                        Expanded(
+                          child: PinBox(
+                            controller: pinControllers[i],
+                            error: pinError,
+                            onChanged: (String value) {
+                              if (value.length == 1) {
+                                if (i < 3) {
+                                  FocusScope.of(context).nextFocus();
+                                } else {
+                                  FocusScope.of(context).unfocus();
+                                }
+                              } else if (value.isEmpty && i > 0) {
+                                FocusScope.of(context).previousFocus();
+                              }
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _validatePIN,
+                    child: Text(
+                        AppLocalizations.of(context).translate('Validate PIN')),
+                  ),
+                  if (!isPINValidated &&
+                      validationAttempts > 0 &&
+                      validationAttempts < maxAttempts)
+                    Text(
+                      '${AppLocalizations.of(context)
+                              .translate('Remaining attempts: ')}${maxAttempts - validationAttempts}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  if (validationAttempts >= maxAttempts)
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('No more attempts left.'),
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  if (isPINValidated) ...[
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: newPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)
+                            .translate('New Password'),
+                        hintText: AppLocalizations.of(context)
+                            .translate('Enter your new password'),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              BorderSide(color: Theme.of(context).primaryColor),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)
+                            .translate('Confirm New Password'),
+                        hintText: AppLocalizations.of(context)
+                            .translate('Confirm your new password'),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              BorderSide(color: Theme.of(context).primaryColor),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _resetPassword,
+                      child: Text(AppLocalizations.of(context)
+                          .translate('Reset Password')),
+                    ),
+                  ],
+                ],
+              ),
             ),
-            if (isPINValidated) ...[
-              const SizedBox(height: 20),
-              TextField(
-                controller: newPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'New Password',
-                  hintText: 'Enter your new password',
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: confirmNewPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Confirm New Password',
-                  hintText: 'Confirm your new password',
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Implement logic to reset password
-                  _resetPassword();
-                },
-                child: Text('Reset Password'),
-              ),
-            ],
-            const SizedBox(height: 20),
-            Text('Remaining tries: ${maxRetries - retryCount}'),
-          ],
+          ),
         ),
       ),
     );
@@ -123,136 +222,143 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     String username = usernameController.text.trim();
     String pin = pinControllers.map((controller) => controller.text).join();
 
-    // Check if username is empty
-    if (username.isEmpty) {
-      setState(() {
-        usernameError = true;
-        pinError = false;
-      });
+    if (username.isEmpty || pin.length != 4) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Username should not be empty.'),
-          duration: Duration(seconds: 3),
+          content: Text(AppLocalizations.of(context).translate(
+              'Please ensure the username is entered and the PIN is exactly 4 digits.')),
+          duration: const Duration(seconds: 2),
         ),
       );
       return;
     }
 
-    // Check if PIN is empty or not 4 digits
-    if (pin.length != 4) {
-      setState(() {
-        pinError = true;
-        usernameError = false; // Reset username error state
-      });
-      return;
-    }
-
-    // Perform PIN validation
-    final response = await userService.validatePIN(username, pin);
+    bool isValid = await userService.validatePIN(username, pin);
     setState(() {
-      if (response == 'Username not found') {
-        usernameError = true;
-        pinError = false;
-        isPINValidated = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Username not found.'),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      } else if (response == 'Invalid PIN') {
-        pinError = true;
-        usernameError = false;
-        isPINValidated = false;
-        retryCount++;
-        if (retryCount >= maxRetries) {
-          // Implement logic for handling max retries exceeded
-          print('Max retries exceeded');
+      isPINValidated = isValid;
+      pinError = !isValid;
+      if (!isValid) {
+        validationAttempts++;
+        for (var controller in pinControllers) {
+          controller.clear();
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('PIN validation failed. Please try again.'),
-            duration: Duration(seconds: 3),
+            content: Text(AppLocalizations.of(context)
+                .translate('PIN validation failed. Please try again.')),
+            duration: const Duration(seconds: 2),
           ),
         );
-      } else if (response == 'PIN validated successfully') {
-        isPINValidated = true;
-        pinError = false;
-        usernameError = false;
-        retryCount = 0; // Reset retry count on successful validation
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate('PIN validated successfully.')),
+            duration: const Duration(seconds: 2),
+          ),
+        );
       }
     });
+
+    if (validationAttempts >= maxAttempts) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate('Maximum validation attempts exceeded.')),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _resetPassword() {
     String newPassword = newPasswordController.text;
-    String confirmedPassword = confirmNewPasswordController.text;
-    String username = usernameController.text.trim();
+    String confirmedPassword = confirmPasswordController.text;
 
-    // Implement your logic to reset the password here
-    if (newPassword == confirmedPassword) {
-      // Passwords match, proceed with password reset
-      userService.resetPassword(username, newPassword).then((success) {
-        if (success) {
-          // Password reset successful, navigate to success screen or handle accordingly
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Password reset successfully.'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        } else {
-          // Handle password reset failure
-          // Example: Show snackbar or dialog to inform the user
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to reset password. Please try again.'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
-      });
-    } else {
-      // Passwords do not match, show error message or handle accordingly
+    if (newPassword != confirmedPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Passwords do not match.'),
-          duration: Duration(seconds: 3),
+          content: Text(AppLocalizations.of(context)
+              .translate('Passwords do not match.')),
+          duration: const Duration(seconds: 2),
         ),
       );
+      return;
     }
+
+    if (newPassword.isEmpty || confirmedPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)
+              .translate('Password cannot be empty.')),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    userService
+        .resetPassword(usernameController.text, newPassword)
+        .then((success) {
+      if (success) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate('Password reset successfully.')),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .translate('Failed to reset password. Please try again.')),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    });
   }
 }
+
 
 class PinBox extends StatelessWidget {
   final TextEditingController controller;
   final bool error;
-  final ValueChanged<String>? onChanged;
+  final Function(String) onChanged;
 
   const PinBox({
     Key? key,
     required this.controller,
     required this.error,
-    this.onChanged,
+    required this.onChanged,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: TextInputType.number,
-      obscureText: true,
-      textAlign: TextAlign.center,
-      decoration: InputDecoration(
-        contentPadding: const EdgeInsets.all(16),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: error ? Colors.red : Colors.grey),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        obscureText: true,
+        textAlign: TextAlign.center,
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.all(16),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: error ? Colors.red : Colors.grey),
+          ),
         ),
+        maxLength: 1,
+        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        buildCounter: (BuildContext context,
+            {int? currentLength, bool? isFocused, int? maxLength}) {
+          return null; // Remove the character counter
+        },
       ),
-      maxLength: 1,
-      onChanged: onChanged,
     );
   }
 }

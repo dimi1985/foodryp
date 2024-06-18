@@ -72,101 +72,108 @@ class CategoryService {
     }
   }
 
-  Future<bool> createCategory(
-      String name,
-      String font,
-      String color,
-      String categoryImage,
-      List<String> recipes,
-      bool isForDiet,
-      bool isForVegetarians, String? userRole,) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${Constants.baseUrl}/api/saveCategory'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': name,
-          'font': font,
-          'color': color,
-          'categoryImage': categoryImage,
-          'recipes': recipes,
-          'isForDiet': isForDiet,
-          'isForVegetarians': isForVegetarians,
-          'userRole': userRole,
-        }),
-      );
+ Future<bool> createCategory(
+  String name,
+  String font,
+  String color,
+  String categoryImage,
+  List<String> recipes,
+  bool isForDiet,
+  bool isForVegetarians,
+  String? userRole,
+) async {
+  try {
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/saveCategory'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'name': name,
+        'font': font,
+        'color': color,
+        'categoryImage': categoryImage,
+        'recipes': recipes,
+        'isForDiet': isForDiet,
+        'isForVegetarians': isForVegetarians,
+        'userRole': userRole,
+      }),
+    );
 
-      if (response.statusCode == 201) {
-        // Registration successful
-        final responseData = jsonDecode(response.body);
-        String categoryId = responseData['categoryId'];
-        // categoryId = id;
+    if (response.statusCode == 201) {
+      // Registration successful
+      final responseData = jsonDecode(response.body);
+      String categoryId = responseData['categoryId'];
+      await _saveCategoryIDLocally(categoryId);
+      print('Category created successfully: $responseData');
+      return true;
+    } else {
+      // Handle other status codes
+      print('Error: ${response.statusCode}, ${response.body}');
+      return false;
+    }
+  } catch (e) {
+    print('Error saving Category user: $e');
+    return false;
+  }
+}
 
-        await _saveCategoryIDLocally(categoryId);
+Future<bool> uploadCategoryImage(File? file, Uint8List? uint8list) async {
+  await _initPrefs();
+  final categoryId = _prefs.getString('categoryId');
+  if (categoryId == null) {
+    print('No category ID found in preferences');
+    return false;
+  }
 
+  try {
+    String url = '${Constants.baseUrl}/api/uploadCategoryImage';
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+
+    if (file != null || uint8list != null) {
+      String filename = 'category-$categoryId-${DateTime.now()}.jpg';
+
+      if (kIsWeb && uint8list != null) {
+        // For web platform
+        request.fields['categoryId'] = categoryId;
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'categoryImage',
+            uint8list,
+            filename: filename,
+          ),
+        );
+      } else if (file != null) {
+        // For Android platform
+        request.fields['categoryId'] = categoryId;
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'categoryImage',
+            file.path,
+          ),
+        );
+      }
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        // Category image uploaded successfully
+        final responseData = await http.Response.fromStream(response);
+        print('Image uploaded successfully: ${responseData.body}');
         return true;
-      }
-      return false;
-    } catch (e) {
-      print('Error saving Category user: $e');
-      return false;
-    }
-  }
-
-  Future<void> uploadCategoryImage(File file, Uint8List uint8list) async {
-    await _initPrefs();
-    final categoryId = _prefs.getString('categoryId');
-    try {
-      String url = '${Constants.baseUrl}/api/uploadCategoryImage';
-      var request = http.MultipartRequest('POST', Uri.parse(url));
-
-      if (file != null || uint8list != null) {
-        String filename = 'category-$categoryId-${DateTime.now()}.jpg';
-
-        if (kIsWeb) {
-          // For web platform
-          request.fields['categoryId'] = categoryId!;
-          request.files.add(
-            http.MultipartFile.fromBytes(
-              'categoryImage',
-              uint8list,
-              filename: filename,
-            ),
-          );
-        } else {
-          // For Android platform
-          request.fields['categoryId'] = categoryId!;
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'categoryImage',
-              file.path,
-            ),
-          );
-        }
-
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          // Category image uploaded successfully
-          // Handle the response data as needed
-        } else {
-          // Error uploading category image
-          if (kDebugMode) {
-            print('Error uploading category image: ${response.statusCode}');
-          }
-        }
       } else {
-        // No image selected
-        if (kDebugMode) {
-          print('No file selected');
-        }
+        // Error uploading category image
+        print('Error uploading category image: ${response.statusCode}, ${response.reasonPhrase}');
+        return false;
       }
-    } catch (e) {
-      // Handle upload error
-      if (kDebugMode) {
-        print('Error uploading category image: $e');
-      }
+    } else {
+      // No image selected
+      print('No file selected');
+      return false;
     }
+  } catch (e) {
+    // Handle upload error
+    print('Error uploading category image: $e');
+    return false;
   }
+}
 
   Future<bool> updateCategory(
       String categoryId,

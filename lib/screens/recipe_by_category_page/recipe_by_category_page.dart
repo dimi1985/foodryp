@@ -18,7 +18,7 @@ class RecipeByCategoryPage extends StatefulWidget {
   _RecipeByCategoryPageState createState() => _RecipeByCategoryPageState();
 }
 
-class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
+class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with AutomaticKeepAliveClientMixin{
   late ScrollController _scrollController;
   List<Recipe> recipes = [];
   bool _isLoading = false;
@@ -31,8 +31,8 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
     if (recipes.isEmpty) {
-      _fetchRecipesByCategory();
-        _fetchRecipesByCategoryByLikes();
+      _fetchRecipesByCategory().then((_) =>  _fetchRecipesByCategoryByLikes());
+       
     }
   }
 
@@ -149,6 +149,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('${AppLocalizations.of(context).translate('Recipes for')} ${widget.category.name}'),
@@ -207,4 +208,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> {
       child: CircularProgressIndicator(),
     );
   }
+  
+  @override
+ bool get wantKeepAlive => true;
 }

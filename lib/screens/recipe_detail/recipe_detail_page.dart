@@ -23,6 +23,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import '../../models/comment.dart';
 
+
 class RecipeDetailPage extends StatefulWidget {
   final Recipe recipe;
   final String internalUse;
@@ -39,8 +40,8 @@ class RecipeDetailPage extends StatefulWidget {
   State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
 
-class _RecipeDetailPageState extends State<RecipeDetailPage>
-    with SingleTickerProviderStateMixin {
+
+class _RecipeDetailPageState extends State<RecipeDetailPage> {
   late bool isLiked = false;
   late List<Comment> comments = [];
   late List<String> commentUI = [];
@@ -50,12 +51,17 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
   double _currentRating = 0; // Initial rating
   bool _hasRated = false;
 
+  // State for managing comment editing
+  Map<String, bool> isEditing = {};
+  Map<String, TextEditingController> commentControllers = {};
+
   @override
   void initState() {
     super.initState();
     _currentRating = widget.recipe.rating; // Set initial rating
     initLikeAndAuthStatus();
     fetchComments();
+    print('imgageHost: ${widget.recipe.recipeImage}');
   }
 
   @override
@@ -102,6 +108,31 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     setState(() {
       _hasRated = true;
     });
+  }
+
+  void _toggleEditing(String commentId) {
+    setState(() {
+      isEditing[commentId] = !(isEditing[commentId] ?? false);
+    });
+  }
+
+  void _updateComment(String commentId, String newText) async {
+    await CommentService().updateComment(commentId, newText);
+    fetchComments(); // Refresh comments after update
+  }
+
+  void _deleteComment(String commentId) async {
+    await CommentService().deleteComment(commentId, widget.user?.role ?? '', widget.recipe.id ?? '');
+    fetchComments(); // Refresh comments after deletion
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers
+    commentControllers.forEach((key, controller) {
+      controller.dispose();
+    });
+    super.dispose();
   }
 
   @override
@@ -258,21 +289,25 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
         children: [
           Row(
             children: [
-              Text(
-                widget.recipe.recipeTitle ?? Constants.emptyField,
-                style: connectionService.connectionStatus
-                        .contains(ConnectivityResult.none)
-                    ? const TextStyle(fontFamily: 'Comfortaa')
-                    : GoogleFonts.getFont(
-                        widget.recipe.categoryFont ?? Constants.emptyField,
-                        fontSize: Responsive.isDesktop(context)
-                            ? Constants.desktopHeadingTitleSize
-                            : Constants.mobileHeadingTitleSize,
-                        fontWeight: FontWeight.bold,
-                        color: HexColor(widget.recipe.categoryColor ??
-                                Constants.emptyField)
-                            .withOpacity(0.7),
-                      ),
+              Expanded(
+                child: Text(
+                  widget.recipe.recipeTitle ?? Constants.emptyField,
+                  style: connectionService.connectionStatus
+                          .contains(ConnectivityResult.none)
+                      ? const TextStyle(fontFamily: 'Comfortaa')
+                      : GoogleFonts.getFont(
+                          widget.recipe.categoryFont ?? Constants.emptyField,
+                          fontSize: Responsive.isDesktop(context)
+                              ? Constants.desktopHeadingTitleSize
+                              : Constants.mobileHeadingTitleSize,
+                          fontWeight: FontWeight.bold,
+                          color: HexColor(widget.recipe.categoryColor ??
+                                  Constants.emptyField)
+                              .withOpacity(0.7),
+                        ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               const SizedBox(
                 width: 20,
@@ -298,7 +333,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
             ],
           ),
           const SizedBox(height: 10.0),
-
           Row(
             children: [
               isAuthenticated && kIsWeb && widget.internalUse != 'top_three' ||
@@ -351,7 +385,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               )
             ],
           ),
-
           const SizedBox(height: 10.0),
           Container(
             decoration: BoxDecoration(
@@ -454,7 +487,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               ),
             ],
           ),
-
           const SizedBox(height: 20.0),
           Text(
             AppLocalizations.of(context).translate('Ingredients'),
@@ -508,7 +540,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
             },
           ),
           const SizedBox(height: 20.0),
-
           Text(
             AppLocalizations.of(context).translate('Cooking Advices'),
             style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
@@ -567,6 +598,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               final comment = comments[index];
               final bool isEnabled =
                   isAuthenticated; // Input is enabled only if the user is authenticated
+
+              if (!commentControllers.containsKey(comment.id)) {
+                commentControllers[comment.id] =
+                    TextEditingController(text: comment.text);
+              }
+
               return Card(
                 elevation: 0, // Adds a subtle shadow for depth
                 margin: const EdgeInsets.symmetric(
@@ -623,7 +660,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                                     fetchComments();
                                   });
                                 }
-                              : null, // Disable onPressed if the user is not authenticated
+                              : null,
                         ),
                       TextButton(
                         onPressed: isEnabled
@@ -703,7 +740,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                                                         }
                                                       }
                                                     : null,
-                                                child: Text('Submit Report'),
+                                                child: const Text('Submit Report'),
                                               ),
                                             ],
                                           ),
@@ -719,18 +756,56 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                           style: TextStyle(
                             color: isEnabled
                                 ? Theme.of(context).primaryColor
-                                : Colors.black,
+                                : themeProvider.currentTheme == ThemeType.dark ? Colors.white: Colors.black,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  subtitle: Text(
-                    comments[index].text,
-                    style: TextStyle(
-                        color: themeProvider.currentTheme == ThemeType.dark
-                            ? Colors.white
-                            : Colors.black),
+                  subtitle: Row(
+                    children: [
+                      Expanded(
+                        child: isEditing[comment.id] == true
+                            ? TextField(
+                                controller: commentControllers[comment.id],
+                                decoration: const InputDecoration(
+                                  hintText: 'Edit comment',
+                                ),
+                                onSubmitted: (newText) {
+                                  _updateComment(comment.id, newText);
+                                  _toggleEditing(comment.id);
+                                },
+                              )
+                            : Text(
+                                comments[index].text,
+                                style: TextStyle(
+                                  color: themeProvider.currentTheme ==
+                                          ThemeType.dark
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              ),
+                      ),
+                      if (isAuthenticated)
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                _toggleEditing(comment.id);
+                              },
+                              child: Text(isEditing[comment.id] == true
+                                  ? 'Update'
+                                  : 'Edit'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                _deleteComment(comment.id);
+                              },
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                    ],
                   ),
                   isThreeLine: true,
                 ),

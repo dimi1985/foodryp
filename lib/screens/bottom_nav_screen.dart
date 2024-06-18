@@ -30,11 +30,10 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   @override
   void initState() {
     super.initState();
-
     if (kIsWeb) {
       fetchUserProfile();
     } else {
-      fetchUserProfile().then((value) {
+      fetchUserProfile().then((_) {
         setState(() {
           // Update state after fetching user profile
         });
@@ -200,7 +199,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                AppLocalizations.of(context).translate('Your session and NOT credentials is saved automaticly for a one-time login'),
+                AppLocalizations.of(context).translate('Your session and NOT credentials is saved automatically for a one-time login'),
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),

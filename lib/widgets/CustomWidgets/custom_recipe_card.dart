@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -14,18 +12,44 @@ import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
-import 'package:foodryp/widgets/CustomWidgets/recipe_save_widget.dart';
-import 'package:foodryp/widgets/shimmer_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
+
+class DiagonalStripePainter extends CustomPainter {
+  final Color color;
+
+  DiagonalStripePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path()
+      ..moveTo(size.width, 0)
+      ..lineTo(size.width - 40, 0)
+      ..lineTo(size.width, 40)
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
 
 class CustomRecipeCard extends StatefulWidget {
   final String internalUse;
   final Recipe recipe;
   final List<String>? missingIngredients;
   final String? userId;
+
   const CustomRecipeCard({
     super.key,
     required this.internalUse,
@@ -45,14 +69,9 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
 
   @override
   void initState() {
-    checkAuthenticationAndOwnershipStatus();
-    if (mounted) {
-      setState(() {
-        updateUniqueIngredients();
-      });
-    }
-
     super.initState();
+    checkAuthenticationAndOwnershipStatus();
+    updateUniqueIngredients();
   }
 
   @override
@@ -85,10 +104,13 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
-    bool isDesktop = Responsive.isDesktop(context);
     final connectionService = Provider.of<ConnectivityService>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
+
+    // Log the image URL for debugging
+    final imageUrl = widget.recipe.recipeImage ?? '';
+    print('Image URL: $imageUrl');
+
     return Card(
       surfaceTintColor: Colors.white70,
       child: Column(
@@ -102,17 +124,51 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     topLeft: Radius.circular(Constants.defaultPadding),
                     topRight: Radius.circular(Constants.defaultPadding),
                   ),
-                  child: ShimmerNetworkImage(
-                    imageUrl: widget.recipe.recipeImage ?? Constants.emptyField,
-                    fit: BoxFit.cover,
-                    width: screenSize.width,
-                    height: screenSize.height,
-                    memCacheHeight: screenSize.height,
-                    memCacheWidth: screenSize.width,
+                  child: imageUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          key: ValueKey(imageUrl), // Use the image URL as a key
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          width: screenSize.width,
+                          height: screenSize.height,
+                          memCacheHeight: screenSize.height.toInt(),
+                          memCacheWidth: screenSize.width.toInt(),
+                          placeholder: (context, url) {
+                            print('Loading image: $url');
+                            return Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                width: screenSize.width,
+                                height: screenSize.height,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                          errorWidget: (context, url, error) {
+                            print('Error loading image: $url, error: $error');
+                            return const Center(
+                              child: Icon(Icons.error),
+                            );
+                          },
+                        )
+                      : const Center(
+                          child: Icon(Icons.error),
+                        ),
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: CustomPaint(
+                    size: const Size(100, 100),
+                    painter: DiagonalStripePainter(
+                      HexColor(widget.recipe.categoryColor ?? Constants.emptyField)
+                          .withOpacity(0.7),
+                    ),
                   ),
                 ),
                 Positioned(
-                  bottom: 10,
+                  top: 10,
                   right: 10,
                   child: Row(
                     children: [
@@ -128,55 +184,8 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                                 ? Colors.green
                                 : null,
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: HexColor(widget.recipe.categoryColor ??
-                                  Constants.emptyField)
-                              .withOpacity(0.7),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Text(
-                            overflow: TextOverflow.ellipsis,
-                            widget.recipe.categoryName.toUpperCase(),
-                            style: connectionService.connectionStatus
-                                    .contains(ConnectivityResult.none)
-                                ? const TextStyle(fontFamily: 'Comfortaa')
-                                : GoogleFonts.getFont(
-                                    widget.recipe.categoryFont ??
-                                        Constants.emptyField,
-                                    fontSize: Responsive.isDesktop(context)
-                                        ? Constants.desktopFontSize
-                                        : Constants.mobileFontSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                          ),
-                        ),
-                      ),
+                      const SizedBox(width: 4),
                     ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  left: 10,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 221, 221, 221)
-                          .withOpacity(0.5),
-                      borderRadius:
-                          BorderRadius.circular(10), // Add rounded corners
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: Text(
-                        overflow: TextOverflow.ellipsis,
-                        widget.recipe.difficulty ?? Constants.emptyField,
-                        style: const TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
                   ),
                 ),
               ],
@@ -222,7 +231,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                             : const Color.fromARGB(255, 70, 70, 70),
                       ),
                     ),
-                    const SizedBox(width: 5), // Adjust the spacing as needed
+                    const SizedBox(width: 5),
                     Text(
                       '•',
                       style: TextStyle(
@@ -235,12 +244,11 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       ),
                     ),
                     const SizedBox(width: 5),
-
                     Expanded(
                       child: Text(
                         overflow: TextOverflow.ellipsis,
-                        Constants.calculateMembershipDuration(context,
-                            widget.recipe.dateCreated), // Format the date
+                        Constants.calculateMembershipDuration(
+                          context, widget.recipe.dateCreated),
                         style: TextStyle(
                           fontSize: Responsive.isDesktop(context)
                               ? Constants.desktopFontSize
@@ -253,7 +261,23 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 221, 221, 221).withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.all(6),
+                  child: Text(
+                    overflow: TextOverflow.ellipsis,
+                    widget.recipe.difficulty ?? Constants.emptyField,
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -263,25 +287,19 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         overflow: TextOverflow.ellipsis,
                         widget.recipe.recipeTitle?.toUpperCase() ??
                             Constants.emptyField,
-                        style: connectionService.connectionStatus
-                                .contains(ConnectivityResult.none)
+                        style: connectionService.connectionStatus.contains(ConnectivityResult.none)
                             ? const TextStyle(fontFamily: 'Comfortaa')
                             : GoogleFonts.getFont(
-                                widget.recipe.categoryFont ??
-                                    Constants.emptyField,
+                                widget.recipe.categoryFont ?? Constants.emptyField,
                                 fontSize: Responsive.isDesktop(context)
                                     ? Constants.desktopFontSize
                                     : Constants.mobileFontSize,
                                 fontWeight: FontWeight.bold,
-                                color: HexColor(widget.recipe.categoryColor ??
-                                    Constants.emptyField),
+                                color: HexColor(widget.recipe.categoryColor ?? Constants.emptyField),
                               ),
                       ),
                     ),
-                    if (!isDesktop &&
-                        widget.internalUse != 'MainScreen' &&
-                        widget.internalUse != 'RecipePage' &&
-                        isAndroid)
+                    if (!Responsive.isDesktop(context) && widget.internalUse != 'MainScreen' && widget.internalUse != 'RecipePage' && Theme.of(context).platform == TargetPlatform.android)
                       PopupMenuButton<String>(
                         onSelected: (String result) {
                           if (result == 'edit') {
@@ -297,15 +315,13 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                             );
                           } else if (result == 'delete') {
                             Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  RecipeDeletionConfirmationScreen(
+                              builder: (context) => RecipeDeletionConfirmationScreen(
                                 recipe: widget.recipe,
                               ),
                             ));
                           }
                         },
-                        itemBuilder: (BuildContext context) =>
-                            <PopupMenuEntry<String>>[
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                           const PopupMenuItem<String>(
                             value: 'edit',
                             child: ListTile(
@@ -324,9 +340,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     RatingBarIndicator(
@@ -340,13 +354,7 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       direction: Axis.horizontal,
                     ),
                     const Spacer(),
-                    if (isOwner &&
-                        isAuthenticated &&
-                        widget.internalUse != 'MainScreen' &&
-                        widget.internalUse != 'RecipePage' &&
-                        widget.internalUse != 'AddWeeklyMenuPage' &&
-                        widget.internalUse != 'RecipePageByCategory' &&
-                        isDesktop)
+                    if (isOwner && isAuthenticated && widget.internalUse != 'MainScreen' && widget.internalUse != 'RecipePage' && widget.internalUse != 'AddWeeklyMenuPage' && widget.internalUse != 'RecipePageByCategory' && Responsive.isDesktop(context))
                       IconButton(
                         onPressed: () {
                           Navigator.push(
@@ -362,17 +370,11 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                         },
                         icon: const Icon(Icons.edit),
                       ),
-                    if (isOwner &&
-                        isAuthenticated &&
-                        widget.internalUse != 'MainScreen' &&
-                        widget.internalUse != 'RecipePage' &&
-                        widget.internalUse != 'RecipePageByCategory' &&
-                        isDesktop)
+                    if (isOwner && isAuthenticated && widget.internalUse != 'MainScreen' && widget.internalUse != 'RecipePage' && widget.internalUse != 'RecipePageByCategory' && Responsive.isDesktop(context))
                       IconButton(
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                RecipeDeletionConfirmationScreen(
+                            builder: (context) => RecipeDeletionConfirmationScreen(
                               recipe: widget.recipe,
                             ),
                           ));
@@ -381,24 +383,24 @@ class _CustomRecipeCardState extends State<CustomRecipeCard> {
                       ),
                     Icon(
                       Icons.comment,
-                      color: themeProvider.currentTheme == ThemeType.light
-                          ? Colors.black
-                          : Colors.white,
+                      color: themeProvider.currentTheme == ThemeType.light ? Colors.black : Colors.white,
                     ),
                     Text(
-                      widget.recipe.commentId?.length.toString() ??
-                          Constants.emptyField,
+                      widget.recipe.commentId?.length.toString() ?? Constants.emptyField,
                     ),
                   ],
                 ),
-                if (widget.internalUse == 'RecipePage' &&
-                    (uniqueIngredients.isNotEmpty))
-                  Text(
+                if (widget.internalUse == 'RecipePage' && uniqueIngredients.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
                       '${AppLocalizations.of(context).translate('There Are Missing Ingredients:')} ${uniqueIngredients.length}',
-                      style: TextStyle(color: Colors.red.withOpacity(0.7))),
+                      style: TextStyle(color: Colors.red.withOpacity(0.7)),
+                    ),
+                  ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

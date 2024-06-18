@@ -53,9 +53,11 @@ class _ProfilePageState extends State<ProfilePage> {
           await userService.getPublicUserProfile(widget.user.username);
     }
 
-    setState(() {
+   if(mounted){
+     setState(() {
       widget.user = userProfile ?? Constants.defaultUser;
     });
+   }
   }
 
   @override

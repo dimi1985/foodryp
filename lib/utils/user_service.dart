@@ -699,7 +699,7 @@ class UserService {
     }
   }
 
-  Future<String> validatePIN(String username, String pin) async {
+  Future<bool> validatePIN(String username, String pin) async {
     try {
       final response = await http.post(
         Uri.parse('${Constants.baseUrl}/api/validatePIN'),
@@ -710,13 +710,13 @@ class UserService {
       );
 
       if (response.statusCode == 200) {
-        return 'PIN validated successfully';
+        return true;
       } else {
         final responseBody = jsonDecode(response.body);
         return responseBody['error'] ?? 'Unknown error';
       }
     } catch (e) {
-      return 'Internal server error';
+      return false;
     }
   }
 

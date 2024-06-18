@@ -54,37 +54,52 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
   }
 
   Future<void> _loadData() async {
-    await _fetchUserProfile();
+    try {
+      await _fetchUserProfile();
+    } catch (e) {
+      // Handle any errors that occur during the data loading process
+      // Optionally, show an error message to the user
+    }
   }
 
-
   Future<void> _fetchUserProfile() async {
-    bool oneTimeSave = await UserService().getsaveOneTimeSheetShow();
-    if (!oneTimeSave) {
-      _showSaveCredentialsBottomSheet();
-    }
     final userService = UserService();
     setState(() {
       userIsBeingFetched = true;
     });
-    final userProfile = await userService.getUserProfile();
-    userId = await userService.getCurrentUserId();
-    setState(() {
-      if (userId.isNotEmpty) {
-        isAuthenticated = true;
-      }
-      if (userProfile != null) {
-        user = userProfile;
+
+    try {
+      userId = await userService.getCurrentUserId();
+      if (userId.isEmpty) {
+        // If userId is empty, navigate to authentication screen
         setState(() {
+          isAuthenticated = false;
+          user = Constants.defaultUser;
           userIsBeingFetched = false;
         });
-      } else {
+        _navigateToPage(menuItems.indexOf('Sign Up/Sign In'));
+        return;
+      }
+
+      final userProfile = await userService.getUserProfile();
+      setState(() {
+        if (userProfile != null) {
+          user = userProfile;
+          isAuthenticated = true;
+        } else {
+          user = Constants.defaultUser;
+          isAuthenticated = false;
+        }
+        userIsBeingFetched = false;
+      });
+    } catch (e) {
+      // Handle errors, for instance, log them or show a message to the user
+      setState(() {
         user = Constants.defaultUser;
-        setState(() {
-          userIsBeingFetched = false;
-        });
-      }
-    });
+        isAuthenticated = false;
+        userIsBeingFetched = false;
+      });
+    }
   }
 
   void _navigateToPage(int index) {
@@ -93,7 +108,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
     });
     _pageController.animateToPage(
       index,
-      duration: const Duration(microseconds: 100),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.fastEaseInToSlowEaseOut,
     );
   }
@@ -166,8 +181,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
                     scrollDirection: Axis.horizontal,
                     children: menuItems
                         .where((item) =>
-                            item !=
-                            'ProfilePage') // Exclude 'ProfilePage' from view
+                            item != 'ProfilePage') // Exclude 'ProfilePage' from view
                         .map((item) => _buildMenuItem(item))
                         .toList(),
                   ),
@@ -341,7 +355,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
             children: [
               Text(
                 AppLocalizations.of(context).translate(
-                    'Your session and NOT credentials is saved automaticly for a one-time login'),
+                    'Your session and NOT credentials is saved automatically for a one-time login'),
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),

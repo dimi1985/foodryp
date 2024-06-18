@@ -15,7 +15,7 @@ class FollowingRecipesPage extends StatefulWidget {
   _FollowingRecipesPageState createState() => _FollowingRecipesPageState();
 }
 
-class _FollowingRecipesPageState extends State<FollowingRecipesPage> {
+class _FollowingRecipesPageState extends State<FollowingRecipesPage> with AutomaticKeepAliveClientMixin{
   List<Recipe> _followingRecipes = [];
   bool _isLoading = true;
 
@@ -85,4 +85,7 @@ class _FollowingRecipesPageState extends State<FollowingRecipesPage> {
       ),
     );
   }
+  
+  @override
+ bool get wantKeepAlive => true;
 }

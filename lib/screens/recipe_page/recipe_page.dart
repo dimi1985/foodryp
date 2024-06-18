@@ -1,4 +1,3 @@
-
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/foundation.dart';
@@ -25,11 +24,14 @@ class RecipePage extends StatefulWidget {
   _RecipePageState createState() => _RecipePageState();
 }
 
-class _RecipePageState extends State<RecipePage> {
+class _RecipePageState extends State<RecipePage>
+    with AutomaticKeepAliveClientMixin {
   late ScrollController _scrollController;
   List<Recipe> recipes = [];
   List<Recipe> filteredRecipes = [];
   bool _isLoading = false;
+  bool _isLoadingMore = false;
+  bool _hasMoreData = true;
   int _currentPage = 1;
   final int _pageSize = 10;
   late String currentPage;
@@ -40,51 +42,15 @@ class _RecipePageState extends State<RecipePage> {
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController()..addListener(_scrollListener);
+    _scrollController = ScrollController();
     currentPage = 'Recipes';
-    if (_searchQuery.isEmpty) {
-      _fetchRecipes();
-    } else {
-      fetchRecipesBySearch(_searchQuery);
-    }
+    _fetchRecipes();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _scrollListener() {
-    if (!_isLoading &&
-        !_noResultsFound &&
-        _scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent) {
-      _fetchMoreRecipes();
-    }
-  }
-
-  Future<void> fetchRecipesBySearch(String searchQuery) async {
-    setState(() => _isLoading = true);
-    try {
-      final fetchedRecipes = await RecipeService().getRecipesBySearch(
-        searchQuery,
-        _pageSize,
-        _currentPage,
-      );
-      setState(() {
-        recipes.clear();
-        recipes.addAll(fetchedRecipes);
-        filteredRecipes = fetchedRecipes;
-        _noResultsFound = fetchedRecipes.isEmpty;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching recipes: $e');
-      }
-      setState(() => _isLoading = false);
-    }
   }
 
   Future<void> _fetchRecipes() async {
@@ -100,6 +66,7 @@ class _RecipePageState extends State<RecipePage> {
         recipes = fetchedRecipes;
         filteredRecipes = fetchedRecipes;
         _isLoading = false;
+        _hasMoreData = fetchedRecipes.length == _pageSize;
       });
     } catch (e) {
       setState(() {
@@ -109,39 +76,69 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future<void> _fetchMoreRecipes() async {
-    if (!_isLoading) {
+    if (_isLoadingMore || !_hasMoreData) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    try {
+      final fetchedRecipes = await RecipeService().getAllRecipesByPage(
+        _currentPage + 1, // Fetch next page
+        _pageSize,
+      );
       setState(() {
-        _isLoading = true;
-      });
-      try {
-        final fetchedRecipes = await RecipeService().getAllRecipesByPage(
-          _currentPage + 1, // Fetch next page
-          _pageSize,
-        );
-        setState(() {
-          if (fetchedRecipes.isEmpty) {
-            _isLoading = false;
-          } else {
-            recipes.addAll(fetchedRecipes);
-            filteredRecipes.addAll(fetchedRecipes);
-            _currentPage++; // Increment current page
-            _isLoading = false;
-          }
-        });
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error fetching more recipes: $e');
+        if (fetchedRecipes.isEmpty) {
+          _hasMoreData = false;
+        } else {
+          recipes.addAll(fetchedRecipes);
+          filteredRecipes.addAll(fetchedRecipes);
+          _currentPage++; // Increment current page
         }
-        setState(() {
-          _isLoading = false;
-        });
+        _isLoadingMore = false;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching more recipes: $e');
       }
+      setState(() {
+        _isLoadingMore = false;
+      });
+    }
+  }
+
+  Future<void> fetchRecipesBySearch(String searchQuery) async {
+    setState(() {
+      _isLoading = true;
+      _currentPage = 1;
+    });
+    try {
+      final fetchedRecipes = await RecipeService().getRecipesBySearch(
+        searchQuery,
+        _currentPage,
+        _pageSize,
+      );
+      setState(() {
+        recipes = fetchedRecipes;
+        filteredRecipes = fetchedRecipes;
+        _noResultsFound = fetchedRecipes.isEmpty;
+        _isLoading = false;
+        _hasMoreData = fetchedRecipes.length == _pageSize;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching recipes: $e');
+      }
+      setState(() => _isLoading = false);
     }
   }
 
   void _toggleFilter() {
     setState(() {
       _showFilter = !_showFilter;
+      if (!_showFilter) {
+        filteredRecipes = recipes;
+      }
     });
   }
 
@@ -151,23 +148,34 @@ class _RecipePageState extends State<RecipePage> {
     if (durationType == 'Preparation Time') {
       filtered = recipes.where((recipe) {
         if (recipe.prepDuration != null) {
-          final prepDuration = int.tryParse(recipe.prepDuration!);
-          return prepDuration != null &&
-              prepDuration >= minDuration &&
-              prepDuration <= maxDuration;
+          final prepDurationString = recipe.prepDuration!.split(' ').first;
+          final prepDuration = int.tryParse(prepDurationString);
+          if (prepDuration != null) {
+            final isInRange =
+                prepDuration >= minDuration && prepDuration <= maxDuration;
+           
+            return isInRange;
+          }
+        }
+        return false;
+      }).toList();
+    } else if (durationType == 'Cooking Time') {
+      filtered = recipes.where((recipe) {
+        if (recipe.cookDuration != null) {
+          final cookDurationString = recipe.cookDuration!.split(' ').first;
+          final cookDuration = int.tryParse(cookDurationString);
+          if (cookDuration != null) {
+            final isInRange =
+                cookDuration >= minDuration && cookDuration <= maxDuration;
+            
+            return isInRange;
+          }
         }
         return false;
       }).toList();
     } else {
-      filtered = recipes.where((recipe) {
-        if (recipe.cookDuration != null) {
-          final cookDuration = int.tryParse(recipe.cookDuration!);
-          return cookDuration != null &&
-              cookDuration >= minDuration &&
-              cookDuration <= maxDuration;
-        }
-        return false;
-      }).toList();
+      // Handle other types of duration if needed
+      filtered = recipes;
     }
 
     setState(() {
@@ -178,6 +186,7 @@ class _RecipePageState extends State<RecipePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final bool isDesktop = Responsive.isDesktop(context);
     final searchSettingsProvider = Provider.of<SearchSettingsProvider>(context);
     bool searchOnEveryKeystroke = searchSettingsProvider.searchOnEveryKeystroke;
@@ -189,7 +198,6 @@ class _RecipePageState extends State<RecipePage> {
                   Text(AppLocalizations.of(context).translate('All Recipes')),
             )
           : null,
-          
       body: Column(
         children: [
           Container(
@@ -232,14 +240,14 @@ class _RecipePageState extends State<RecipePage> {
       child: Center(
         child: SizedBox(
           width: 600,
-          child: _isLoading
+          child: _isLoading && _currentPage == 1
               ? _buildLoader()
               : _noResultsFound
                   ? _buildNoResultsWidget() // Display no results message
                   : ListView.builder(
                       key: const PageStorageKey<String>('recipes'),
                       controller: _scrollController,
-                      itemCount: filteredRecipes.length + (_isLoading ? 1 : 0),
+                      itemCount: filteredRecipes.length + 1,
                       itemBuilder: (context, index) {
                         if (index < filteredRecipes.length) {
                           final recipe = filteredRecipes[index];
@@ -262,6 +270,7 @@ class _RecipePageState extends State<RecipePage> {
                                         recipe: recipe,
                                         internalUse: '',
                                         missingIngredients: const [],
+                                             user: widget.user,
                                       ),
                                     ),
                                   ).then((_) {
@@ -279,7 +288,22 @@ class _RecipePageState extends State<RecipePage> {
                             ),
                           );
                         } else {
-                          return _buildLoader();
+                          return _hasMoreData
+                              ? Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                    onPressed: _fetchMoreRecipes,
+                                    child: _isLoadingMore
+                                        ? const CircularProgressIndicator()
+                                        : Text(AppLocalizations.of(context)
+                                            .translate('Load More')),
+                                  ),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(AppLocalizations.of(context)
+                                      .translate('No more recipes')),
+                                );
                         }
                       },
                     ),
@@ -288,11 +312,9 @@ class _RecipePageState extends State<RecipePage> {
     );
   }
 
-
   Widget _buildLoader() {
     return const ShimmerLoader(); // Use the shimmer loader here
   }
-
 
   Widget _buildSearchField(bool searchOnEveryKeystroke, bool isDesktop) {
     return Container(
@@ -326,7 +348,6 @@ class _RecipePageState extends State<RecipePage> {
             // If the TextField has a value, perform search based on search behavior
             if (searchOnEveryKeystroke) {
               setState(() {
-                _currentPage = 1;
                 _searchQuery = value;
                 recipes.clear();
                 filteredRecipes.clear();
@@ -338,7 +359,6 @@ class _RecipePageState extends State<RecipePage> {
         onSubmitted: (value) {
           if (!searchOnEveryKeystroke) {
             setState(() {
-              _currentPage = 1;
               _searchQuery = value;
               recipes.clear();
               filteredRecipes.clear();
@@ -409,4 +429,7 @@ class _RecipePageState extends State<RecipePage> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

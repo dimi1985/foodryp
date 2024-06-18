@@ -399,11 +399,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
           _sectionTitle(AppLocalizations.of(context).translate(AppLocalizations.of(context).translate('Recovery Pin'))),
-
-
-
-
-
           Column(
             children: [
               ListTile(

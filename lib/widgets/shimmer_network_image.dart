@@ -11,14 +11,14 @@ class ShimmerNetworkImage extends StatelessWidget {
   final double? memCacheWidth;
 
   const ShimmerNetworkImage({
-    Key? key,
+    super.key,
     required this.imageUrl,
     this.fit = BoxFit.cover,
     this.width = double.infinity,
     this.height = double.infinity,
     this.memCacheHeight,
     this.memCacheWidth,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

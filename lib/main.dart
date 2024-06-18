@@ -10,6 +10,7 @@ import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
+import 'package:foodryp/utils/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -21,8 +22,14 @@ void main() async {
 
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
+ String? userId = await UserService().getCurrentUserId();
   String? languageCode = prefs.getString('languageCode');
   String? countryCode = prefs.getString('countryCode');
+
+  if(userId.isEmpty){
+    UserService().clearUserId();
+  }
+
   Locale initialLocale = Locale(languageCode ?? 'el', countryCode ?? 'GR');
 
   // Run the app

@@ -30,15 +30,19 @@ class _CategorySectionState extends State<CategorySection> {
       final categoryService = CategoryService();
       final fetchedCategories = await categoryService.getFixedCategories(desiredLength);
 
-      setState(() {
+      if(mounted){
+        setState(() {
         categories = fetchedCategories;
         _isLoading = false;
       });
+      }
     } catch (e) {
       print('Error fetching categories: $e');
-      setState(() {
+      if(mounted){
+        setState(() {
         _isLoading = false;
       });
+      }
     }
   }
 

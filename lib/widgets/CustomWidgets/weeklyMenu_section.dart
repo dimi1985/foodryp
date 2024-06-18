@@ -40,9 +40,11 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
   void initState() {
     super.initState();
     fetchWeeklyMenus().then((_) {
-      setState(() {
+   if(mounted){
+       setState(() {
         isLoading = false;
       });
+   }
     });
   }
 

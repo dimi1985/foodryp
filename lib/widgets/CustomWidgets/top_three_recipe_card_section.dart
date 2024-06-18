@@ -83,7 +83,7 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
               if (kIsWeb)
                 Text(
                   AppLocalizations.of(context)
-                      .translate('Top\nThree Recipes\nOf\nThe Week'),
+                      .translate('Top\nThree Recipes\nOf\nThe Day'),
                   style: TextStyle(
                     fontSize: screenSize.width <= 1500 ? 30 : 50,
                     fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
                         visible: showText,
                         child: Text(
                           AppLocalizations.of(context)
-                              .translate('Top\nThree Recipes\nOf\nThe Week'),
+                              .translate('Top\nThree Recipes\nOf\nThe Day'),
                           style: TextStyle(
                             fontSize: screenSize.width <= 1500 ? 30 : 50,
                             fontWeight: FontWeight.bold,

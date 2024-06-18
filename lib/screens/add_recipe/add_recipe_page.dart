@@ -265,7 +265,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   bool _areAllIngredientsValid() {
     for (var controller in ingredientsControllers) {
-      if (controller.text.isEmpty) {
+      print('Ingredient controller text: "${controller.text}"'); // Debugging
+      if (controller.text.trim().isEmpty) {
         return false;
       }
     }
@@ -274,7 +275,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   bool _areAllInstructionsValid() {
     for (var controller in instructionControllers) {
-      if (controller.text.isEmpty) {
+      print('Instruction controller text: "${controller.text}"'); // Debugging
+      if (controller.text.trim().isEmpty) {
         return false;
       }
     }
@@ -299,16 +301,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
   }
 
   bool _allItemsValid() {
-    return tappedCategoryIndex >= 0 &&
-        _isRecipeTitleValid() &&
-        _isDescriptionValid() &&
-        _isImageSelected() &&
-        _areAllIngredientsValid() &&
-        _areAllInstructionsValid() &&
-        _isServingValid() &&
-        _isCookDurationValid() &&
-        _isPrepDurationValid() &&
-        _isDifficultySelected();
+    bool isValid = tappedCategoryIndex >= 0;
+
+    print('Validation result: $isValid'); // Debugging
+    return isValid;
   }
 
   @override
@@ -823,12 +819,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             ingredients = getIngredients();
                             instructions = getInstructions();
                             cookingAdvices = getAdvices();
-                            recipeTitleValue = recipeTitleTextController.text;
-                            descriptionValue = descriptionTextController.text;
-                            servingValue = servingTextController.text;
-                            prepDurationValue = prepDurationTextController.text;
-                            cookDurationValue = cookDurationTextController.text;
-                            caloriesValue = caloriesTextController.text;
+                            recipeTitleValue =
+                                recipeTitleTextController.text.trim();
+                            descriptionValue =
+                                descriptionTextController.text.trim();
+                            servingValue = servingTextController.text.trim();
+                            prepDurationValue =
+                                prepDurationTextController.text.trim();
+                            cookDurationValue =
+                                cookDurationTextController.text.trim();
+                            caloriesValue = caloriesTextController.text.trim();
                             // Use the values as needed
 
                             showDialog(
@@ -884,8 +884,10 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                     .height /
                                                                 4,
                                                           )
-                                                        : const Text(
-                                                            'No Image'),
+                                                        : Text(AppLocalizations
+                                                                .of(context)
+                                                            .translate(
+                                                                'No Image Selected')),
                                                   ),
                                                 )
                                               : Center(
@@ -893,26 +895,60 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                     borderRadius:
                                                         const BorderRadius
                                                             .vertical(
-                                                            top:
-                                                                Radius.circular(
-                                                                    16.0)),
-                                                    child: kIsWeb
-                                                        ? Image.memory(
-                                                            uint8list,
-                                                            fit: BoxFit.cover,
-                                                            width: screenSize
-                                                                .width,
-                                                            height: screenSize
-                                                                    .height /
-                                                                4)
-                                                        : Image.file(
-                                                            _imageFile!,
-                                                            fit: BoxFit.cover,
+                                                      top:
+                                                          Radius.circular(16.0),
+                                                    ),
+                                                    child: (imageIsPicked ||
+                                                            (widget.isForEdit &&
+                                                                widget.recipe
+                                                                        ?.recipeImage !=
+                                                                    null))
+                                                        ? (kIsWeb
+                                                            ? Image.memory(
+                                                                uint8list,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                width:
+                                                                    screenSize
+                                                                        .width,
+                                                                height: screenSize
+                                                                        .height /
+                                                                    4,
+                                                              )
+                                                            : Image.file(
+                                                                _imageFile!,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                width:
+                                                                    screenSize
+                                                                        .width,
+                                                                height: screenSize
+                                                                        .height /
+                                                                    4,
+                                                              ))
+                                                        : Container(
                                                             width: screenSize
                                                                 .width,
                                                             height: screenSize
                                                                     .height /
                                                                 4,
+                                                            color: Colors
+                                                                .grey[200],
+                                                            child: Center(
+                                                              child: Text(
+                                                                AppLocalizations.of(
+                                                                        context)
+                                                                    .translate(
+                                                                        'No Image Selected'),
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      600],
+                                                                  fontSize: 18,
+                                                                ),
+                                                              ),
+                                                            ),
                                                           ),
                                                   ),
                                                 ),
@@ -933,9 +969,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 ),
                                                 const SizedBox(height: 16.0),
                                                 Text(
-                                                  recipeTitleValue,
+                                                  recipeTitleValue.isNotEmpty
+                                                      ? recipeTitleValue
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'No Title Entered'),
                                                   style: const TextStyle(
-                                                      fontSize: 16.0),
+                                                    fontSize: 16.0,
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 20.0),
                                                 if (isForDiet ||
@@ -990,13 +1032,27 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
-                                                  widget.isForEdit && !isTapped
-                                                      ? widget.recipe
-                                                              ?.categoryName ??
-                                                          ''
-                                                      : selectedCategoryName,
+                                                  (widget.isForEdit && !isTapped
+                                                      ? (widget.recipe?.categoryName ??
+                                                                  '')
+                                                              .isNotEmpty
+                                                          ? widget.recipe
+                                                                  ?.categoryName ??
+                                                              ''
+                                                          : AppLocalizations.of(
+                                                                  context)
+                                                              .translate(
+                                                                  'No Category Selected')
+                                                      : selectedCategoryName
+                                                              .isNotEmpty
+                                                          ? selectedCategoryName
+                                                          : AppLocalizations.of(
+                                                                  context)
+                                                              .translate(
+                                                                  'No Category Selected')),
                                                   style: const TextStyle(
-                                                      fontSize: 16.0),
+                                                    fontSize: 16.0,
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
@@ -1009,9 +1065,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
-                                                  descriptionValue,
+                                                  descriptionValue.isNotEmpty
+                                                      ? descriptionValue
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'No Description Entered'),
                                                   style: const TextStyle(
-                                                      fontSize: 16.0),
+                                                    fontSize: 16.0,
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 16.0),
                                                 Text(
@@ -1024,9 +1086,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
-                                                  servingValue,
+                                                  servingValue.isNotEmpty
+                                                      ? servingValue
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'No Serving Info Entered'),
                                                   style: const TextStyle(
-                                                      fontSize: 16.0),
+                                                    fontSize: 16.0,
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 16.0),
                                                 Text(
@@ -1040,9 +1108,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
-                                                  prepDurationValue,
+                                                  prepDurationValue.isNotEmpty
+                                                      ? prepDurationValue
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'No Preparation Duration Entered'),
                                                   style: const TextStyle(
-                                                      fontSize: 16.0),
+                                                    fontSize: 16.0,
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 16.0),
                                                 Text(
@@ -1056,9 +1130,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
-                                                  cookDurationValue,
+                                                  cookDurationValue.isNotEmpty
+                                                      ? cookDurationValue
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'No Cooking Duration Entered'),
                                                   style: const TextStyle(
-                                                      fontSize: 16.0),
+                                                    fontSize: 16.0,
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 16.0),
                                                 Text(
@@ -1072,12 +1152,28 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
-                                                  children: ingredients
-                                                      .map((ingredient) {
-                                                    return Text('- $ingredient',
-                                                        style: const TextStyle(
-                                                            fontSize: 16.0));
-                                                  }).toList(),
+                                                  children:
+                                                      ingredients.isNotEmpty
+                                                          ? ingredients.map(
+                                                              (ingredient) {
+                                                              return Text(
+                                                                '- $ingredient',
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        16.0),
+                                                              );
+                                                            }).toList()
+                                                          : [
+                                                              Text(
+                                                                AppLocalizations.of(
+                                                                        context)
+                                                                    .translate(
+                                                                        'No Ingredients Added'),
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        16.0),
+                                                              ),
+                                                            ],
                                                 ),
                                                 const SizedBox(height: 16.0),
                                                 Text(
@@ -1093,13 +1189,28 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
-                                                  children: instructions
-                                                      .map((instruction) {
-                                                    return Text(
-                                                        '- $instruction',
-                                                        style: const TextStyle(
-                                                            fontSize: 16.0));
-                                                  }).toList(),
+                                                  children:
+                                                      instructions.isNotEmpty
+                                                          ? instructions.map(
+                                                              (instruction) {
+                                                              return Text(
+                                                                '- $instruction',
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        16.0),
+                                                              );
+                                                            }).toList()
+                                                          : [
+                                                              Text(
+                                                                AppLocalizations.of(
+                                                                        context)
+                                                                    .translate(
+                                                                        'No Instructions Added'),
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        16.0),
+                                                              ),
+                                                            ],
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
@@ -1114,12 +1225,28 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
-                                                  children: cookingAdvices
-                                                      .map((advice) {
-                                                    return Text('- $advice',
-                                                        style: const TextStyle(
-                                                            fontSize: 16.0));
-                                                  }).toList(),
+                                                  children:
+                                                      cookingAdvices.isNotEmpty
+                                                          ? cookingAdvices
+                                                              .map((advice) {
+                                                              return Text(
+                                                                '- $advice',
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        16.0),
+                                                              );
+                                                            }).toList()
+                                                          : [
+                                                              Text(
+                                                                AppLocalizations.of(
+                                                                        context)
+                                                                    .translate(
+                                                                        'No Cooking Advices Added'),
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        16.0),
+                                                              ),
+                                                            ],
                                                 ),
                                                 const SizedBox(height: 16.0),
                                                 Text(
@@ -1132,9 +1259,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
-                                                  caloriesValue,
+                                                  caloriesValue.isNotEmpty
+                                                      ? caloriesValue
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'No Calories Info Entered'),
                                                   style: const TextStyle(
-                                                      fontSize: 16.0),
+                                                    fontSize: 16.0,
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
@@ -1147,10 +1280,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                 ),
                                                 const SizedBox(height: 8.0),
                                                 Text(
-                                                  _selectedDifficulty,
+                                                  _selectedDifficulty.isNotEmpty
+                                                      ? _selectedDifficulty
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'No Difficulty Selected'),
                                                   style: const TextStyle(
-                                                      fontSize: 16.0),
-                                                )
+                                                    fontSize: 16.0,
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           ),

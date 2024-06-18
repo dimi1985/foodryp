@@ -270,106 +270,111 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
   Widget _buildSelectedRecipeCard(int index, ThemeProvider themeProvider) {
     final recipe = selectedRecipes[index];
     return Draggable<Recipe>(
-      key: ValueKey('selected_$index'), // Ensure unique keys
-      data: recipe,
-      feedback: _buildRecipeCard(recipe, themeProvider),
-      childWhenDragging: Container(),
-      onDragEnd: (details) {
-        if (!details.wasAccepted) {
-          setState(() {
-            selectedRecipes.removeAt(index);
-          });
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Stack(
-          children: [
-            Container(
-              height: 200,
-              width: 300,
-              decoration: BoxDecoration(
-                color: themeProvider.currentTheme == ThemeType.dark
-                    ? const Color.fromARGB(255, 37, 36, 37)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
+  key: ValueKey('selected_$index'), // Ensure unique keys
+  data: recipe,
+  feedback: Material(
+    elevation: 6.0,
+    child: _buildRecipeCard(recipe, themeProvider),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+    ),
+  ),
+  childWhenDragging: SizedBox.shrink(),
+  onDragEnd: (details) {
+    if (!details.wasAccepted) {
+      setState(() {
+        selectedRecipes.removeAt(index);
+      });
+    }
+  },
+  child: Padding(
+    padding: const EdgeInsets.all(32),
+    child: Stack(
+      children: [
+        Container(
+          height: 200,
+          width: 300,
+          decoration: BoxDecoration(
+            color: themeProvider.currentTheme == ThemeType.dark
+                ? const Color.fromARGB(255, 37, 36, 37)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _getDayOfWeek(index),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  themeProvider.currentTheme == ThemeType.dark
-                                      ? Colors.white
-                                      : Colors.black.withOpacity(0.7),
-                              fontSize: 18,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Expanded(
-                            child: Text(
-                              overflow: TextOverflow.ellipsis,
-                              recipe.recipeTitle ?? Constants.emptyField,
-                              style: GoogleFonts.getFont(
-                                recipe.categoryFont ?? Constants.emptyField,
-                                color: HexColor(
-                                  recipe.categoryColor ?? Constants.emptyField,
-                                ).withOpacity(0.7),
-                              ),
-                            ),
-                          ),
-                        ],
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 5,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getDayOfWeek(index),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: themeProvider.currentTheme == ThemeType.dark
+                              ? Colors.white
+                              : Colors.black.withOpacity(0.7),
+                          fontSize: 18,
+                        ),
                       ),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: Text(
+                          overflow: TextOverflow.ellipsis,
+                          recipe.recipeTitle ?? Constants.emptyField,
+                          style: GoogleFonts.getFont(
+                            recipe.categoryFont ?? Constants.emptyField,
+                            color: HexColor(
+                              recipe.categoryColor ?? Constants.emptyField,
+                            ).withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 5,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
                     ),
                   ),
-                  Expanded(
-                    flex: 5,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
-                        ),
-                        child: Image.network(
-                          recipe.recipeImage ?? Constants.emptyField,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
-                      ),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                    child: Image.network(
+                      recipe.recipeImage ?? Constants.emptyField,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      ],
+    ),
+  ),
+);
   }
 
   String _getDayOfWeek(int index) {
@@ -477,11 +482,11 @@ class _AddWeeklyMenuPageState extends State<AddWeeklyMenuPage> {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.arrow_left),
+            icon: const Icon(Icons.arrow_left),
             onPressed: () {
               _scrollController.animateTo(
                 _scrollController.offset - 200, // Adjust the scroll amount as needed
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               );
             },
