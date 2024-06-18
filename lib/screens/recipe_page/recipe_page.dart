@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/recipe.dart';
@@ -63,8 +61,8 @@ class _RecipePageState extends State<RecipePage>
         _pageSize,
       );
       setState(() {
-        recipes = fetchedRecipes;
-        filteredRecipes = fetchedRecipes;
+        recipes = fetchedRecipes.where((recipe) => !recipe.isPremium).toList();
+        filteredRecipes = recipes;
         _isLoading = false;
         _hasMoreData = fetchedRecipes.length == _pageSize;
       });
@@ -91,8 +89,9 @@ class _RecipePageState extends State<RecipePage>
         if (fetchedRecipes.isEmpty) {
           _hasMoreData = false;
         } else {
-          recipes.addAll(fetchedRecipes);
-          filteredRecipes.addAll(fetchedRecipes);
+          final newRecipes = fetchedRecipes.where((recipe) => !recipe.isPremium).toList();
+          recipes.addAll(newRecipes);
+          filteredRecipes.addAll(newRecipes);
           _currentPage++; // Increment current page
         }
         _isLoadingMore = false;
@@ -119,8 +118,8 @@ class _RecipePageState extends State<RecipePage>
         _pageSize,
       );
       setState(() {
-        recipes = fetchedRecipes;
-        filteredRecipes = fetchedRecipes;
+        recipes = fetchedRecipes.where((recipe) => !recipe.isPremium).toList();
+        filteredRecipes = recipes;
         _noResultsFound = fetchedRecipes.isEmpty;
         _isLoading = false;
         _hasMoreData = fetchedRecipes.length == _pageSize;

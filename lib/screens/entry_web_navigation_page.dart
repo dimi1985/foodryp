@@ -20,6 +20,8 @@ import 'package:foodryp/utils/users_list_provider.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:provider/provider.dart';
 
+import 'premium_shopping_page.dart';
+
 class EntryWebNavigationPage extends StatefulWidget {
   const EntryWebNavigationPage({super.key});
 
@@ -124,9 +126,10 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
       'Weekly Menu Page',
       if (isAuthenticated) 'My Fridge',
       if (isAuthenticated) 'Add Recipe',
+      if (isAuthenticated) 'Premium Shopping', // Add new menu item
       if (!isAuthenticated) 'Sign Up/Sign In',
       if (isForInternalUse) 'ProfilePage',
-      if (isAuthenticated) 'Following Recipes Page',
+      if (isAuthenticated) 'Following',
     ];
 
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -246,6 +249,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
                               (item != 'Creators' || isAuthenticated) &&
                               (item != 'My Fridge' || isAuthenticated) &&
                               (item != 'Add Recipe' || isAuthenticated) &&
+                              (item != 'Premium Shopping' || isAuthenticated) &&
                               (item != 'Sign Up/Sign In' || !isAuthenticated))
                           .where((item) =>
                               item != 'ProfilePage') // Exclude 'ProfilePage'
@@ -306,6 +310,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
               user: user,
             ),
           if (isAuthenticated) const AddRecipePage(isForEdit: false),
+          if (isAuthenticated) const PremiumShoppingPage(), // Add the new page here
           if (isAuthenticated)
             ProfilePage(
               user: user,
@@ -366,6 +371,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
                   ElevatedButton(
                     onPressed: () async {
                       await UserService().saveOneTimeSheetShow();
+                      // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                     },
                     child:

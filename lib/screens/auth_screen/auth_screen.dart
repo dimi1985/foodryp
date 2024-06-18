@@ -229,6 +229,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         onPressed:
                             isLoading ? null : () => _handleAuth(isAndroid),
                         style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepOrange.withOpacity(0.9),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
@@ -236,7 +237,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         child: Text(isLogin
                             ? AppLocalizations.of(context).translate('Login')
                             : AppLocalizations.of(context)
-                                .translate('Register')),
+                                .translate('Register'),style: const TextStyle(color: Colors.white),),
                       ),
                     ),
                     const SizedBox(height: 15.0),

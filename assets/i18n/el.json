@@ -292,7 +292,7 @@
   "Remaining attempts: ": "Υπόλοιπες προσπάθειες:",
   "Recovery Pin": "Ανάκτηση Pin",
   "Enter Your 4-Digit PIN": "Εισαγάγετε το 4ψήφιο PIN σας",
-  "This PIN will be used for verification when you request to reset your forgotten password.": "Αυτό το PIN θα χρησιμοποιηθεί για επαλήθευση όταν ζητήσετε να επαναφέρετε τον ξεχασμένο κωδικό πρόσβασής σας.",
+  "This PIN will be used for verification when you request to reset your forgotten password.So you must register one in order to reset your password": "Αυτό το PIN θα χρησιμοποιηθεί για επαλήθευση όταν ζητάτε να επαναφέρετε τον ξεχασμένο κωδικό πρόσβασής σας. Επομένως, πρέπει να εγγραφείτε για να επαναφέρετε τον κωδικό πρόσβασής σας",
   "PIN sent successfully": "Το PIN στάλθηκε με επιτυχία",
   "Failed to send PIN": "Αποτυχία αποστολής PIN",
   "Send PIN": "Αποστολή PIN",
@@ -309,6 +309,21 @@
   "No Instructions Added": "Δεν προστέθηκαν οδηγίες",
   "No Cooking Advices Added": "Δεν προστέθηκαν συμβουλές μαγειρικής",
   "No Calories Info Entered": "Δεν έχουν καταχωρηθεί πληροφορίες θερμίδων",
-  "No Difficulty Selected": "Δεν επιλέχθηκε καμία δυσκολία"
+  "No Difficulty Selected": "Δεν επιλέχθηκε καμία δυσκολία",
+  "No Image at this time": "Δεν υπάρχει εικόνα αυτή τη στιγμή",
+  "Enter Price for Premium Recipe": "Εισαγάγετε την τιμή για Premium συνταγή",
+  "Chef Level Recipe: €9.99 - €14.99": "Συνταγή επιπέδου σεφ: 9,99 € - 14,99 €",
+  "Please set a price between €9.99 and €14.99 for Chef level recipes.": "Ορίστε μια τιμή μεταξύ 9,99 € και 14,99 € για συνταγές επιπέδου σεφ.",
+  "Michelin Level Recipe: €14.99 - €19.99": "Συνταγή επιπέδου Michelin: 14,99 € - 19,99 €",
+  "Please set a price between €14.99 and €19.99 for Michelin level recipes.": "Ορίστε μια τιμή μεταξύ 14,99 € και 19,99 € για συνταγές επιπέδου Michelin.",
+  "Premium Shopping": "Premium Αγορές",
+  "Premium Shopping Page": "Σελίδα αγορών Premium",
+  "Price (€)": "Τιμή (€)",
+  "License Agreement": "Συμφωνία άδειας",
+  "By agreeing to the license agreement, you acknowledge that your cut will be 70%, while Foodryp will receive 30%. Do you agree to these terms?": "Συμφωνώντας με την άδεια χρήσης, αναγνωρίζετε ότι η περικοπή σας θα είναι 70%, ενώ η Foodryp θα λάβει 30%. Συμφωνείτε με αυτούς τους όρους;",
+  "Recipe updated successfully": "Η συνταγή ενημερώθηκε με επιτυχία",
+  "Recipe created successfully": "Η συνταγή δημιουργήθηκε με επιτυχία",
+  "Buy Now": "Αγορασε τωρα",
+  "Coming Soon": "Σύντομα Κοντά σας"
   }
   

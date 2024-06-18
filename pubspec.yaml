@@ -93,6 +93,7 @@ flutter:
     - assets/hero.jpg
     - assets/default_avatar_female.jpg
     - assets/default_avatar_male.jpg
+    - assets/placeholder.png
     - assets/i18n/
 
   # An image asset can refer to one or more resolution-specific "variants", see

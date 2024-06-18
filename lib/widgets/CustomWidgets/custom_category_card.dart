@@ -1,19 +1,16 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/contants.dart';
-import 'package:foodryp/utils/responsive.dart';
+import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/theme_provider.dart';
 import 'package:foodryp/widgets/shimmer_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
-class CustomCategoryCard extends StatelessWidget {
+class CustomCategoryCard extends StatefulWidget {
   final CategoryModel category;
 
   const CustomCategoryCard({
@@ -22,9 +19,38 @@ class CustomCategoryCard extends StatelessWidget {
   });
 
   @override
+  _CustomCategoryCardState createState() => _CustomCategoryCardState();
+}
+
+class _CustomCategoryCardState extends State<CustomCategoryCard> {
+  int nonPremiumRecipeCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNonPremiumRecipeCount();
+  }
+
+  Future<void> _fetchNonPremiumRecipeCount() async {
+    int count = 0;
+    for (var recipeId in widget.category.recipes ?? []) {
+      bool isPremium = await RecipeService().isRecipePremium(recipeId);
+      if (!isPremium) {
+        count++;
+      }
+    }
+    if(mounted){
+      setState(() {
+      nonPremiumRecipeCount = count;
+    });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final screenSize = MediaQuery.of(context).size;
+
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Stack(
@@ -68,25 +94,25 @@ class CustomCategoryCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               overflow: TextOverflow.ellipsis,
-                              category.name,
+                              widget.category.name,
                               style: GoogleFonts.getFont(
-                                category.font,
+                                widget.category.font,
                                 color:
-                                    HexColor(category.color).withOpacity(0.7),
+                                    HexColor(widget.category.color).withOpacity(0.7),
                               ),
                             ),
                           ),
                           const SizedBox(height: 10),
 
-                          // Recipe details
+                          // Recipe count excluding premium recipes
                           Expanded(
                             child: Text(
                               overflow: TextOverflow.ellipsis,
-                              '${AppLocalizations.of(context).translate('Recipes:')} ${category.recipes?.length.toString()}',
+                              '${AppLocalizations.of(context).translate('Recipes:')} $nonPremiumRecipeCount',
                               style: GoogleFonts.getFont(
-                                category.font,
+                                widget.category.font,
                                 color:
-                                    HexColor(category.color).withOpacity(0.7),
+                                    HexColor(widget.category.color).withOpacity(0.7),
                               ),
                             ),
                           ),
@@ -114,23 +140,22 @@ class CustomCategoryCard extends StatelessWidget {
                         child: Stack(
                           children: [
                             ShimmerNetworkImage(
-                    imageUrl:category.categoryImage ??
-                                  Constants.emptyField,
-                    fit: BoxFit.cover,
-                    width: screenSize.width,
-                    height: screenSize.height,
-                    memCacheHeight: screenSize.height,
-                    memCacheWidth: screenSize.width,
-                  ),
-                            category.isForDiet || category.isForVegetarians
+                              imageUrl: widget.category.categoryImage ?? Constants.emptyField,
+                              fit: BoxFit.cover,
+                              width: screenSize.width,
+                              height: screenSize.height,
+                              memCacheHeight: screenSize.height,
+                              memCacheWidth: screenSize.width,
+                            ),
+                            widget.category.isForDiet || widget.category.isForVegetarians
                                 ? Positioned(
                                     bottom: 10,
                                     right: 10,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: category.isForDiet
+                                        color: widget.category.isForDiet
                                             ? Colors.blue
-                                            : category.isForVegetarians
+                                            : widget.category.isForVegetarians
                                                 ? Colors.green
                                                 : null,
                                         borderRadius: BorderRadius.circular(10),
@@ -141,15 +166,15 @@ class CustomCategoryCard extends StatelessWidget {
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
                                             Icon(
-                                              category.isForDiet
+                                              widget.category.isForDiet
                                                   ? MdiIcons.nutrition
                                                   : MdiIcons.leaf,
                                               color: Colors.white,
                                             ),
                                             const SizedBox(width: 8),
                                             _dynamicText(
-                                                category.isForDiet,
-                                                category.isForVegetarians,
+                                                widget.category.isForDiet,
+                                                widget.category.isForVegetarians,
                                                 context),
                                           ],
                                         ),

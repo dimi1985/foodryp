@@ -402,9 +402,10 @@ class _SettingsPageState extends State<SettingsPage> {
           Column(
             children: [
               ListTile(
+
                 title:  Text(AppLocalizations.of(context).translate('Enter Your 4-Digit PIN')),
                 subtitle:  Text(
-                    AppLocalizations.of(context).translate('This PIN will be used for verification when you request to reset your forgotten password.')),
+                    AppLocalizations.of(context).translate('This PIN will be used for verification when you request to reset your forgotten password.So you must register one in order to reset your password')),
                 leading: const Icon(Icons.lock),
                 trailing: ElevatedButton(
                   onPressed: () async {

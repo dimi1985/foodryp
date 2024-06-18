@@ -1,4 +1,5 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, use_build_context_synchronously
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import '../../models/comment.dart';
 
-
 class RecipeDetailPage extends StatefulWidget {
   final Recipe recipe;
   final String internalUse;
@@ -39,7 +39,6 @@ class RecipeDetailPage extends StatefulWidget {
   @override
   State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
-
 
 class _RecipeDetailPageState extends State<RecipeDetailPage> {
   late bool isLiked = false;
@@ -61,7 +60,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     _currentRating = widget.recipe.rating; // Set initial rating
     initLikeAndAuthStatus();
     fetchComments();
-    print('imgageHost: ${widget.recipe.recipeImage}');
   }
 
   @override
@@ -122,7 +120,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   }
 
   void _deleteComment(String commentId) async {
-    await CommentService().deleteComment(commentId, widget.user?.role ?? '', widget.recipe.id ?? '');
+    await CommentService().deleteComment(
+        commentId, widget.user?.role ?? '', widget.recipe.id ?? '');
     fetchComments(); // Refresh comments after deletion
   }
 
@@ -182,13 +181,57 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(
                                     10.0), // Rounded corners
-                                child: Image.network(
-                                  widget.recipe.recipeImage ??
+                                child: CachedNetworkImage(
+                                  key: ValueKey(
+                                    widget.recipe.recipeImage ??
+                                        Constants.emptyField,
+                                  ), // Use the image URL as a key
+                                  imageUrl: widget.recipe.recipeImage ??
                                       Constants.emptyField,
                                   fit: BoxFit.cover,
-                                  width: screenSize.width, // Take full width
-                                  height: screenSize.height /
-                                      2, // Adjust height as needed
+                                  width: screenSize.width,
+                                  height: screenSize.height,
+                                  memCacheHeight: screenSize.height.toInt(),
+                                  memCacheWidth: screenSize.width.toInt(),
+                                  placeholder: (context, url) {
+                                    return Container(
+                                      width: screenSize.width,
+                                      height: screenSize.height,
+                                      color: Colors.grey[300],
+                                    );
+                                  },
+                                  errorWidget: (context, url, error) {
+                                    return Center(
+                                      child: Stack(
+                                        children: <Widget>[
+                                          // Image placeholder
+                                          Positioned.fill(
+                                            child: Image.asset(
+                                              'assets/placeholder.png',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          // Text at the bottom
+                                          Positioned(
+                                            bottom: 20.0,
+                                            left: 0.0,
+                                            right: 0.0,
+                                            child: Text(
+                                              AppLocalizations.of(context)
+                                                  .translate(
+                                                      'No Image at this time'),
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 24.0,
+                                                color: Colors.white,
+                                                backgroundColor: Colors.black54,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -251,11 +294,55 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                             ],
                             borderRadius: BorderRadius.circular(10.0),
                           ),
-                          child: Image.network(
-                            widget.recipe.recipeImage ?? Constants.emptyField,
-                            width: screenSize.width, // Take full width
-                            height: 250.0, // Adjust height as needed
+                          child: CachedNetworkImage(
+                            key: ValueKey(
+                              widget.recipe.recipeImage ?? Constants.emptyField,
+                            ), // Use the image URL as a key
+                            imageUrl: widget.recipe.recipeImage ??
+                                Constants.emptyField,
                             fit: BoxFit.cover,
+                            width: screenSize.width,
+                            height: screenSize.height,
+                            memCacheHeight: screenSize.height.toInt(),
+                            memCacheWidth: screenSize.width.toInt(),
+                            placeholder: (context, url) {
+                              return Container(
+                                width: screenSize.width,
+                                height: screenSize.height,
+                                color: Colors.grey[300],
+                              );
+                            },
+                            errorWidget: (context, url, error) {
+                              return Center(
+                                child: Stack(
+                                  children: <Widget>[
+                                    // Image placeholder
+                                    Positioned.fill(
+                                      child: Image.asset(
+                                        'assets/placeholder.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    // Text at the bottom
+                                    Positioned(
+                                      bottom: 20.0,
+                                      left: 0.0,
+                                      right: 0.0,
+                                      child: Text(
+                                        AppLocalizations.of(context)
+                                            .translate('No Image at this time'),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 24.0,
+                                          color: Colors.white,
+                                          backgroundColor: Colors.black54,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -740,7 +827,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                                         }
                                                       }
                                                     : null,
-                                                child: const Text('Submit Report'),
+                                                child:
+                                                    const Text('Submit Report'),
                                               ),
                                             ],
                                           ),
@@ -756,7 +844,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                           style: TextStyle(
                             color: isEnabled
                                 ? Theme.of(context).primaryColor
-                                : themeProvider.currentTheme == ThemeType.dark ? Colors.white: Colors.black,
+                                : themeProvider.currentTheme == ThemeType.dark
+                                    ? Colors.white
+                                    : Colors.black,
                           ),
                         ),
                       ),

@@ -8,6 +8,7 @@ import 'package:foodryp/screens/auth_screen/auth_screen.dart';
 import 'package:foodryp/screens/creators_page/creators_page.dart';
 import 'package:foodryp/screens/mainScreen/main_screen.dart';
 import 'package:foodryp/screens/my_fridge_page.dart';
+import 'package:foodryp/screens/premium_shopping_page.dart';
 import 'package:foodryp/screens/profile_page/profile_page.dart';
 import 'package:foodryp/screens/recipe_page/recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
@@ -76,6 +77,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
       if (localUserId.isNotEmpty) CreatorsPage(user: user ?? Constants.defaultUser),
       if (localUserId.isNotEmpty) MyFridgePage(user: user ?? Constants.defaultUser),
       if (localUserId.isNotEmpty) const FollowingRecipesPage(),
+      if (localUserId.isNotEmpty) const PremiumShoppingPage(),
       if (localUserId.isEmpty) const AuthScreen(),
     ];
   }
@@ -94,7 +96,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryItemsCount = localUserId.isNotEmpty ? 4 : 3; // Number of primary items
+    final primaryItemsCount = localUserId.isNotEmpty ? 5 : 3; // Adjusted primary items count
     final contextMenuItemsStartIndex = primaryItemsCount; // Start index for context menu items
 
     return Scaffold(
@@ -124,6 +126,11 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                   BottomNavigationBarItem(
                     icon: Icon(MdiIcons.account),
                     label: user?.username ?? Constants.emptyField,
+                  ),
+                if (localUserId.isNotEmpty)
+                  BottomNavigationBarItem(
+                    icon: Icon(MdiIcons.shopping),
+                    label: AppLocalizations.of(context).translate('Premium Shopping'),
                   ),
                 if (localUserId.isNotEmpty)
                   BottomNavigationBarItem(
@@ -209,6 +216,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       await UserService().saveOneTimeSheetShow();
+                      // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                     },
                     child: Text(AppLocalizations.of(context).translate('Thanks')),

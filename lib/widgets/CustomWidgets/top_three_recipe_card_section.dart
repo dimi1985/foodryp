@@ -44,10 +44,12 @@ class _TopThreeRecipeCardSectionState extends State<TopThreeRecipeCardSection> {
   Future<void> _fetchTopThreeRecipes() async {
     try {
       final List<Recipe> recipes = await RecipeService().fetchTopThreeRecipes();
-      setState(() {
+      if(mounted){
+        setState(() {
         _topRecipes = recipes;
         _isLoading = false;
       });
+      }
     } catch (e) {
       // Handle error
       print('Error fetching top three recipes: $e');

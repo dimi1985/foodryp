@@ -32,10 +32,12 @@ class _RecipeSectionState extends State<RecipeSection> {
   Future<void> fetchixedRecipes() async {
     const int desiredLength = 4;
     final fetchedRecipes = await RecipeService().getFixedRecipes(desiredLength);
-    setState(() {
-      recipes = fetchedRecipes;
+    if(mounted){
+      setState(() {
+      recipes = fetchedRecipes.where((recipe) => !recipe.isPremium).toList(); // Exclude premium recipes
       _isLoading = false;
     });
+    }
   }
 
   @override
@@ -71,7 +73,7 @@ class _RecipeSectionState extends State<RecipeSection> {
                 } else {
                   final recipe = recipes[index];
                   // Log the recipe image URL
-                  print('Recipe ${recipe.recipeTitle} Image URL: ${recipe.recipeImage}');
+               
                   return Padding(
                     padding: const EdgeInsets.all(Constants.defaultPadding),
                     child: SizedBox(

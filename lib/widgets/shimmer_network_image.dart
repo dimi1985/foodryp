@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:foodryp/utils/app_localizations.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShimmerNetworkImage extends StatelessWidget {
@@ -30,7 +31,8 @@ class ShimmerNetworkImage extends StatelessWidget {
       width: width,
       height: height,
       filterQuality: FilterQuality.none,
-      progressIndicatorBuilder: (context, url, downloadProgress) => Shimmer.fromColors(
+      progressIndicatorBuilder: (context, url, downloadProgress) =>
+          Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,
         child: Container(
@@ -39,8 +41,33 @@ class ShimmerNetworkImage extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-      errorWidget: (context, url, error) => const Center(
-        child: Icon(Icons.error),
+      errorWidget: (context, url, error) => Center(
+        child: Stack(
+          children: <Widget>[
+            // Image placeholder
+            Positioned.fill(
+              child: Image.asset(
+                'assets/placeholder.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+            // Text at the bottom
+            Positioned(
+              bottom: 20.0,
+              left: 0.0,
+              right: 0.0,
+              child: Text(
+                AppLocalizations.of(context).translate('No Image at this time'),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 24.0,
+                  color: Colors.white,
+                  backgroundColor: Colors.black54,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

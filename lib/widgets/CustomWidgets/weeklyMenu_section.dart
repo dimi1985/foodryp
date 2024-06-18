@@ -51,9 +51,11 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
   Future<void> fetchWeeklyMenus() async {
     final mealService = MealService();
     try {
-      setState(() {
+      if(mounted){
+        setState(() {
         isLoading = true;
       });
+      }
 
       currentUserId = await UserService().getCurrentUserId();
       List<WeeklyMenu> fetchedMenus = [];
@@ -70,7 +72,8 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
       }
 
       // Clear existing lists before populating with new data
-      setState(() {
+      if(mounted){
+        setState(() {
         if (widget.isForDiet) {
           weeklyDietList =
               fetchedMenus.where((menu) => menu.isForDiet).toList();
@@ -79,6 +82,7 @@ class _WeeklyMenuSectionState extends State<WeeklyMenuSection> {
         }
         isLoading = false;
       });
+      }
     } catch (e) {
       print('Error fetching weekly menus: $e');
     }

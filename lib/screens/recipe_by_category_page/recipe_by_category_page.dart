@@ -18,7 +18,7 @@ class RecipeByCategoryPage extends StatefulWidget {
   _RecipeByCategoryPageState createState() => _RecipeByCategoryPageState();
 }
 
-class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with AutomaticKeepAliveClientMixin{
+class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with AutomaticKeepAliveClientMixin {
   late ScrollController _scrollController;
   List<Recipe> recipes = [];
   bool _isLoading = false;
@@ -31,8 +31,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
     if (recipes.isEmpty) {
-      _fetchRecipesByCategory().then((_) =>  _fetchRecipesByCategoryByLikes());
-       
+      _fetchRecipesByCategory().then((_) => _fetchRecipesByCategoryByLikes());
     }
   }
 
@@ -43,8 +42,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
       _fetchMoreRecipes();
     }
   }
@@ -59,7 +57,6 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
         setState(() {
           _page = 1;
           _pageSize = 10;
-          
         });
       }
 
@@ -72,7 +69,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
         if (timesCalled == 2) {
           recipes.clear();
         }
-        recipes.addAll(fetchedRecipes);
+        recipes.addAll(fetchedRecipes.where((recipe) => !recipe.isPremium)); // Exclude premium recipes
         _isLoading = false;
         _page++; // Increment page number for the next fetch
       });
@@ -99,7 +96,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
           _pageSize,
         );
         setState(() {
-          recipes.addAll(fetchedRecipes);
+          recipes.addAll(fetchedRecipes.where((recipe) => !recipe.isPremium)); // Exclude premium recipes
           _isLoading = false;
           _page++; // Increment page number for the next fetch
         });
@@ -117,11 +114,8 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
   Future<void> _fetchRecipesByCategoryByLikes() async {
     setState(() {
       _isLoading = true;
-     
     });
     try {
-     
-
       final fetchedRecipes = await RecipeService().getRecipesByCategoryByLikes(
         widget.category.name,
         _page,
@@ -131,7 +125,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
         if (timesCalled == 2) {
           recipes.clear();
         }
-        recipes.addAll(fetchedRecipes);
+        recipes.addAll(fetchedRecipes.where((recipe) => !recipe.isPremium)); // Exclude premium recipes
         _isLoading = false;
         _page++; // Increment page number for the next fetch
       });
@@ -145,7 +139,6 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
       });
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +151,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
         child: SizedBox(
           width: 600,
           child: ListView.separated(
-              key:  const PageStorageKey<String>('recipes_by_category'),
+            key: const PageStorageKey<String>('recipes_by_category'),
             controller: _scrollController,
             itemCount: recipes.length + (_isLoading ? 1 : 0),
             itemBuilder: (context, index) {
@@ -208,7 +201,7 @@ class _RecipeByCategoryPageState extends State<RecipeByCategoryPage> with Automa
       child: CircularProgressIndicator(),
     );
   }
-  
+
   @override
- bool get wantKeepAlive => true;
+  bool get wantKeepAlive => true;
 }

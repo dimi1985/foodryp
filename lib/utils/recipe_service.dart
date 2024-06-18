@@ -83,7 +83,11 @@ class RecipeService {
     int ratingCount,
     List<String> cookingAdvices,
     String calories,
+    bool isPremium,
+    double price,
+    List<String>? buyers
   ) async {
+     
     try {
       final token = await TokenManager.getTokenLocally();
       final headers = {'Authorization': 'Bearer $token'};
@@ -111,15 +115,18 @@ class RecipeService {
           'categoryColor': categoryColor,
           'categoryFont': categoryFont,
           'categoryName': selectedCategoryName,
-          'recomendedBy': [],
-          'meal': [],
-          'commentId': [],
+          'recomendedBy': recomendedBy,
+          'meal': meal,
+          'commentId': commentId,
           'isForDiet': isForDiet,
           'isForVegetarians': isForVegetarians,
           'rating': rating,
           'ratingCount': ratingCount,
           'cookingAdvices': cookingAdvices,
           'calories': calories,
+          'isPremium': isPremium,
+          'price': price,
+          'buyers': buyers,
         }),
       );
       if (response.statusCode == 201) {
@@ -165,7 +172,11 @@ class RecipeService {
     int ratingCount,
     List<String> cookingAdvices,
     String calories,
+      bool isPremium,
+      double price,
+    List<String>? buyers
   ) async {
+
     try {
       final token = await TokenManager.getTokenLocally();
       final headers = {'Authorization': 'Bearer $token'};
@@ -202,6 +213,9 @@ class RecipeService {
           'ratingCount': ratingCount,
           'cookingAdvices': cookingAdvices,
           'calories': calories,
+          'isPremium': isPremium,
+          'price': price,
+          'buyers': buyers,
         }),
       );
       if (response.statusCode == 200) {
@@ -666,6 +680,57 @@ class RecipeService {
         print('Error fetching saved recipes details: $e');
       }
       return [];
+    }
+  }
+
+Future<List<Recipe>> getPremiumRecipes() async {
+    await _initPrefs();
+    final userId = _prefs.getString('userId');
+    try {
+      final token = await TokenManager.getTokenLocally(); // Retrieve token from local storage
+      final headers = {
+        'Authorization': 'Bearer $token', // Include authorization token
+      };
+
+      final response = await http.get(
+        Uri.parse('${Constants.baseUrl}/api/premium_recipes/$userId'),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+      
+        return jsonData.map((item) => Recipe.fromJson(item)).toList();
+      } else {
+        log('Failed to fetch premium recipes for user $userId. Status code: ${response.statusCode}',
+            name: 'RecipeService', error: true);
+        throw Exception('Failed to load premium recipes');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching premium recipes: $e');
+      }
+      return [];
+    }
+  }
+
+ Future<bool> isRecipePremium(String recipeId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${Constants.baseUrl}/api/recipes/isPremium/$recipeId'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return jsonData['isPremium'];
+      } else {
+        throw Exception('Failed to check if recipe is premium');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching premium status: $e');
+      }
+      return false;
     }
   }
 

@@ -70,7 +70,7 @@ class Constants {
     rating: 0,
     ratingCount: 0,
     cookingAdvices: [],
-    calories: '',
+    calories: '', isPremium: false, price: 0, buyers: [],
   );
   static String emptyField = '';
   static bool defaultBoolValue = false;
@@ -81,6 +81,7 @@ class Constants {
 
     static const baseUrl =
       kIsWeb ? 'https://api.foodryp.com' : 'https://api.foodryp.com';
+
 
   static bool checiIfAndroid(BuildContext context) {
     bool isAndroid = Theme.of(context).platform == TargetPlatform.android;

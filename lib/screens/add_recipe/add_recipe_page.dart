@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:foodryp/models/category.dart';
 import 'package:foodryp/models/recipe.dart';
 import 'package:foodryp/models/user.dart';
-import 'package:foodryp/screens/bottom_nav_screen.dart';
-import 'package:foodryp/screens/entry_web_navigation_page.dart';
+import 'package:foodryp/screens/success_add_recipe_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/category_service.dart';
 import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/theme_provider.dart';
+import 'package:foodryp/utils/user_agreement_service.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/calories_row.dart';
 import 'package:foodryp/widgets/CustomWidgets/cooking_advices_row.dart';
@@ -66,6 +66,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   TextEditingController prepDurationTextController = TextEditingController();
   TextEditingController cookDurationTextController = TextEditingController();
   TextEditingController caloriesTextController = TextEditingController();
+  TextEditingController priceRecipeController = TextEditingController();
 
   late int tappedCategoryIndex = -1;
 
@@ -75,6 +76,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   String selectedCategoryId = '';
   String selectedCategoryFont = '';
   String selectedCategoryName = '';
+  double selectedRecipePremiumPrice = 0;
 
   late String recipeTitleValue;
   late String descriptionValue;
@@ -92,6 +94,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   User user = Constants.defaultUser;
   List<bool> isAllChecked = [];
+  bool isPremium = false;
+  bool agreeToLicense = false;
+  final UserAgreementService userAgreementService = UserAgreementService();
 
   Future<void> fetchUserProfile() async {
     final userService = UserService();
@@ -126,6 +131,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
       caloriesTextController.text =
           widget.recipe!.calories ?? Constants.emptyField;
+
+      priceRecipeController.text =
+          double.parse(widget.recipe!.price.toString()).toString();
 
       _selectedDifficulty = widget.recipe!.difficulty!;
 
@@ -178,6 +186,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
               // Set booleans for the chips
               isForDiet = widget.recipe!.isForDiet;
               isForVegetarians = widget.recipe!.isForVegetarians;
+              isPremium = widget.recipe!.isPremium;
             });
           }
         }
@@ -235,71 +244,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
     }
   }
 
-  bool _isRecipeTitleValid() {
-    return recipeTitleTextController.text.isNotEmpty;
-  }
-
-  bool _isDescriptionValid() {
-    return descriptionTextController.text.isNotEmpty;
-  }
-
-  bool _isImageSelected() {
-    if (imageIsPicked) {
-      return true;
-    }
-
-    if (widget.recipe != null) {
-      if (widget.recipe?.recipeImage is String &&
-          widget.recipe!.recipeImage!.isNotEmpty) {
-        // Android case where recipeImage is a non-empty string
-        return true;
-      } else if (widget.recipe!.recipeImage is Uint8List &&
-          widget.recipe!.recipeImage!.isNotEmpty) {
-        // Web case where recipeImage is a non-empty Uint8List
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  bool _areAllIngredientsValid() {
-    for (var controller in ingredientsControllers) {
-      print('Ingredient controller text: "${controller.text}"'); // Debugging
-      if (controller.text.trim().isEmpty) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool _areAllInstructionsValid() {
-    for (var controller in instructionControllers) {
-      print('Instruction controller text: "${controller.text}"'); // Debugging
-      if (controller.text.trim().isEmpty) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool _isServingValid() {
-    return servingTextController.text.isNotEmpty;
-  }
-
-  bool _isCookDurationValid() {
-    return cookDurationTextController.text.isNotEmpty;
-  }
-
-  bool _isPrepDurationValid() {
-    return prepDurationTextController.text.isNotEmpty;
-  }
-
-  bool _isDifficultySelected() {
-    // ignore: unnecessary_null_comparison
-    return _selectedDifficulty != null;
-  }
-
   bool _allItemsValid() {
     bool isValid = tappedCategoryIndex >= 0;
 
@@ -313,6 +257,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
     bool isDesktop = Responsive.isDesktop(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
+    Map<String, String> difficultyMapping(BuildContext context) {
+      return {
+        'Easy': AppLocalizations.of(context).translate('Easy'),
+        'Medium': AppLocalizations.of(context).translate('Medium'),
+        'Hard': AppLocalizations.of(context).translate('Hard'),
+        'Chef': AppLocalizations.of(context).translate('Chef'),
+        'Michelin': AppLocalizations.of(context).translate('Michelin'),
+      };
+    }
+
     difficultyLevels = [
       AppLocalizations.of(context).translate('Easy'),
       AppLocalizations.of(context).translate('Medium'),
@@ -320,6 +274,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
       AppLocalizations.of(context).translate('Chef'),
       AppLocalizations.of(context).translate('Michelin'),
     ];
+
+    final difficultyMap = difficultyMapping(context);
 
     return Scaffold(
       appBar: widget.isForEdit
@@ -342,7 +298,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  // Form fields for recipe details
                   const SizedBox(height: 50.0),
                   Row(
                     children: [
@@ -351,22 +306,17 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             '${AppLocalizations.of(context).translate('Category')}:',
                         isDesktop: isDesktop,
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
+                      const SizedBox(width: 15),
                       selectedCategoryColor.isNotEmpty
                           ? Icon(
                               MdiIcons.checkCircleOutline,
                               color: Colors.green.withOpacity(0.5),
                             )
-                          : Container()
+                          : Container(),
                     ],
                   ),
-                  //Get Categories
                   categories.isEmpty
-                      ? const Center(
-                          child: LinearProgressIndicator(),
-                        )
+                      ? const Center(child: LinearProgressIndicator())
                       : SizedBox(
                           height: 50,
                           width: screenSize.width,
@@ -374,7 +324,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             behavior: ScrollConfiguration.of(context).copyWith(
                               dragDevices: {
                                 PointerDeviceKind.touch,
-                                PointerDeviceKind.mouse,
+                                PointerDeviceKind.mouse
                               },
                             ),
                             child: ListView.builder(
@@ -431,9 +381,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                 );
                               },
                             ),
-                          )),
+                          ),
+                        ),
                   const SizedBox(height: 20.0),
-
                   Row(
                     children: [
                       SectionTitle(
@@ -442,9 +392,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             : 'Special Nutritions Recipe (Optional):'),
                         isDesktop: isDesktop,
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
+                      const SizedBox(width: 15),
                       isForDiet || isForVegetarians
                           ? Expanded(
                               child: Icon(
@@ -452,7 +400,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                 color: Colors.green.withOpacity(0.5),
                               ),
                             )
-                          : Container()
+                          : Container(),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -501,7 +449,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         : null,
                   ),
                   const SizedBox(height: 20.0),
-
                   DescriptionRow(
                     descriptionTextController: descriptionTextController,
                     isDesktop: isDesktop,
@@ -517,7 +464,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         : null,
                   ),
                   const SizedBox(height: 20.0),
-
                   Row(
                     children: [
                       SectionTitle(
@@ -525,18 +471,15 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             .translate('Image Selection:'),
                         isDesktop: isDesktop,
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
+                      const SizedBox(width: 15),
                       imageIsPicked
                           ? Icon(
                               MdiIcons.checkCircleOutline,
                               color: Colors.green.withOpacity(0.5),
                             )
-                          : Container()
+                          : Container(),
                     ],
                   ),
-
                   const SizedBox(height: 20.0),
                   SizedBox(
                     height: isDesktop ? 350 : 200,
@@ -546,7 +489,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                       allowSelection: true,
                       containerSize: isDesktop ? 600 : screenSize.width,
                       onImageSelected: (file, bytes) {
-                        // Handle image selection
                         if (mounted) {
                           setState(() {
                             _imageFile = file;
@@ -561,15 +503,12 @@ class _AddRecipePageState extends State<AddRecipePage> {
                     ),
                   ),
                   const SizedBox(height: 20.0),
-
                   IngredientsRow(
                     ingredientsControllers: ingredientsControllers,
                     isDesktop: isDesktop,
                   ),
                   const SizedBox(height: 20.0),
-                  //Ingredient Section
                   ListView.builder(
-                    // controller: _scrollController,
                     shrinkWrap: true,
                     itemCount: ingredientsControllers.length,
                     itemBuilder: (context, index) {
@@ -582,8 +521,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         child: CustomTextField(
                           controller: ingredientsControllers[index],
                           hintText:
-                              '${AppLocalizations.of(context).translate('Ingredient')}'
-                              ' ${index + 1}',
+                              '${AppLocalizations.of(context).translate('Ingredient')} ${index + 1}',
                           borderColor: selectedCategoryColor.isNotEmpty
                               ? HexColor(selectedCategoryColor)
                               : null,
@@ -597,16 +535,12 @@ class _AddRecipePageState extends State<AddRecipePage> {
                     },
                   ),
                   const SizedBox(height: 20.0),
-
                   InstructionsRow(
                     instructionControllers: instructionControllers,
                     isDesktop: isDesktop,
                   ),
-
                   const SizedBox(height: 20.0),
-                  //Instruction section
                   ListView.builder(
-                    // controller: _scrollController,
                     shrinkWrap: true,
                     itemCount: instructionControllers.length,
                     itemBuilder: (context, index) {
@@ -618,10 +552,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         ),
                         child: CustomTextField(
                           controller: instructionControllers[index],
-
                           hintText:
-                              '${AppLocalizations.of(context).translate('Instruction')}'
-                              ' ${index + 1}',
+                              '${AppLocalizations.of(context).translate('Instruction')} ${index + 1}',
                           borderColor: selectedCategoryColor.isNotEmpty
                               ? HexColor(selectedCategoryColor)
                               : null,
@@ -629,23 +561,20 @@ class _AddRecipePageState extends State<AddRecipePage> {
                           onSuffixIconPressed: index == 0
                               ? _addInstruction
                               : () => _removeInstruction(index),
-                          maxLines:
-                              null, // Allow multiple lines for instructions
-                          keyboardType: TextInputType.multiline, labelText: '',
+                          maxLines: null,
+                          keyboardType: TextInputType.multiline,
+                          labelText: '',
                         ),
                       );
                     },
                   ),
                   const SizedBox(height: 20.0),
-
                   CookingAdvicesRow(
                     adviceControllers: adviceControllers,
                     isDesktop: isDesktop,
                   ),
                   const SizedBox(height: 20.0),
-                  //Instruction section
                   ListView.builder(
-                    // controller: _scrollController,
                     shrinkWrap: true,
                     itemCount: adviceControllers.length,
                     itemBuilder: (context, index) {
@@ -657,10 +586,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         ),
                         child: CustomTextField(
                           controller: adviceControllers[index],
-
                           hintText:
-                              '${AppLocalizations.of(context).translate('Cooking Advices')}'
-                              ' ${index + 1}',
+                              '${AppLocalizations.of(context).translate('Cooking Advices')} ${index + 1}',
                           borderColor: selectedCategoryColor.isNotEmpty
                               ? HexColor(selectedCategoryColor)
                               : null,
@@ -668,20 +595,18 @@ class _AddRecipePageState extends State<AddRecipePage> {
                           onSuffixIconPressed: index == 0
                               ? _addAdvice
                               : () => _removeAdvice(index),
-                          maxLines:
-                              null, // Allow multiple lines for instructions
-                          keyboardType: TextInputType.multiline, labelText: '',
+                          maxLines: null,
+                          keyboardType: TextInputType.multiline,
+                          labelText: '',
                         ),
                       );
                     },
                   ),
                   const SizedBox(height: 20.0),
-
                   ServingRow(
                     servingTextController: servingTextController,
                     isDesktop: isDesktop,
                   ),
-
                   const SizedBox(height: 20.0),
                   CustomTextField(
                     controller: servingTextController,
@@ -697,7 +622,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                     cookDurationTextController: cookDurationTextController,
                     isDesktop: isDesktop,
                   ),
-
                   const SizedBox(height: 20.0),
                   CustomTextField(
                     controller: cookDurationTextController,
@@ -708,14 +632,11 @@ class _AddRecipePageState extends State<AddRecipePage> {
                         ? HexColor(selectedCategoryColor)
                         : null,
                   ),
-
                   const SizedBox(height: 20.0),
-
                   PrepDurationRow(
                     prepDurationTextController: prepDurationTextController,
                     isDesktop: isDesktop,
                   ),
-
                   const SizedBox(height: 20.0),
                   CustomTextField(
                     controller: prepDurationTextController,
@@ -731,8 +652,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                     caloriesTextController: caloriesTextController,
                     isDesktop: isDesktop,
                   ),
-
-                  //Calories section
                   const SizedBox(height: 20.0),
                   CustomTextField(
                     controller: caloriesTextController,
@@ -751,7 +670,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   ),
                   const SizedBox(height: 20.0),
                   SizedBox(
-                    height: 50, // Adjust height as needed
+                    height: 50,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
@@ -762,11 +681,18 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                 onTap: () {
                                   setState(() {
                                     if (widget.isForEdit) {
-                                      widget.recipe!.difficulty =
-                                          value; // Update the model
+                                      widget.recipe!.difficulty = value;
+                                      widget.recipe?.isPremium = isPremium;
                                     } else {
-                                      _selectedDifficulty =
-                                          value; // Update local state
+                                      _selectedDifficulty = value;
+                                      if (_selectedDifficulty ==
+                                              difficultyMap['Chef'] ||
+                                          _selectedDifficulty ==
+                                              difficultyMap['Michelin']) {
+                                        isPremium = true;
+                                      } else {
+                                        isPremium = false;
+                                      }
                                     }
                                   });
                                 },
@@ -784,38 +710,50 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                           : Colors.grey,
                                     ),
                                   ),
-                                  child: Text(
-                                    value,
-                                    style: TextStyle(
-                                      color: (widget.isForEdit
-                                              ? widget.recipe?.difficulty ==
-                                                  value
-                                              : _selectedDifficulty == value)
-                                          ? Colors
-                                              .orange // Change color if selected
-                                          : themeProvider.currentTheme ==
-                                                  ThemeType.dark
-                                              ? Colors.white
-                                              : Colors
-                                                  .black, // Default color if not selected
-                                    ),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        value,
+                                        style: TextStyle(
+                                          color: (widget.isForEdit
+                                                  ? widget.recipe?.difficulty ==
+                                                      value
+                                                  : _selectedDifficulty ==
+                                                      value)
+                                              ? Colors.orange
+                                              : themeProvider.currentTheme ==
+                                                      ThemeType.dark
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      if (value == difficultyMap['Chef'] ||
+                                          value == difficultyMap['Michelin'])
+                                        Icon(
+                                          MdiIcons.starOutline,
+                                          color: Colors.orange,
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(
-                                width: 8,
-                              ), // Add space between the text items
+                              const SizedBox(width: 8),
                             ],
                           ),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 20.0),
                   TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.deepOrange, // Background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
                     onPressed: _allItemsValid()
                         ? () {
-                            //  previewIngredientsAndInstructions();
                             ingredients = getIngredients();
                             instructions = getInstructions();
                             cookingAdvices = getAdvices();
@@ -829,7 +767,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                             cookDurationValue =
                                 cookDurationTextController.text.trim();
                             caloriesValue = caloriesTextController.text.trim();
-                            // Use the values as needed
 
                             showDialog(
                               context: context,
@@ -839,73 +776,50 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                     borderRadius: BorderRadius.circular(16.0),
                                   ),
                                   elevation: 0,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: HexColor(selectedCategoryColor),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    constraints: BoxConstraints(
-                                      maxWidth: isDesktop
-                                          ? 700
-                                          : MediaQuery.of(context).size.width,
-                                    ),
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          widget.isForEdit && !imageIsPicked
-                                              ? Center(
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        const BorderRadius
-                                                            .vertical(
-                                                            top:
-                                                                Radius.circular(
-                                                                    16.0)),
-                                                    child: widget
-                                                                .recipe
-                                                                ?.recipeImage
-                                                                ?.isNotEmpty ??
-                                                            Constants
-                                                                .defaultBoolValue
-                                                        ? Image.network(
-                                                            widget.recipe
-                                                                    ?.recipeImage ??
+                                  child: StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color:
+                                                HexColor(selectedCategoryColor),
+                                            width: 2,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        constraints: BoxConstraints(
+                                          maxWidth: isDesktop
+                                              ? 700
+                                              : MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                        ),
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              widget.isForEdit && !imageIsPicked
+                                                  ? Center(
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .vertical(
+                                                          top: Radius.circular(
+                                                              16.0),
+                                                        ),
+                                                        child: widget
+                                                                    .recipe
+                                                                    ?.recipeImage
+                                                                    ?.isNotEmpty ??
                                                                 Constants
-                                                                    .emptyField,
-                                                            fit: BoxFit.cover,
-                                                            width: screenSize
-                                                                .width,
-                                                            height: screenSize
-                                                                    .height /
-                                                                4,
-                                                          )
-                                                        : Text(AppLocalizations
-                                                                .of(context)
-                                                            .translate(
-                                                                'No Image Selected')),
-                                                  ),
-                                                )
-                                              : Center(
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        const BorderRadius
-                                                            .vertical(
-                                                      top:
-                                                          Radius.circular(16.0),
-                                                    ),
-                                                    child: (imageIsPicked ||
-                                                            (widget.isForEdit &&
+                                                                    .defaultBoolValue
+                                                            ? Image.network(
                                                                 widget.recipe
-                                                                        ?.recipeImage !=
-                                                                    null))
-                                                        ? (kIsWeb
-                                                            ? Image.memory(
-                                                                uint8list,
+                                                                        ?.recipeImage ??
+                                                                    Constants
+                                                                        .emptyField,
                                                                 fit: BoxFit
                                                                     .cover,
                                                                 width:
@@ -915,282 +829,339 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                         .height /
                                                                     4,
                                                               )
-                                                            : Image.file(
-                                                                _imageFile!,
-                                                                fit: BoxFit
-                                                                    .cover,
+                                                            : Text(AppLocalizations
+                                                                    .of(context)
+                                                                .translate(
+                                                                    'No Image Selected')),
+                                                      ),
+                                                    )
+                                                  : Center(
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .vertical(
+                                                          top: Radius.circular(
+                                                              16.0),
+                                                        ),
+                                                        child: (imageIsPicked ||
+                                                                (widget.isForEdit &&
+                                                                    widget.recipe
+                                                                            ?.recipeImage !=
+                                                                        null))
+                                                            ? (kIsWeb
+                                                                ? Image.memory(
+                                                                    uint8list,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                    width: screenSize
+                                                                        .width,
+                                                                    height:
+                                                                        screenSize.height /
+                                                                            4,
+                                                                  )
+                                                                : Image.file(
+                                                                    _imageFile!,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                    width: screenSize
+                                                                        .width,
+                                                                    height:
+                                                                        screenSize.height /
+                                                                            4,
+                                                                  ))
+                                                            : Container(
                                                                 width:
                                                                     screenSize
                                                                         .width,
                                                                 height: screenSize
                                                                         .height /
                                                                     4,
-                                                              ))
-                                                        : Container(
-                                                            width: screenSize
-                                                                .width,
-                                                            height: screenSize
-                                                                    .height /
-                                                                4,
-                                                            color: Colors
-                                                                .grey[200],
-                                                            child: Center(
-                                                              child: Text(
-                                                                AppLocalizations.of(
-                                                                        context)
-                                                                    .translate(
-                                                                        'No Image Selected'),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                          .grey[
-                                                                      600],
-                                                                  fontSize: 18,
+                                                                color: Colors
+                                                                    .grey[200],
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    AppLocalizations.of(
+                                                                            context)
+                                                                        .translate(
+                                                                            'No Image Selected'),
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                              .grey[
+                                                                          600],
+                                                                      fontSize:
+                                                                          18,
+                                                                    ),
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ),
-                                                  ),
-                                                ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate(
-                                                          'Recipe Title'),
-                                                  style: const TextStyle(
-                                                      fontSize: 20.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                                Text(
-                                                  recipeTitleValue.isNotEmpty
-                                                      ? recipeTitleValue
-                                                      : AppLocalizations.of(
+                                                      ),
+                                                    ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(16.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      AppLocalizations.of(
                                                               context)
                                                           .translate(
-                                                              'No Title Entered'),
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 20.0),
-                                                if (isForDiet ||
-                                                    isForVegetarians)
-                                                  Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate(
-                                                            'Special Nutritions Recipe:'),
-                                                    style: const TextStyle(
-                                                        fontSize: 16.0,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                const SizedBox(height: 16.0),
-                                                if (isForDiet &&
-                                                    !isForVegetarians)
-                                                  Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate(
-                                                            'Diet Ready'),
-                                                    style: const TextStyle(
-                                                        fontSize: 16.0),
-                                                  ),
-                                                if (isForVegetarians &&
-                                                    !isForDiet)
-                                                  Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate(
-                                                            'Vegeterians Ready'),
-                                                    style: const TextStyle(
-                                                        fontSize: 16.0),
-                                                  ),
-                                                if (isForDiet &&
-                                                    isForVegetarians)
-                                                  Text(
-                                                    AppLocalizations.of(context)
-                                                        .translate(
-                                                            'Diet and Vegeterian Ready'),
-                                                    style: const TextStyle(
-                                                        fontSize: 16.0),
-                                                  ),
-                                                if (isForDiet ||
-                                                    isForVegetarians)
-                                                  const SizedBox(height: 16.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('Category'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  (widget.isForEdit && !isTapped
-                                                      ? (widget.recipe?.categoryName ??
-                                                                  '')
+                                                              'Recipe Title'),
+                                                      style: const TextStyle(
+                                                          fontSize: 20.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                    Text(
+                                                      recipeTitleValue
                                                               .isNotEmpty
-                                                          ? widget.recipe
-                                                                  ?.categoryName ??
-                                                              ''
+                                                          ? recipeTitleValue
                                                           : AppLocalizations.of(
                                                                   context)
                                                               .translate(
-                                                                  'No Category Selected')
-                                                      : selectedCategoryName
+                                                                  'No Title Entered'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 20.0),
+                                                    if (isForDiet ||
+                                                        isForVegetarians)
+                                                      Text(
+                                                        AppLocalizations.of(
+                                                                context)
+                                                            .translate(
+                                                                'Special Nutritions Recipe:'),
+                                                        style: const TextStyle(
+                                                            fontSize: 16.0,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                    if (isForDiet &&
+                                                        !isForVegetarians)
+                                                      Text(
+                                                        AppLocalizations.of(
+                                                                context)
+                                                            .translate(
+                                                                'Diet Ready'),
+                                                        style: const TextStyle(
+                                                            fontSize: 16.0),
+                                                      ),
+                                                    if (isForVegetarians &&
+                                                        !isForDiet)
+                                                      Text(
+                                                        AppLocalizations.of(
+                                                                context)
+                                                            .translate(
+                                                                'Vegeterians Ready'),
+                                                        style: const TextStyle(
+                                                            fontSize: 16.0),
+                                                      ),
+                                                    if (isForDiet &&
+                                                        isForVegetarians)
+                                                      Text(
+                                                        AppLocalizations.of(
+                                                                context)
+                                                            .translate(
+                                                                'Diet and Vegeterian Ready'),
+                                                        style: const TextStyle(
+                                                            fontSize: 16.0),
+                                                      ),
+                                                    if (isForDiet ||
+                                                        isForVegetarians)
+                                                      const SizedBox(
+                                                          height: 16.0),
+                                                    Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'Category'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      (widget.isForEdit &&
+                                                              !isTapped
+                                                          ? (widget.recipe?.categoryName ??
+                                                                      '')
+                                                                  .isNotEmpty
+                                                              ? widget.recipe
+                                                                      ?.categoryName ??
+                                                                  ''
+                                                              : AppLocalizations
+                                                                      .of(
+                                                                          context)
+                                                                  .translate(
+                                                                      'No Category Selected')
+                                                          : selectedCategoryName
+                                                                  .isNotEmpty
+                                                              ? selectedCategoryName
+                                                              : AppLocalizations
+                                                                      .of(
+                                                                          context)
+                                                                  .translate(
+                                                                      'No Category Selected')),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'Description'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      descriptionValue
                                                               .isNotEmpty
-                                                          ? selectedCategoryName
+                                                          ? descriptionValue
                                                           : AppLocalizations.of(
                                                                   context)
                                                               .translate(
-                                                                  'No Category Selected')),
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('Description'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  descriptionValue.isNotEmpty
-                                                      ? descriptionValue
-                                                      : AppLocalizations.of(
+                                                                  'No Description Entered'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                    Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate('Serving'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      servingValue.isNotEmpty
+                                                          ? servingValue
+                                                          : AppLocalizations.of(
+                                                                  context)
+                                                              .translate(
+                                                                  'No Serving Info Entered'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                    Text(
+                                                      AppLocalizations.of(
                                                               context)
                                                           .translate(
-                                                              'No Description Entered'),
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('Serving'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  servingValue.isNotEmpty
-                                                      ? servingValue
-                                                      : AppLocalizations.of(
+                                                              'Preparation Duration'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      prepDurationValue
+                                                              .isNotEmpty
+                                                          ? prepDurationValue
+                                                          : AppLocalizations.of(
+                                                                  context)
+                                                              .translate(
+                                                                  'No Preparation Duration Entered'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                    Text(
+                                                      AppLocalizations.of(
                                                               context)
                                                           .translate(
-                                                              'No Serving Info Entered'),
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate(
-                                                          'Preparation Duration'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  prepDurationValue.isNotEmpty
-                                                      ? prepDurationValue
-                                                      : AppLocalizations.of(
+                                                              'Cooking Duration'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      cookDurationValue
+                                                              .isNotEmpty
+                                                          ? cookDurationValue
+                                                          : AppLocalizations.of(
+                                                                  context)
+                                                              .translate(
+                                                                  'No Cooking Duration Entered'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                    Text(
+                                                      '${AppLocalizations.of(context).translate('Ingredients')}:',
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children:
+                                                          ingredients.isNotEmpty
+                                                              ? ingredients.map(
+                                                                  (ingredient) {
+                                                                  return Text(
+                                                                    '- $ingredient',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            16.0),
+                                                                  );
+                                                                }).toList()
+                                                              : [
+                                                                  Text(
+                                                                    AppLocalizations.of(
+                                                                            context)
+                                                                        .translate(
+                                                                            'No Ingredients Added'),
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            16.0),
+                                                                  ),
+                                                                ],
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                    Text(
+                                                      AppLocalizations.of(
                                                               context)
                                                           .translate(
-                                                              'No Preparation Duration Entered'),
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate(
-                                                          'Cooking Duration'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  cookDurationValue.isNotEmpty
-                                                      ? cookDurationValue
-                                                      : AppLocalizations.of(
-                                                              context)
-                                                          .translate(
-                                                              'No Cooking Duration Entered'),
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                                Text(
-                                                  '${AppLocalizations.of(context).translate('Ingredients')}'
-                                                  ':',
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children:
-                                                      ingredients.isNotEmpty
-                                                          ? ingredients.map(
-                                                              (ingredient) {
-                                                              return Text(
-                                                                '- $ingredient',
-                                                                style: const TextStyle(
-                                                                    fontSize:
-                                                                        16.0),
-                                                              );
-                                                            }).toList()
-                                                          : [
-                                                              Text(
-                                                                AppLocalizations.of(
-                                                                        context)
-                                                                    .translate(
-                                                                        'No Ingredients Added'),
-                                                                style: const TextStyle(
-                                                                    fontSize:
-                                                                        16.0),
-                                                              ),
-                                                            ],
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate(
-                                                          'Instructions:'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children:
-                                                      instructions.isNotEmpty
+                                                              'Instructions:'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: instructions
+                                                              .isNotEmpty
                                                           ? instructions.map(
                                                               (instruction) {
                                                               return Text(
@@ -1211,22 +1182,25 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                         16.0),
                                                               ),
                                                             ],
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('Advices:'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children:
-                                                      cookingAdvices.isNotEmpty
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'Advices:'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: cookingAdvices
+                                                              .isNotEmpty
                                                           ? cookingAdvices
                                                               .map((advice) {
                                                               return Text(
@@ -1247,350 +1221,514 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                         16.0),
                                                               ),
                                                             ],
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('Calories'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  caloriesValue.isNotEmpty
-                                                      ? caloriesValue
-                                                      : AppLocalizations.of(
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                    Text(
+                                                      AppLocalizations.of(
                                                               context)
                                                           .translate(
-                                                              'No Calories Info Entered'),
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('Difficulty:'),
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                Text(
-                                                  _selectedDifficulty.isNotEmpty
-                                                      ? _selectedDifficulty
-                                                      : AppLocalizations.of(
+                                                              'Calories'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      caloriesValue.isNotEmpty
+                                                          ? caloriesValue
+                                                          : AppLocalizations.of(
+                                                                  context)
+                                                              .translate(
+                                                                  'No Calories Info Entered'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      AppLocalizations.of(
                                                               context)
                                                           .translate(
-                                                              'No Difficulty Selected'),
-                                                  style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Center(
-                                            child: Padding(
-                                                padding: const EdgeInsets.all(
-                                                    Constants.defaultPadding),
-                                                child: ElevatedButton(
-                                                  onPressed: () {
-                                                    // Show the processing dialog
-                                                    showDialog(
-                                                      context: context,
-                                                      barrierDismissible:
-                                                          false, // Prevent dismissing the dialog by tapping outside
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return AlertDialog(
-                                                          content: Row(
-                                                            children: [
-                                                              const CircularProgressIndicator(),
-                                                              const SizedBox(
-                                                                  width: 16),
-                                                              Text(AppLocalizations
-                                                                      .of(
-                                                                          context)
-                                                                  .translate(
-                                                                      'Processing...')),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    );
-
-                                                    // Call the appropriate recipe service method based on whether it's for creation or update
-                                                    Future<bool>
-                                                        recipeOperation =
-                                                        widget.isForEdit
-                                                            ? RecipeService()
-                                                                .updateRecipe(
-                                                                widget.recipe
-                                                                        ?.id ??
-                                                                    Constants
-                                                                        .emptyField,
-                                                                recipeTitleValue
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.recipeTitle ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : recipeTitleValue,
-                                                                ingredients
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.ingredients ??
-                                                                        []
-                                                                    : ingredients,
-                                                                instructions
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.instructions ??
-                                                                        []
-                                                                    : instructions,
-                                                                prepDurationValue
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.prepDuration ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : prepDurationValue,
-                                                                cookDurationValue
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.cookDuration ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : cookDurationValue,
-                                                                servingValue
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.servingNumber ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : servingValue,
-                                                                _selectedDifficulty
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.difficulty ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : _selectedDifficulty,
-                                                                user.username
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.username ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : user
-                                                                        .username,
-                                                                user.profileImage
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.useImage ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : user
-                                                                        .username,
-                                                                user.id,
-                                                                DateTime.now(),
-                                                                descriptionValue
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.description ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : descriptionValue,
-                                                                selectedCategoryId
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.categoryId ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : selectedCategoryId,
-                                                                selectedCategoryColor
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.categoryColor ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : selectedCategoryColor,
-                                                                selectedCategoryFont
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.categoryFont ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : selectedCategoryFont,
-                                                                selectedCategoryName
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.categoryName ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : selectedCategoryName,
-                                                                [].isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.recomendedBy ??
-                                                                        []
-                                                                    : [],
-                                                                [],
-                                                                [],
-                                                                isForDiet,
-                                                                isForVegetarians,
-                                                                0,
-                                                                0,
-                                                                cookingAdvices
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.cookingAdvices ??
-                                                                        []
-                                                                    : cookingAdvices,
-                                                                caloriesValue
-                                                                        .isEmpty
-                                                                    ? widget.recipe
-                                                                            ?.calories ??
-                                                                        Constants
-                                                                            .emptyField
-                                                                    : caloriesValue,
-                                                              )
-                                                            : RecipeService()
-                                                                .createRecipe(
-                                                                recipeTitleValue,
-                                                                ingredients,
-                                                                instructions,
-                                                                prepDurationValue,
-                                                                cookDurationValue,
-                                                                servingValue,
-                                                                _selectedDifficulty,
-                                                                user.username,
-                                                                user.profileImage,
-                                                                user.id,
-                                                                DateTime.now(),
-                                                                descriptionValue,
-                                                                selectedCategoryId,
-                                                                selectedCategoryColor,
-                                                                selectedCategoryFont,
-                                                                selectedCategoryName,
-                                                                [],
-                                                                [],
-                                                                [],
-                                                                isForDiet,
-                                                                isForVegetarians,
-                                                                0,
-                                                                0,
-                                                                cookingAdvices,
-                                                                caloriesValue,
-                                                              );
-
-                                                    // Handle the completion of the recipe operation
-                                                    recipeOperation
-                                                        .then((value) {
-                                                      // Hide the dialog
-                                                      Navigator.pop(context);
-
-                                                      if (value) {
-                                                        // Show success SnackBar
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(AppLocalizations
-                                                                    .of(context)
-                                                                .translate(widget
-                                                                        .isForEdit
-                                                                    ? 'Recipe updated successfully'
-                                                                    : 'Recipe created successfully')),
-                                                          ),
-                                                        );
-                                                        if (imageIsPicked) {
-                                                          if (_imageFile !=
-                                                                  null ||
-                                                              uint8list
-                                                                  .isNotEmpty) {
-                                                            RecipeService()
-                                                                .uploadRecipeImage(
-                                                                    _imageFile ??
-                                                                        File(
-                                                                            ''),
-                                                                    uint8list);
-                                                          } else {
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              SnackBar(
-                                                                content: Text(
-                                                                    '${AppLocalizations.of(context).translate('Failed to ')} ${AppLocalizations.of(context).translate(widget.isForEdit ? 'update' : 'create')} ${AppLocalizations.of(context).translate('recipe')}'),
-                                                              ),
-                                                            );
-                                                          }
-                                                        }
-                                                        // Pop the current screen
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                        Navigator
-                                                            .pushAndRemoveUntil(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  isAndroid
-                                                                      ? const BottomNavScreen()
-                                                                      : const EntryWebNavigationPage()),
-                                                          (Route<dynamic>
-                                                                  route) =>
-                                                              false,
-                                                        );
-                                                      } else {
-                                                        // Show failure SnackBar
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                                '${AppLocalizations.of(context).translate('Failed to ')} ${AppLocalizations.of(context).translate(widget.isForEdit ? 'update' : 'create')} ${AppLocalizations.of(context).translate('recipe')}'),
-                                                          ),
-                                                        );
-                                                      }
-                                                    }).catchError((error) {
-                                                      // Hide the dialog
-                                                      Navigator.pop(context);
-
-                                                      // Show error SnackBar
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                              '${AppLocalizations.of(context).translate('Error:')} $error'),
+                                                              'Difficulty:'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Text(
+                                                      _selectedDifficulty
+                                                              .isNotEmpty
+                                                          ? _selectedDifficulty
+                                                          : AppLocalizations.of(
+                                                                  context)
+                                                              .translate(
+                                                                  'No Difficulty Selected'),
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    if (_selectedDifficulty ==
+                                                            difficultyMap[
+                                                                'Chef'] ||
+                                                        _selectedDifficulty ==
+                                                            difficultyMap[
+                                                                'Michelin'])
+                                                      Container(
+                                                        margin: const EdgeInsets
+                                                            .symmetric(
+                                                            vertical: 16.0),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(16.0),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Colors.blue[100],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      8.0),
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.blue,
+                                                              width: 2),
                                                         ),
-                                                      );
-                                                    });
-                                                  },
-                                                  child: Text(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              AppLocalizations.of(
+                                                                      context)
+                                                                  .translate(
+                                                                      'Enter Price for Premium Recipe'),
+                                                              style: const TextStyle(
+                                                                  fontSize:
+                                                                      16.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 8.0),
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  AppLocalizations.of(
+                                                                          context)
+                                                                      .translate(
+                                                                          'Chef Level Recipe: €9.99 - €14.99'),
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          14.0,
+                                                                      color: Colors
+                                                                          .black54),
+                                                                ),
+                                                                const SizedBox(
+                                                                    height:
+                                                                        8.0),
+                                                                Text(
+                                                                  AppLocalizations.of(
+                                                                          context)
+                                                                      .translate(
+                                                                          'Please set a price between €9.99 and €14.99 for Chef level recipes.'),
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          14.0,
+                                                                      color: Colors
+                                                                          .black54),
+                                                                ),
+                                                                const SizedBox(
+                                                                    height:
+                                                                        8.0),
+                                                                Text(
+                                                                  AppLocalizations.of(
+                                                                          context)
+                                                                      .translate(
+                                                                          'Michelin Level Recipe: €14.99 - €19.99'),
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          14.0,
+                                                                      color: Colors
+                                                                          .black54),
+                                                                ),
+                                                                const SizedBox(
+                                                                    height:
+                                                                        8.0),
+                                                                Text(
+                                                                  AppLocalizations.of(
+                                                                          context)
+                                                                      .translate(
+                                                                          'Please set a price between €14.99 and €19.99 for Michelin level recipes.'),
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          14.0,
+                                                                      color: Colors
+                                                                          .black54),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 8.0),
+                                                            TextFormField(
+                                                              controller:
+                                                                  priceRecipeController,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                labelText: AppLocalizations.of(
+                                                                        context)
+                                                                    .translate(
+                                                                        'Price (€)'),
+                                                                border:
+                                                                    OutlineInputBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8.0),
+                                                                ),
+                                                              ),
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .number,
+                                                              onChanged:
+                                                                  (value) {
+                                                                setState(() {
+                                                                  try {
+                                                                    selectedRecipePremiumPrice =
+                                                                        double.parse(
+                                                                            value);
+                                                                  } catch (e) {
+                                                                    // Handle error (e.g., show a message to the user)
+                                                                  }
+                                                                });
+                                                              },
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 16.0),
+                                                            Row(
+                                                              children: [
+                                                                Checkbox(
+                                                                  value:
+                                                                      agreeToLicense,
+                                                                  onChanged:
+                                                                      (bool?
+                                                                          value) {
+                                                                    setState(
+                                                                        () {
+                                                                      agreeToLicense =
+                                                                          value ??
+                                                                              false;
+                                                                    });
+                                                                  },
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    _showLicenseAgreement(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(AppLocalizations.of(
+                                                                          context)
+                                                                      .translate(
+                                                                          'License Agreement')),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                  ],
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      Constants.defaultPadding),
+                                                  child: ElevatedButton(
+                                                    style: TextButton.styleFrom(
+                                                      backgroundColor: Colors
+                                                          .deepOrange, // Background color
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
+                                                      ),
+                                                    ),
+                                                    onPressed: agreeToLicense
+                                                        ? () {
+                                                            // Show the processing dialog
+                                                            showDialog(
+                                                              context: context,
+                                                              barrierDismissible:
+                                                                  false,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return AlertDialog(
+                                                                  content: Row(
+                                                                    children: [
+                                                                      const CircularProgressIndicator(),
+                                                                      const SizedBox(
+                                                                          width:
+                                                                              16),
+                                                                      Text(AppLocalizations.of(
+                                                                              context)
+                                                                          .translate(
+                                                                              'Processing...')),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              },
+                                                            );
+
+                                                            Future<
+                                                                bool> recipeOperation = widget
+                                                                    .isForEdit
+                                                                ? RecipeService()
+                                                                    .updateRecipe(
+                                                                    widget.recipe
+                                                                            ?.id ??
+                                                                        Constants
+                                                                            .emptyField,
+                                                                    recipeTitleValue
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.recipeTitle ??
+                                                                            Constants.emptyField
+                                                                        : recipeTitleValue,
+                                                                    ingredients
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.ingredients ??
+                                                                            []
+                                                                        : ingredients,
+                                                                    instructions
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.instructions ??
+                                                                            []
+                                                                        : instructions,
+                                                                    prepDurationValue
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.prepDuration ??
+                                                                            Constants.emptyField
+                                                                        : prepDurationValue,
+                                                                    cookDurationValue
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.cookDuration ??
+                                                                            Constants.emptyField
+                                                                        : cookDurationValue,
+                                                                    servingValue
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.servingNumber ??
+                                                                            Constants.emptyField
+                                                                        : servingValue,
+                                                                    _selectedDifficulty
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.difficulty ??
+                                                                            Constants.emptyField
+                                                                        : _selectedDifficulty,
+                                                                    user.username
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.username ??
+                                                                            Constants
+                                                                                .emptyField
+                                                                        : user
+                                                                            .username,
+                                                                    user.profileImage
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.useImage ??
+                                                                            Constants
+                                                                                .emptyField
+                                                                        : user
+                                                                            .username,
+                                                                    user.id,
+                                                                    DateTime
+                                                                        .now(),
+                                                                    descriptionValue
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.description ??
+                                                                            Constants.emptyField
+                                                                        : descriptionValue,
+                                                                    selectedCategoryId
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.categoryId ??
+                                                                            Constants.emptyField
+                                                                        : selectedCategoryId,
+                                                                    selectedCategoryColor
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.categoryColor ??
+                                                                            Constants.emptyField
+                                                                        : selectedCategoryColor,
+                                                                    selectedCategoryFont
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.categoryFont ??
+                                                                            Constants.emptyField
+                                                                        : selectedCategoryFont,
+                                                                    selectedCategoryName
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.categoryName ??
+                                                                            Constants.emptyField
+                                                                        : selectedCategoryName,
+                                                                    [].isEmpty
+                                                                        ? widget.recipe?.recomendedBy ??
+                                                                            []
+                                                                        : [],
+                                                                    [],
+                                                                    [],
+                                                                    isForDiet,
+                                                                    isForVegetarians,
+                                                                    0,
+                                                                    0,
+                                                                    cookingAdvices
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.cookingAdvices ??
+                                                                            []
+                                                                        : cookingAdvices,
+                                                                    caloriesValue
+                                                                            .isEmpty
+                                                                        ? widget.recipe?.calories ??
+                                                                            Constants.emptyField
+                                                                        : caloriesValue,
+                                                                    isPremium,
+                                                                    selectedRecipePremiumPrice,
+                                                                    [],
+                                                                  )
+                                                                : RecipeService()
+                                                                    .createRecipe(
+                                                                    recipeTitleValue,
+                                                                    ingredients,
+                                                                    instructions,
+                                                                    prepDurationValue,
+                                                                    cookDurationValue,
+                                                                    servingValue,
+                                                                    _selectedDifficulty,
+                                                                    user.username,
+                                                                    user.profileImage,
+                                                                    user.id,
+                                                                    DateTime
+                                                                        .now(),
+                                                                    descriptionValue,
+                                                                    selectedCategoryId,
+                                                                    selectedCategoryColor,
+                                                                    selectedCategoryFont,
+                                                                    selectedCategoryName,
+                                                                    [],
+                                                                    [],
+                                                                    [],
+                                                                    isForDiet,
+                                                                    isForVegetarians,
+                                                                    0,
+                                                                    0,
+                                                                    cookingAdvices,
+                                                                    caloriesValue,
+                                                                    isPremium,
+                                                                    selectedRecipePremiumPrice,
+                                                                    [],
+                                                                  );
+
+                                                            recipeOperation
+                                                                .then((value) {
+                                                              Navigator.pop(
+                                                                  context);
+
+                                                              if (value) {
+                                                                _saveAgreementToBackend();
+                                                                if (imageIsPicked) {
+                                                                  if (_imageFile !=
+                                                                          null ||
+                                                                      uint8list
+                                                                          .isNotEmpty) {
+                                                                    RecipeService().uploadRecipeImage(
+                                                                        _imageFile ??
+                                                                            File(''),
+                                                                        uint8list);
+                                                                  } else {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                        content:
+                                                                            Text('${AppLocalizations.of(context).translate('Failed to ')} ${AppLocalizations.of(context).translate(widget.isForEdit ? 'update' : 'create')} ${AppLocalizations.of(context).translate('recipe')}'),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                }
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                Navigator
+                                                                    .pushAndRemoveUntil(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          SuccessAddRecipePage(
+                                                                              isForEdit: widget.isForEdit)),
+                                                                  (Route<dynamic>
+                                                                          route) =>
+                                                                      false,
+                                                                );
+                                                              } else {
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  SnackBar(
+                                                                    content: Text(
+                                                                        '${AppLocalizations.of(context).translate('Failed to ')} ${AppLocalizations.of(context).translate(widget.isForEdit ? 'update' : 'create')} ${AppLocalizations.of(context).translate('recipe')}'),
+                                                                  ),
+                                                                );
+                                                              }
+                                                            }).catchError(
+                                                                    (error) {
+                                                              Navigator.pop(
+                                                                  context);
+
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                SnackBar(
+                                                                  content: Text(
+                                                                      '${AppLocalizations.of(context).translate('Error:')} $error'),
+                                                                ),
+                                                              );
+                                                            });
+                                                          }
+                                                        : null,
+                                                    child: Text(
                                                       AppLocalizations.of(
                                                               context)
                                                           .translate(
                                                               widget.isForEdit
                                                                   ? 'Update'
-                                                                  : 'Save')),
-                                                )),
+                                                                  : 'Save'),
+                                                      style: TextStyle(
+                                                          color: agreeToLicense
+                                                              ? Colors.white
+                                                              : Colors.grey),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8.0),
+                                            ],
                                           ),
-                                          const SizedBox(height: 8.0),
-                                        ],
-                                      ),
-                                    ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 );
                               },
                             );
                           }
                         : null,
-                    child: Text(AppLocalizations.of(context)
-                        .translate('Preview Recipe')),
+                    child: Text(
+                      AppLocalizations.of(context).translate('Preview Recipe'),
+                      style: TextStyle(
+                          color: _allItemsValid() ? Colors.white : Colors.grey),
+                    ),
                   ),
                 ],
               ),
@@ -1611,5 +1749,46 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
   List<String> getAdvices() {
     return adviceControllers.map((controller) => controller.text).toList();
+  }
+
+  void _showLicenseAgreement(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text(
+                  AppLocalizations.of(context).translate('License Agreement')),
+              content: Text(AppLocalizations.of(context).translate(
+                  'By agreeing to the license agreement, you acknowledge that your cut will be 70%, while Foodryp will receive 30%. Do you agree to these terms?')),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(AppLocalizations.of(context).translate('Close')),
+                  onPressed: () {
+                    setState(() {
+                      agreeToLicense = true;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _saveAgreementToBackend() async {
+    try {
+      await userAgreementService.saveUserAgreement(
+        '1.0',
+        'By agreeing to the license agreement, you acknowledge that your cut will be 70%, while Foodryp will receive 30%. Do you agree to these terms?',
+      );
+      print('Agreement saved successfully');
+    } catch (e) {
+      print('Failed to save agreement: $e');
+    }
   }
 }
