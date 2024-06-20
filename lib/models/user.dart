@@ -14,7 +14,9 @@ class User {
   List<String>? followRequestsReceived;
   List<String>? followRequestsCanceled;
   final List<String>? commentId;
-    final List<String>? savedRecipes;
+  final List<String>? savedRecipes;
+  final String? themePreference; // Added field for theme preference
+  final String? languagePreference; // Add this field
 
   User({
     required this.id,
@@ -22,17 +24,19 @@ class User {
     required this.email,
     required this.profileImage,
     this.gender,
-    required this.memberSince,
-    required this.role,
-    required this.recipes,
-    required this.likedRecipes,
-    required this.followers,
-    required this.following,
-    required this.followRequestsSent,
-    required this.followRequestsReceived,
-    required this.followRequestsCanceled,
-    required this.commentId,
-    required this.savedRecipes,
+    this.memberSince,
+    this.role,
+    this.recipes,
+    this.likedRecipes,
+    this.followers,
+    this.following,
+    this.followRequestsSent,
+    this.followRequestsReceived,
+    this.followRequestsCanceled,
+    this.commentId,
+    this.savedRecipes,
+    this.themePreference, // Initialize themePreference
+    this.languagePreference,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -44,7 +48,7 @@ class User {
       gender: json['gender'],
       memberSince: json['memberSince'] != null
           ? DateTime.parse(json['memberSince'])
-          : null, // Parse string to DateTime object
+          : null,
       role: json['role'],
       recipes: json['recipes']?.cast<String>(),
       likedRecipes: json['likedRecipes']?.cast<String>(),
@@ -55,10 +59,10 @@ class User {
       followRequestsCanceled: json['followRequestsCanceled']?.cast<String>(),
       commentId: json['commentId']?.cast<String>(),
       savedRecipes: json['savedRecipes']?.cast<String>(),
+      themePreference: json['themePreference'],
+      languagePreference: json['languagePreference'],
     );
   }
-
-  set buttonText(String buttonText) {}
 
   Map<String, dynamic> toJson() => {
         '_id': id,
@@ -66,7 +70,7 @@ class User {
         'email': email,
         'profileImage': profileImage,
         'gender': gender,
-        'memberSince': memberSince,
+        'memberSince': memberSince?.toIso8601String(),
         'role': role,
         'recipes': recipes,
         'likedRecipes': likedRecipes,
@@ -76,6 +80,8 @@ class User {
         'followRequestsReceived': followRequestsReceived,
         'followRequestsCanceled': followRequestsCanceled,
         'commentId': commentId,
-         'savedRecipes': savedRecipes,
+        'savedRecipes': savedRecipes,
+        'themePreference': themePreference,
+        'languagePreference': languagePreference,
       };
 }

@@ -28,6 +28,7 @@ class CustomAdminCard extends StatelessWidget {
               Icon(icon, size: 48.0),
               const SizedBox(height: 8.0),
               Text(
+                textAlign: TextAlign.center,
                 title,
                 style: const TextStyle(
                     fontSize: 18.0, fontWeight: FontWeight.bold),

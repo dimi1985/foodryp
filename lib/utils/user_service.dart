@@ -30,6 +30,8 @@ class UserService {
     List<String> likedRecipes,
     List<String> mealId,
     List<String> followedByRequest,
+    String themePreference,
+    String languagePreference,
   ) async {
     try {
       final response = await http.post(
@@ -48,6 +50,8 @@ class UserService {
           'followedBy': followedBy,
           'likedRecipes': likedRecipes,
           'followedByRequest': followedByRequest,
+          'themePreference': themePreference,
+          'languagePreference': languagePreference,
         }),
       );
 
@@ -766,4 +770,112 @@ class UserService {
       return false;
     }
   }
+
+  Future<bool> updateThemePreference(String themePreference) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? userId = prefs.getString('userId');
+    final String? token = await TokenManager
+        .getTokenLocally(); // Adjust according to your token management
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+
+    if (token == null || userId == null) {
+      // Handle missing auth token or user ID
+      return false;
+    }
+
+    try {
+      print('themePreference $themePreference');
+      final response = await http.put(
+        Uri.parse('${Constants.baseUrl}/api/theme'),
+        headers: headers,
+        body: jsonEncode({
+          'userId': userId,
+          'themePreference': themePreference,
+        }),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error updating theme preference: $e');
+      return false;
+    }
+  }
+
+Future<bool> updateLanguagePreference(String languagePreference) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? userId = prefs.getString('userId');
+  final String? token = await TokenManager.getTokenLocally(); // Adjust according to your token management
+  final headers = {
+    'Authorization': 'Bearer $token',
+    'Content-Type': 'application/json'
+  };
+
+  if (token == null || userId == null) {
+    // Handle missing auth token or user ID
+    return false;
+  }
+
+  try {
+    print('languagePreference $languagePreference');
+    final response = await http.put(
+      Uri.parse('${Constants.baseUrl}/api/language'),
+      headers: headers,
+      body: jsonEncode({
+        'userId': userId,
+        'languagePreference': languagePreference,
+      }),
+    );
+
+    return response.statusCode == 200;
+  } catch (e) {
+    print('Error updating language preference: $e');
+    return false;
+  }
+}
+
+ Future<String?> getThemePreference() async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+
+  try {
+    final response = await http.get(
+      Uri.parse('${Constants.baseUrl}/api/themePreference/$userId'),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['themePreference'];
+    } else {
+      print('Error fetching theme preference: ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Error fetching theme preference: $e');
+    return null;
+  }
+}
+Future<String?> getLanguagePreference() async {
+  await _initPrefs();
+  final userId = _prefs.getString('userId');
+
+  try {
+    final response = await http.get(
+      Uri.parse('${Constants.baseUrl}/api/languagePreference/$userId'),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['languagePreference'];
+    } else {
+      print('Error fetching language preference: ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Error fetching language preference: $e');
+    return null;
+  }
+}
+
+
 }

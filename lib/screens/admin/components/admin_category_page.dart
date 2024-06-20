@@ -21,6 +21,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
   late final List<CategoryModel> _categories = [];
   late int _page = 1;
   final int _pageSize = 10;
+  CategoryService categoryService = CategoryService();
 
   @override
   void initState() {
@@ -82,6 +83,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                       final category = _categories[index];
                       return InkWell(
                           onTap: () {
+                            categoryService.saveCategoryIDLocally(category.id.toString());
                             Navigator.push(
                               context,
                               MaterialPageRoute(

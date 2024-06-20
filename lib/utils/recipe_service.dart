@@ -505,6 +505,20 @@ class RecipeService {
     }
   }
 
+    Future<void> invalidateCache() async {
+    final response = await http.post(
+      Uri.parse('${Constants.baseUrl}/api/invalidate-cache'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      print('Cache invalidated: ${data['message']}');
+    } else {
+      throw Exception('Failed to invalidate cache');
+    }
+  }
+
   Future<void> rateRecipe(String recipeId, double rating) async {
     await _initPrefs();
     final userId = _prefs.getString('userId');

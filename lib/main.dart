@@ -6,6 +6,7 @@ import 'package:foodryp/screens/entry_web_navigation_page.dart';
 import 'package:foodryp/utils/app_localizations.dart';
 import 'package:foodryp/utils/celebration_settings_provider.dart';
 import 'package:foodryp/utils/connectivity_service.dart';
+import 'package:foodryp/utils/contants.dart';
 import 'package:foodryp/utils/language_provider.dart';
 import 'package:foodryp/utils/recipe_provider.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
@@ -20,13 +21,40 @@ void main() async {
   // Ensure that the necessary bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
+  UserService userService = UserService();
 
+  String? languageCode = Constants.emptyField;
+  String? countryCode = Constants.emptyField;
   SharedPreferences prefs = await SharedPreferences.getInstance();
- String? userId = await UserService().getCurrentUserId();
-  String? languageCode = prefs.getString('languageCode');
-  String? countryCode = prefs.getString('countryCode');
 
-  if(userId.isEmpty){
+  String? themePreference = await userService.getThemePreference();
+  String? languagePreference = await userService.getLanguagePreference();
+
+  if (themePreference != null) {
+    ThemeType themeType = themeTypeFromString(themePreference);
+    await prefs.setString('theme', themeType.toString());
+  } else {
+    print('Failed to fetch theme preference');
+  }
+
+  if (languagePreference != null) {
+    // Split the languagePreference into languageCode and countryCode
+    List<String> parts = languagePreference.split('-');
+    languageCode = parts[0];
+    countryCode = parts.length > 1 ? parts[1] : '';
+
+    // Save languageCode and countryCode to SharedPreferences
+    await prefs.setString('languageCode', languageCode);
+    await prefs.setString('countryCode', countryCode);
+  } else {
+    print('Failed to fetch language preference');
+  }
+
+  String? userId = await UserService().getCurrentUserId();
+  languageCode = prefs.getString('languageCode');
+  countryCode = prefs.getString('countryCode');
+
+  if (userId.isEmpty) {
     UserService().clearUserId();
   }
 
@@ -50,6 +78,15 @@ void main() async {
   );
 }
 
+ThemeType themeTypeFromString(String theme) {
+  switch (theme) {
+    case 'dark':
+      return ThemeType.dark;
+    case 'light':
+    default:
+      return ThemeType.light;
+  }
+}
 
 class Foodryp extends StatefulWidget {
   final Locale initialLocale;
@@ -111,12 +148,20 @@ class _FoodrypState extends State<Foodryp> {
 
   Widget determineMobileLayout(List<ConnectivityResult> connectionStatus) {
     bool isOffline = connectionStatus.contains(ConnectivityResult.none);
-    
+
     if (kIsWeb) {
-      return isOffline ?  const Center(child: Text('You are offline'),) : const EntryWebNavigationPage();
+      return isOffline
+          ? const Center(
+              child: Text('You are offline'),
+            )
+          : const EntryWebNavigationPage();
     } else if (defaultTargetPlatform == TargetPlatform.android ||
-               defaultTargetPlatform == TargetPlatform.iOS) {
-      return isOffline ?const Center(child: Text('You are offline'),) : const BottomNavScreen();
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      return isOffline
+          ? const Center(
+              child: Text('You are offline'),
+            )
+          : const BottomNavScreen();
     } else {
       return const BottomNavScreen(); // Default to BottomNavScreen for other platforms
     }

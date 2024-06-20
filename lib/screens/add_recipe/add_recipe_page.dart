@@ -1460,7 +1460,12 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                 .circular(10.0),
                                                       ),
                                                     ),
-                                                    onPressed: agreeToLicense
+                                                    onPressed: (agreeToLicense && _selectedDifficulty ==
+                                                            difficultyMap[
+                                                                'Chef'] &&
+                                                        _selectedDifficulty ==
+                                                            difficultyMap[
+                                                                'Michelin'] && isPremium) || !isPremium
                                                         ? () {
                                                             // Show the processing dialog
                                                             showDialog(
@@ -1705,7 +1710,12 @@ class _AddRecipePageState extends State<AddRecipePage> {
                                                                   ? 'Update'
                                                                   : 'Save'),
                                                       style: TextStyle(
-                                                          color: agreeToLicense
+                                                          color: (agreeToLicense && _selectedDifficulty ==
+                                                            difficultyMap[
+                                                                'Chef'] &&
+                                                        _selectedDifficulty ==
+                                                            difficultyMap[
+                                                                'Michelin'] && isPremium) || !isPremium
                                                               ? Colors.white
                                                               : Colors.grey),
                                                     ),

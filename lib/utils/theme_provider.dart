@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'user_service.dart'; // Make sure to import the UserService
 
 enum ThemeType { light, dark }
 
 class ThemeProvider with ChangeNotifier {
   ThemeData _themeData = _buildThemeData(ThemeType.light);
   ThemeType _currentTheme = ThemeType.light;
+  final UserService _userService = UserService(); // Initialize UserService
 
   ThemeProvider() {
     _loadThemePreference();
@@ -15,12 +17,14 @@ class ThemeProvider with ChangeNotifier {
 
   ThemeType get currentTheme => _currentTheme;
 
-  void toggleTheme() {
-    _currentTheme = _currentTheme == ThemeType.light ? ThemeType.dark : ThemeType.light;
-    _themeData = _buildThemeData(_currentTheme);
-    _saveThemePreference(_currentTheme);
-    notifyListeners();
-  }
+ void toggleTheme() {
+  _currentTheme = _currentTheme == ThemeType.light ? ThemeType.dark : ThemeType.light;
+  _themeData = _buildThemeData(_currentTheme);
+  _saveThemePreference(_currentTheme);
+  _updateThemePreferenceOnServer(_currentTheme);
+  notifyListeners();
+}
+
 
   static ThemeData _buildThemeData(ThemeType themeType) {
     return themeType == ThemeType.light
@@ -48,4 +52,13 @@ class ThemeProvider with ChangeNotifier {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('theme', themeType.toString());
   }
+
+  Future<void> _updateThemePreferenceOnServer(ThemeType themeType) async {
+    final String themePreference = themeType.toString().split('.').last;
+    final success = await _userService.updateThemePreference(themePreference);
+    if (!success) {
+      print('Failed to update theme preference on server');
+    }
+  }
+
 }

@@ -102,7 +102,7 @@ class CategoryService {
       // Registration successful
       final responseData = jsonDecode(response.body);
       String categoryId = responseData['categoryId'];
-      await _saveCategoryIDLocally(categoryId);
+      await saveCategoryIDLocally(categoryId);
       print('Category created successfully: $responseData');
       return true;
     } else {
@@ -139,6 +139,7 @@ Future<bool> uploadCategoryImage(File? file, Uint8List? uint8list) async {
             'categoryImage',
             uint8list,
             filename: filename,
+            
           ),
         );
       } else if (file != null) {
@@ -230,7 +231,7 @@ Future<bool> uploadCategoryImage(File? file, Uint8List? uint8list) async {
     }
   }
 
-  Future<void> _saveCategoryIDLocally(String categoryId) async {
+  Future<void> saveCategoryIDLocally(String categoryId) async {
     await _initPrefs();
     await _prefs.setString('categoryId', categoryId);
   }

@@ -19,7 +19,6 @@ import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/utils/users_list_provider.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
 import 'package:provider/provider.dart';
-
 import 'premium_shopping_page.dart';
 
 class EntryWebNavigationPage extends StatefulWidget {
@@ -108,31 +107,48 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
     setState(() {
       _currentPageIndex = index;
     });
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.fastEaseInToSlowEaseOut,
-    );
+    _pageController.jumpToPage(index); // Use jumpToPage instead of animateToPage for instant navigation
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final bool isDesktop = Responsive.isDesktop(context);
+  List<Widget> _buildPages() {
+    return [
+      MainScreen(user: user),
+      if (isAuthenticated) CreatorsPage(user: user),
+      RecipePage(user: user, seeAll: false),
+      WeeklyMenuPage(user: user, isForDiet: false, showAll: true),
+      if (isAuthenticated) MyFridgePage(user: user),
+      if (isAuthenticated) const AddRecipePage(isForEdit: false),
+      if (isAuthenticated) const PremiumShoppingPage(),
+      ProfilePage(user: user),
+      if (!isAuthenticated) const AuthScreen(),
+      if (isAuthenticated) const FollowingRecipesPage(),
+    ];
+  }
 
-    menuItems = [
+  List<String> _buildMenuItems() {
+    return [
       'Home',
       if (isAuthenticated) 'Creators',
       'Recipes',
       'Weekly Menu Page',
       if (isAuthenticated) 'My Fridge',
       if (isAuthenticated) 'Add Recipe',
-      if (isAuthenticated) 'Premium Shopping', // Add new menu item
+      if (isAuthenticated) 'Premium Shopping',
+      'ProfilePage',
       if (!isAuthenticated) 'Sign Up/Sign In',
-      if (isForInternalUse) 'ProfilePage',
       if (isAuthenticated) 'Following',
     ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDesktop = Responsive.isDesktop(context);
+
+    final pages = _buildPages();
+    menuItems = _buildMenuItems();
 
     final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
@@ -288,37 +304,7 @@ class _EntryWebNavigationPageState extends State<EntryWebNavigationPage> {
             _currentPageIndex = index;
           });
         },
-        children: [
-          MainScreen(
-            user: user,
-          ),
-          if (isAuthenticated)
-            CreatorsPage(
-              user: user,
-            ),
-          RecipePage(
-            user: user,
-            seeAll: false,
-          ),
-          WeeklyMenuPage(
-            user: user,
-            isForDiet: false,
-            showAll: true,
-          ),
-          if (isAuthenticated)
-            MyFridgePage(
-              user: user,
-            ),
-          if (isAuthenticated) const AddRecipePage(isForEdit: false),
-          if (isAuthenticated) const PremiumShoppingPage(), // Add the new page here
-          if (isAuthenticated)
-            ProfilePage(
-              user: user,
-            ),
-          if (!isAuthenticated) const AuthScreen(),
-          if (isAuthenticated) const FollowingRecipesPage()
-          // Add other pages here as needed
-        ],
+        children: pages,
       ),
     );
   }

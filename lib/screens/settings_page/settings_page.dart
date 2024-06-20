@@ -16,7 +16,6 @@ import 'package:foodryp/utils/language.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/search_settings_provider.dart';
 import 'package:foodryp/utils/theme_provider.dart';
-import 'package:foodryp/utils/token_manager.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/changeFieldDialog.dart';
 import 'package:foodryp/widgets/CustomWidgets/image_picker_preview_container.dart';
@@ -43,6 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String pin = Constants.emptyField;
   bool isPinSend = false;
   bool isPinRegistered = false;
+  UserService _userService = UserService();
 
   @override
   void didChangeDependencies() {
@@ -88,7 +88,9 @@ class _SettingsPageState extends State<SettingsPage> {
       setState(() {
         isPinRegistered = pinHash != null;
       });
-    } catch (e) {return;}
+    } catch (e) {
+      return;
+    }
   }
 
   @override
@@ -195,7 +197,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Icons.lock,
             () {
               showDialog(
-                  context: _scaffoldKey.currentContext!,
+                context: _scaffoldKey.currentContext!,
                 builder: (BuildContext context) {
                   return ChangeFieldDialog(
                     context: context,
@@ -340,6 +342,7 @@ class _SettingsPageState extends State<SettingsPage> {
               });
               const locale = Locale('en', 'US');
               Foodryp.setLocale(context, locale);
+              updateLanguagePreferenceOnServer('en-US');
             },
           ),
           LanguageSettingsTile(
@@ -351,6 +354,7 @@ class _SettingsPageState extends State<SettingsPage> {
               });
               const locale = Locale('el', 'GR');
               Foodryp.setLocale(context, locale);
+              updateLanguagePreferenceOnServer('el-GR');
             },
           ),
 
@@ -398,14 +402,15 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
 
-          _sectionTitle(AppLocalizations.of(context).translate(AppLocalizations.of(context).translate('Recovery Pin'))),
+          _sectionTitle(AppLocalizations.of(context).translate(
+              AppLocalizations.of(context).translate('Recovery Pin'))),
           Column(
             children: [
               ListTile(
-
-                title:  Text(AppLocalizations.of(context).translate('Enter Your 4-Digit PIN')),
-                subtitle:  Text(
-                    AppLocalizations.of(context).translate('This PIN will be used for verification when you request to reset your forgotten password.So you must register one in order to reset your password')),
+                title: Text(AppLocalizations.of(context)
+                    .translate('Enter Your 4-Digit PIN')),
+                subtitle: Text(AppLocalizations.of(context).translate(
+                    'This PIN will be used for verification when you request to reset your forgotten password.So you must register one in order to reset your password')),
                 leading: const Icon(Icons.lock),
                 trailing: ElevatedButton(
                   onPressed: () async {
@@ -415,13 +420,14 @@ class _SettingsPageState extends State<SettingsPage> {
                       });
                     }
                     // Perform your logic to send 'pin' to the server
-                   
+
                     bool success = await UserService().sendPin(pin);
                     if (success) {
                       // Handle success scenario (e.g., show confirmation message)
                       ScaffoldMessenger.of(context).showSnackBar(
-                        
-                        SnackBar(content: Text(AppLocalizations.of(context).translate('PIN sent successfully'))),
+                        SnackBar(
+                            content: Text(AppLocalizations.of(context)
+                                .translate('PIN sent successfully'))),
                       );
                       if (mounted) {
                         setState(() {
@@ -429,10 +435,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         });
                       }
                     } else {
-                      
                       // Handle failure scenario (e.g., show error message)
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(AppLocalizations.of(context).translate('Failed to send PIN'))),
+                        SnackBar(
+                            content: Text(AppLocalizations.of(context)
+                                .translate('Failed to send PIN'))),
                       );
                       if (mounted) {
                         setState(() {
@@ -441,8 +448,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       }
                     }
                   },
-                  
-                  child:  Text(AppLocalizations.of(context).translate('Send PIN')),
+                  child:
+                      Text(AppLocalizations.of(context).translate('Send PIN')),
                 ),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -458,24 +465,24 @@ class _SettingsPageState extends State<SettingsPage> {
                       pin = value;
                     },
                     keyboardType: TextInputType.number,
-                    decoration:  InputDecoration(
-                      
-                      hintText: AppLocalizations.of(context).translate('Enter PIN'),
+                    decoration: InputDecoration(
+                      hintText:
+                          AppLocalizations.of(context).translate('Enter PIN'),
                     ),
                   ),
                 ),
               ),
               // Add card based on isPinRegistered status
               if (isPinRegistered)
-                 Card(
+                Card(
                   color: Colors.red,
                   child: ListTile(
                     title: Text(
-                      AppLocalizations.of(context).translate('PIN Already Registered'),
-                   
-                      style:const TextStyle(color: Colors.white),
+                      AppLocalizations.of(context)
+                          .translate('PIN Already Registered'),
+                      style: const TextStyle(color: Colors.white),
                     ),
-                    leading:const Icon(Icons.warning, color: Colors.white),
+                    leading: const Icon(Icons.warning, color: Colors.white),
                   ),
                 ),
             ],
@@ -605,5 +612,11 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       (route) => false,
     );
+  }
+
+  Future<bool> updateLanguagePreferenceOnServer(
+      String languagePreference) async {
+    // Call the update language preference method from UserService
+    return await _userService.updateLanguagePreference(languagePreference);
   }
 }

@@ -356,6 +356,7 @@ class _AdminAddCategoryPageState extends State<AdminAddCategoryPage> {
 
                 // Perform category update if category exists, otherwise create category
 
+
                 bool success = isUpdating
                     ? await CategoryService().updateCategory(
                         widget.category?.id ?? '',

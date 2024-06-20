@@ -80,7 +80,7 @@ class Constants {
 // 
 
     static const baseUrl =
-      kIsWeb ? 'https://api.foodryp.com' : 'https://api.foodryp.com';
+      kIsWeb ? 'http://localhost:3000' : 'https://api.foodryp.com';
 
 
   static bool checiIfAndroid(BuildContext context) {

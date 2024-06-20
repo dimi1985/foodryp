@@ -15,7 +15,7 @@ class ReusableTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.autofocus = false,
-    required this.togglePasswordVisibility, // Toggle password visibility function
+    required this.togglePasswordVisibility, required String? Function(dynamic value) validator, // Toggle password visibility function
   });
 
   @override

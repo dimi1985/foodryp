@@ -321,5 +321,20 @@
   "Recipe updated successfully": "Recipe updated successfully",
   "Recipe created successfully": "Recipe created successfully",
   "Buy Now": "Buy Now",
-  "Coming Soon": "Coming Soon"
+  "Server Monitor": "Server Monitor",
+  "Server Status": "Server Status",
+  "Uptime": "Uptime",
+  "Load Average": "Load Average",
+  "Memory Usage": "Memory Usage",
+  "Free Memory": "Free Memory",
+  "Total Memory": "Total Memory",
+  "Database Status": "Database Status",
+  "Status": "Status",
+  "Backup Status": "Backup Status",
+  "Size": "Size",
+  "Last Modified": "Last Modified",
+  "Alerts": "Alerts",
+  "No Alerts": "No Alerts",
+  "Alert": "Alert"
+  
 }
