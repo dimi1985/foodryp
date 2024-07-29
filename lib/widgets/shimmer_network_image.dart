@@ -60,7 +60,7 @@ class ShimmerNetworkImage extends StatelessWidget {
                 AppLocalizations.of(context).translate('No Image at this time'),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 24.0,
+                  fontSize:5,
                   color: Colors.white,
                   backgroundColor: Colors.black54,
                 ),

@@ -16,10 +16,12 @@ class ShimmerCustomProfileRecipeCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: double.infinity,
-                height: 150,
-                color: Colors.white,
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  height: 150,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 8),
               Container(

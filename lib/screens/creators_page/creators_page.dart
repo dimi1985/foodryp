@@ -26,14 +26,12 @@ class _CreatorsPageState extends State<CreatorsPage> {
   @override
   void initState() {
     super.initState();
-    // Fetch users in initState
     _fetchUsers();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Fetch current user ID in didChangeDependencies
     _fetchCurrentUserId();
   }
 
@@ -68,33 +66,41 @@ class _CreatorsPageState extends State<CreatorsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Creators'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(Constants.defaultPadding),
-        child: _isLoading
-            ? ListView.builder(
-                itemCount: 10, // Number of shimmer placeholders
-                itemBuilder: (context, index) => ShimmerCustomCreatorCard(),
-              )
-            : ListView.builder(
-                itemCount: _users.length,
-                itemBuilder: (context, index) {
-                  final user = _users[index];
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfilePage(user: user),
-                        ),
-                      );
-                    },
-                    child: CustomCreatorCard(
-                      user: user,
-                      currentLoggedUserId: currentLoggedUserId,
-                    ),
-                  );
-                },
-              ),
+        child: ListView.builder(
+          itemCount: _isLoading ? 10 : _users.length,
+          itemBuilder: (context, index) {
+            if (_isLoading) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ShimmerCustomCreatorCard(),
+              );
+            } else {
+              final user = _users[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfilePage(user: user),
+                      ),
+                    );
+                  },
+                  child: CustomCreatorCard(
+                    user: user,
+                    currentLoggedUserId: currentLoggedUserId,
+                  ),
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }

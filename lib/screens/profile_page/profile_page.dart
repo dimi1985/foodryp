@@ -1,6 +1,3 @@
-// profilePage.dart
-// ignore_for_file: library_private_types_in_public_api, must_be_immutable
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodryp/models/user.dart';
@@ -53,11 +50,11 @@ class _ProfilePageState extends State<ProfilePage> {
           await userService.getPublicUserProfile(widget.user.username);
     }
 
-   if(mounted){
-     setState(() {
-      widget.user = userProfile ?? Constants.defaultUser;
-    });
-   }
+    if (mounted) {
+      setState(() {
+        widget.user = userProfile ?? Constants.defaultUser;
+      });
+    }
   }
 
   @override
@@ -88,9 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // Ensure alignment to the left
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Integrated TopProfile content
             SizedBox(
@@ -107,7 +102,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         widget.user.gender == 'female' ||
                                 widget.user.gender == 'male'
                             ? ImagePickerPreviewContainer(
-                                containerSize: 75.0,
+                                containerSize: Responsive.isDesktop(context)
+                                    ? 150.0
+                                    : 75.0,
                                 initialImagePath: widget.user.profileImage,
                                 onImageSelected:
                                     (File imageFile, List<int> bytes) {},
@@ -124,7 +121,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ? Colors.white
                                 : const Color.fromARGB(255, 37, 36, 37),
                             fontWeight: FontWeight.bold,
-                            fontSize: 17.0,
+                            fontSize: Responsive.isDesktop(context)
+                                ? 24.0
+                                : 17.0,
                           ),
                         ),
                       ],
@@ -149,14 +148,16 @@ class _ProfilePageState extends State<ProfilePage> {
                             );
                           },
                         ),
-                        
                         Text(
-                          AppLocalizations.of(context).translate('View Saved Recipes'),
+                          AppLocalizations.of(context)
+                              .translate('View Saved Recipes'),
                           style: TextStyle(
                             color: themeProvider.currentTheme == ThemeType.dark
                                 ? Colors.white
                                 : const Color.fromARGB(255, 37, 36, 37),
-                            fontSize: 14.0,
+                            fontSize: Responsive.isDesktop(context)
+                                ? 18.0
+                                : 14.0,
                           ),
                         ),
                       ],
@@ -175,7 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 10.0),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(Responsive.isDesktop(context) ? 32 : 16),
               child: Align(
                 alignment: Alignment.topLeft,
                 child: WeeklyMenuSection(
@@ -196,12 +197,15 @@ class _ProfilePageState extends State<ProfilePage> {
               isForDiet: true,
             ),
             const SizedBox(height: 10.0),
-            WeeklyMenuSection(
-              showAll: false,
-              publicUsername: widget.user.username,
-              publicUserId: widget.user.id,
-              userRecipes: widget.user.recipes,
-              isForDiet: true,
+            Padding(
+              padding: EdgeInsets.all(Responsive.isDesktop(context) ? 32 : 16),
+              child: WeeklyMenuSection(
+                showAll: false,
+                publicUsername: widget.user.username,
+                publicUserId: widget.user.id,
+                userRecipes: widget.user.recipes,
+                isForDiet: true,
+              ),
             ),
             const SizedBox(height: 25.0),
             HeadingTitleRow(
@@ -221,10 +225,10 @@ class _ProfilePageState extends State<ProfilePage> {
               isForDiet: false,
             ),
             const SizedBox(height: 10.0),
-            SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: RecipeCardProfileSection(
-                    user: widget.user)),
+            Padding(
+              padding: EdgeInsets.all(Responsive.isDesktop(context) ? 32 : 16),
+              child: RecipeCardProfileSection(user: widget.user),
+            ),
           ],
         ),
       ),

@@ -7,17 +7,18 @@ import 'package:foodryp/utils/recipe_service.dart';
 import 'package:foodryp/utils/responsive.dart';
 import 'package:foodryp/utils/user_service.dart';
 import 'package:foodryp/widgets/CustomWidgets/custom_profile_recipe_card.dart';
-import 'package:foodryp/widgets/CustomWidgets/shimmer_custom_profile_recipe_card.dart'; // Import the shimmer card
+import 'package:foodryp/widgets/CustomWidgets/shimmer_custom_profile_recipe_card.dart';
 
 class RecipeCardProfileSection extends StatefulWidget {
   final User user;
   const RecipeCardProfileSection({
     Key? key,
     required this.user,
-  });
+  }) : super(key: key);
 
   @override
-  State<RecipeCardProfileSection> createState() => _RecipeCardProfileSectionState();
+  State<RecipeCardProfileSection> createState() =>
+      _RecipeCardProfileSectionState();
 }
 
 class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
@@ -55,10 +56,10 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
   }
 
   Future<void> _fetchRecipes() async {
-    if(mounted){
+    if (mounted) {
       setState(() {
-      _isLoading = true;
-    });
+        _isLoading = true;
+      });
     }
     try {
       final fetchedRecipes = await _fetchRecipesData(_currentPage, _pageSize);
@@ -67,11 +68,11 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
         _isLoading = false;
       });
     } catch (_) {
-     if(mounted){
-       setState(() {
-        _isLoading = false;
-      });
-     }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -120,130 +121,47 @@ class _RecipeCardProfileSectionState extends State<RecipeCardProfileSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(Responsive.isDesktop(context) ? 32 : 16),
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.only(top: 16.0),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (Responsive.isDesktop(context)) {
-                      return null;
-                    }
-                    if (_isLoading && index >= recipes.length) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ShimmerCustomProfileRecipeCard(),
-                      );
-                    }
-                    final recipe = recipes[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: InkWell(
-                        hoverColor: Colors.transparent,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RecipeDetailPage(
-                                recipe: recipe,
-                                internalUse: Constants.emptyField,
-                                missingIngredients: const [],
-                              ),
-                            ),
-                          );
-                        },
-                        child: SizedBox(
-                          height: 350,
-                          width: 350,
-                          child: CustomProfileRecipeCard(
-                            internalUse: '',
-                            recipe: recipe,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: _isLoading ? recipes.length + 1 : recipes.length,
-                ),
-              ),
-            ),
-            if (Responsive.isDesktop(context))
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 10.0,
-                    childAspectRatio: 1.0,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (_isLoading && index >= recipes.length) {
-                        return Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: ShimmerCustomProfileRecipeCard(),
-                        );
-                      }
-                      final recipe = recipes[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            hoverColor: Colors.transparent,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RecipeDetailPage(
-                                    recipe: recipe,
-                                    internalUse: '',
-                                    missingIngredients: const [],
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                    Constants.defaultPadding),
-                                color: Colors.transparent,
-                              ),
-                              child: SizedBox(
-                                height: 200,
-                                width: 200,
-                                child: CustomProfileRecipeCard(
-                                  internalUse: '',
-                                  recipe: recipe,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: _isLoading ? recipes.length + 1 : recipes.length,
-                  ),
-                ),
-              ),
-            if (_isLoading)
-              const SliverPadding(
-                padding: EdgeInsets.all(16.0),
-                sliver: SliverToBoxAdapter(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-              ),
-          ],
-        ),
+    return GridView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: Responsive.isDesktop(context) ? 3 : 2,
+        crossAxisSpacing: 10.0,
+        mainAxisSpacing: 10.0,
+        childAspectRatio: 1.0,
       ),
+      itemCount: _isLoading ? recipes.length + 1 : recipes.length,
+      itemBuilder: (context, index) {
+        if (_isLoading && index >= recipes.length) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ShimmerCustomProfileRecipeCard(),
+          );
+        }
+        final recipe = recipes[index];
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: InkWell(
+            hoverColor: Colors.transparent,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RecipeDetailPage(
+                    recipe: recipe,
+                    internalUse: Constants.emptyField,
+                    missingIngredients: const [],
+                  ),
+                ),
+              );
+            },
+            child: CustomProfileRecipeCard(
+              internalUse: '',
+              recipe: recipe,
+            ),
+          ),
+        );
+      },
     );
   }
 }

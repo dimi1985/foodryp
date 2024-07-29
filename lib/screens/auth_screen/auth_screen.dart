@@ -128,7 +128,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     children: [
                       // Logo or App Name
                       Image.asset(
-                        'assets/foodryp_logo.png',
+                        'assets/logo.png',
                         height: isAndroid ? 200 : 300,
                         width: isAndroid ? 200 : 300,
                       ),
